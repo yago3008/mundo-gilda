@@ -45,6 +45,8 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 - **URLs:** produtos continuam em `/product-page/<slug>`, como no Wix (requisito 11.3). As outras URLs antigas (`/category/all-products`, `/cart-page`, slugs com acento, etc.) têm redirecionamento 301.
 - **Frete (Correios Automático):** PAC e SEDEX com cotação real a partir de Curitiba (CEP 82015-384), mais 2 dias de postagem. Aparece no simulador da página do produto (com "Não sei meu CEP"), no carrinho e no checkout. Também cria a página "Rastrear encomenda". Funciona sem contrato. Se a GILDA; tiver contrato com os Correios, é só ligar "Contrato próprio" no painel do plugin: os métodos continuam os mesmos.
 - **Botão "Comprar"** na página do produto: adiciona e vai direto pro checkout (5.9).
+- **Avise-me quando chegar:** tamanho/cor esgotada mostra um formulário de e-mail; quando o estoque volta, a pessoa recebe um e-mail (configurável em WooCommerce → Configurações → E-mails) e sai da lista. As donas veem quantas pessoas esperam cada tamanho em **WooCommerce → Avise-me**. Tem link de cancelamento e limpeza automática (LGPD).
+- **"Restam só N"** quando o estoque da peça está no limite (padrão 2, em WooCommerce → Configurações → Produtos → Inventário).
 - **Filtros da loja** por categoria, cor, tamanho e preço, via URL (`?filter_cor=marrom`, `?min_price=…`). Cada cor tem o código hex salvo para as bolinhas de cor. Detalhes em [backend-para-frontend.md](docs/development/backend-para-frontend.md).
 - **SEO:** meta description (editável por página/produto/categoria), Open Graph para prévia no WhatsApp/Instagram, sitemap sem páginas de sistema nem usuários, schema de Produto. Fora de produção nada é indexado.
 - **Segurança:** bloqueio após 5 logins errados, sem XML-RPC, sem expor usuários (inclusive na recuperação de senha), cabeçalhos de segurança, editor de código do painel desligado. O servidor bloqueia arquivos de versão, logs e backups, e PHP em uploads não executa (`config/apache`, `config/php`). Bateria de testes: `./scripts/security-check.sh [url]`. Resultado atual no local: 78 PASS, 0 FAIL.
@@ -84,6 +86,8 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-buy-now.php               # botão "Comprar" → checkout (5.9)
   gilda-seo.php                   # meta description, Open Graph, sitemap limpo, noindex fora de produção (11.3)
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
+  gilda-stock-alerts.php (+ pasta) # "avise-me quando chegar": formulário, lista de espera, e-mail de volta ao estoque
+  gilda-low-stock.php             # "Restam só N" (últimas unidades)
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
 scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)
 scripts/restore.sh          # restaura um backup

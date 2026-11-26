@@ -56,6 +56,84 @@ Links antigos do Wix (`/product-page/...` com acento, `/category/all-products`, 
 - Pra posicionar em outro lugar do template: shortcode **`[infixs_correios_automatico_calculator]`**. A posição automática e as cores também podem ser mudadas no painel: WooCommerce → Correios Automático → Configurações.
 - Resultado: PAC e SEDEX com preço e prazo.
 
+## 3.1 Avise-me e últimas unidades
+
+Dois mu-plugins: `gilda-stock-alerts.php` (código em `gilda-stock-alerts/`) e `gilda-low-stock.php`. Os dois já funcionam e entregam marcação **sem estilo nenhum**: o visual é seu.
+
+### "Avise-me quando chegar"
+
+Quando a cor/tamanho escolhida (ou o produto simples) está esgotada, aparece um formulário de e-mail. Quando o estoque volta, cada pessoa recebe **um** e-mail com o link da peça (já com cor e tamanho selecionados) e sai da lista.
+
+**Onde aparece**
+- **Produto variável:** dentro do `form.variations_form`, em `.single_variation_wrap`, **entre** a disponibilidade (`.woocommerce-variation`) e o botão de compra (`.woocommerce-variation-add-to-cart`). Começa com `hidden`. O JS do plugin tira o `hidden` no `found_variation` quando `is_in_stock` é falso e põe de volta no `reset_data` / `hide_variation` / variação disponível. O botão "Adicionar ao carrinho" continua lá, desabilitado pelo WooCommerce (classe `disabled wc-variation-is-unavailable`); se quiser escondê-lo enquanto o avise-me aparece, use `.single_variation_wrap:has(.gilda-notify:not([hidden])) .woocommerce-variation-add-to-cart`.
+  - Formulário dentro de formulário não é HTML válido. Por isso os campos ficam no variations_form, mas apontam (atributo `form="gilda-notify-form-<id>"`) para um `<form id="gilda-notify-form-<id>" class="gilda-notify__form">` **vazio** impresso logo depois do variations_form. Não mova os campos para fora sem manter esse atributo.
+- **Produto simples esgotado:** o `<form class="gilda-notify__form">` com o bloco dentro, já visível, logo depois do bloco "Adicionar ao carrinho" (onde o tema mostra o botão "Esgotado").
+- Pra colocar em outro lugar: `echo gilda_stock_alert_form( $product );` (imprime só uma vez por produto).
+
+**Marcação**
+```html
+<div class="gilda-notify gilda-notify--variation" id="gilda-notify-33" data-product-id="33" data-form-id="gilda-notify-form-33" hidden>
+  <p class="gilda-notify__title">Esgotado. Quer saber quando voltar?</p>
+  <p class="gilda-notify__text">Deixe seu e-mail e avisamos assim que <span class="gilda-notify__variation">Marrom / M</span> chegar.</p>
+  <div class="gilda-notify__fields">
+    <label class="gilda-notify__label" for="gilda-notify-email-33">Seu e-mail</label>
+    <input class="gilda-notify__email" type="email" name="email" required …>
+    <label class="gilda-notify__consent"><input class="gilda-notify__consent-input" type="checkbox" required …> <span>Quero receber um único e-mail…</span></label>
+    <span class="gilda-notify__hp" aria-hidden="true" style="position:absolute;left:-10000px…">…</span> <!-- anti-robô: não mostre -->
+    <button type="submit" class="gilda-notify__submit button wp-element-button">Avise-me</button>
+  </div>
+  <p class="gilda-notify__message" role="status" aria-live="polite" hidden></p>
+</div>
+```
+
+| Classe / estado | Quando |
+|---|---|
+| `.gilda-notify--variation` / `.gilda-notify--simple` | tipo de produto |
+| `[hidden]` | variação disponível ou nenhuma escolhida |
+| `.gilda-notify__variation` | texto da combinação escolhida ("Marrom / M"); "este item" no simples |
+| `.is-loading` (no `.gilda-notify`) + `aria-busy` no botão | enviando |
+| `.is-done` (no `.gilda-notify`) | inscrição feita (dá pra esconder `.gilda-notify__fields`) |
+| `.gilda-notify__message.is-success` / `.is-error` | resposta do servidor (texto já pronto, em português) |
+
+Eventos JS disparados no `.gilda-notify` (borbulham): `gilda:notify-show` (`detail.variation`), `gilda:notify-hide`, `gilda:notify-success` e `gilda:notify-error` (`detail.code`, `detail.message`).
+
+Dado nas variações (`data-product_variations` e `found_variation`): `gilda_stock_alert: true` quando aquela variação aceita aviso (está esgotada). Serve, por exemplo, pra marcar o tamanho esgotado com um sininho no seletor (5.6).
+
+Sem JavaScript o formulário do produto simples também funciona: posta em `admin-post.php` e volta pra página com `?gilda_stock_alert=<código>#gilda-notify-<id>`, e a mensagem já vem renderizada.
+
+**Regras (backend):** nonce, campo-isca anti-robô, consentimento obrigatório, até 10 tentativas por hora por IP, até 20 avisos pendentes por e-mail, só aceita item que esteja de fato esgotado e o mesmo e-mail na mesma variação não duplica (a resposta é "ok" do mesmo jeito, pra não revelar quem já está na lista).
+
+**E-mail:** WooCommerce → Configurações → E-mails → **"Avise-me: voltou ao estoque"** (ligar/desligar, assunto, título, texto adicional, HTML/texto). Usa o cabeçalho/rodapé/cores dos outros e-mails da loja. Template sobrescrevível no tema: `gilda/woocommerce/emails/gilda-back-in-stock.php` (e `plain/gilda-back-in-stock.php`); as variáveis estão documentadas no topo do template original em `wp-content/mu-plugins/gilda-stock-alerts/templates/emails/`.
+
+**Cancelamento (LGPD):** o e-mail traz um link "Apagar meu e-mail desta lista". Ele abre uma página de confirmação (`wp_die`, sem o tema) e o botão apaga o registro. Pedir confirmação evita que antivírus de e-mail, que "clicam" nos links, cancelem sozinhos. Também há exportação e exclusão pelas ferramentas de privacidade do WordPress (Ferramentas → Exportar/Apagar dados pessoais). Limpeza automática diária: avisos enviados somem depois de 30 dias e pedidos nunca atendidos depois de 180.
+
+**Pras donas:** **WooCommerce → Avise-me** mostra quantas pessoas esperam cada produto/cor/tamanho, o estoque atual e o pedido mais antigo. Clicando no produto aparecem os e-mails, com "Apagar" e, se o item já voltou, "Enviar avisos agora".
+
+**Hooks (PHP)**
+| Hook | Tipo | Uso |
+|---|---|---|
+| `gilda_stock_alerts_supports( bool, $product )` | filtro | desligar o avise-me em algum produto |
+| `gilda_stock_alerts_rate_limit( 10 )` | filtro | tentativas por hora por IP |
+| `gilda_stock_alerts_retention_sent_days( 30 )` / `gilda_stock_alerts_retention_pending_days( 180 )` | filtro | prazos da limpeza |
+| `gilda_stock_alert_subscribed( $id, $product_id, $variation_id, $email )` | ação | depois de uma inscrição |
+| `gilda_stock_alert_cancelled( $alert )` | ação | depois de um cancelamento pelo link |
+| `gilda_stock_alerts_batch_sent( $id, $sent )` | ação | depois de cada lote de e-mails |
+
+**Como funciona o envio:** quando o status de estoque de um produto simples ou variação muda para "em estoque" (`woocommerce_product_set_stock_status` / `woocommerce_variation_set_stock_status`), o plugin agenda uma tarefa no Action Scheduler (`gilda_stock_alerts_send`, grupo `gilda`). Ela confere se ainda está em estoque e manda em lotes de 50. Assim, salvar o produto no admin não fica lento. Em produção o Action Scheduler roda pelo cron do servidor a cada 5 minutos ([deploy.md](deploy.md), seção 5), então o e-mail sai em até ~5 minutos depois da reposição. Localmente dá pra forçar com `docker compose run --rm wpcli wp action-scheduler run --hooks=gilda_stock_alerts_send`.
+
+### "Restam só N"
+
+Quando o estoque de um produto simples ou da variação escolhida está **entre 1 e o limite** (padrão **2**; WooCommerce → Configurações → Produtos → Inventário → "Últimas unidades (vitrine)"; 0 desliga), o "Em estoque" do WooCommerce vira:
+
+```html
+<p class="stock in-stock gilda-low-stock" data-gilda-low-stock="1">Resta só 1</p>
+```
+
+- **Produto variável:** vem no `availability_html` da variação, que o WooCommerce já coloca em `.woocommerce-variation-availability` quando a cor/tamanho é escolhida. Nada a fazer além do CSS de `.gilda-low-stock`.
+- **Produto simples:** no lugar do aviso de estoque, dentro do formulário de compra.
+- **Dado:** `gilda_low_stock` (número ou `null`) em cada variação do `data-product_variations` / `found_variation`; na Store API, `extensions.gilda.low_stock` em `/wp-json/wc/store/v1/products/<id>` (útil para cards da loja). Em PHP: `gilda_low_stock_qty( $product )` (int|null) e `gilda_low_stock_html( $product )`.
+- Texto alterável pelo filtro `gilda_low_stock_text( $text, $qty, $product )`; limite também pelo filtro `gilda_low_stock_threshold`.
+
 ## 4. Loja e filtros (Epic 4)
 
 Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommerce ("Product Filters") já leem e escrevem esses parâmetros:
