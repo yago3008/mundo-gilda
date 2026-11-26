@@ -45,6 +45,18 @@ function gilda_enqueue_assets() {
 		)
 	);
 
+	// Clique nos cards de categoria: a tela "entra" no nome do card (pattern gilda/categories).
+	wp_enqueue_script(
+		'gilda-category-zoom',
+		GILDA_URI . '/assets/js/category-zoom.js',
+		array(),
+		GILDA_VERSION . '.' . filemtime( GILDA_DIR . '/assets/js/category-zoom.js' ),
+		array(
+			'in_footer' => true,
+			'strategy'  => 'defer',
+		)
+	);
+
 	$wc = function_exists( 'WC' );
 
 	wp_localize_script(
