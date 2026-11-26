@@ -11,11 +11,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
-// Botão ao lado do "Adicionar ao carrinho".
+// Botão ao lado do "Adicionar ao carrinho" — só se o tema não desenhar o dele
+// (o tema "gilda" tem gilda_buy_now_button(); o redirect abaixo continua valendo para os dois).
 add_action(
 	'woocommerce_after_add_to_cart_button',
 	static function () {
 		global $product;
+		if ( has_action( 'woocommerce_after_add_to_cart_button', 'gilda_buy_now_button' ) ) {
+			return;
+		}
 		if ( ! $product instanceof WC_Product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
 			return;
 		}

@@ -46,7 +46,7 @@ Links antigos do Wix (`/product-page/...` com acento, `/category/all-products`, 
 
 **Botões de compra (5.8 e 5.9)**
 - "Adicionar ao carrinho": padrão do WooCommerce.
-- **"Comprar"**: já existe (`gilda-buy-now.php`). É um `<button type="submit" name="gilda_buy_now" value="1" class="gilda-buy-now single_add_to_cart_button button alt">` dentro do formulário de compra. Ele valida cor e tamanho como o outro botão e leva direto pro checkout.
+- **"Comprar"**: já existe (`gilda-buy-now.php`). Se o tema registrar `gilda_buy_now_button()` em `woocommerce_after_add_to_cart_button` (como o tema `gilda` faz hoje), o mu-plugin **não desenha** o botão dele, só cuida do redirecionamento, pra não aparecerem dois. O botão do mu-plugin é assim: É um `<button type="submit" name="gilda_buy_now" value="1" class="gilda-buy-now single_add_to_cart_button button alt">` dentro do formulário de compra. Ele valida cor e tamanho como o outro botão e leva direto pro checkout.
   - Pra estilizar: `.gilda-buy-now`. Pela hierarquia do design system, Comprar é sólido e Adicionar é contorno.
   - Pra usar fora do formulário: um link com `?gilda_buy_now=1&add-to-cart=<id_variacao>&quantity=1`.
 - Enquanto cor e tamanho não forem escolhidos, os dois botões recebem a classe `disabled wc-variation-selection-needed` (pra estilizar o estado desabilitado).
