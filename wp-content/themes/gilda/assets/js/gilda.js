@@ -740,7 +740,7 @@
 			const visual = document.createElement( 'aside' );
 			visual.className = 'gilda-account-auth__visual';
 			visual.setAttribute( 'aria-hidden', 'true' );
-			const productImages = Array.isArray( S.accountImages ) ? S.accountImages.slice( 0, 4 ) : [];
+			const productImages = Array.isArray( S.accountImages ) ? S.accountImages.slice( 0, 6 ) : [];
 			if ( productImages.length ) {
 				const frame = document.createElement( 'div' );
 				frame.className = 'gilda-account-auth__frame';

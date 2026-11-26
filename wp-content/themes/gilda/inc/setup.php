@@ -59,7 +59,17 @@ function gilda_enqueue_assets() {
 
 	$wc = function_exists( 'WC' );
 	$account_images = array();
-	if ( $wc && function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'wc_get_products' ) ) {
+	// Fotos do carrossel do login/cadastro: as versões em alta de data/site-images.json (account_carousel).
+	// Sem elas importadas, usa a foto principal dos produtos.
+	if ( function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'gilda_image' ) ) {
+		foreach ( (array) gilda_image( 'account_carousel' ) as $carousel_id ) {
+			$image_url = wp_get_attachment_image_url( $carousel_id, 'full' );
+			if ( $image_url ) {
+				$account_images[] = esc_url_raw( $image_url );
+			}
+		}
+	}
+	if ( ! $account_images && $wc && function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'wc_get_products' ) ) {
 		$account_products = wc_get_products(
 			array(
 				'limit'   => 8,

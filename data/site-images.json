@@ -115,6 +115,17 @@
       "url": "https://images.unsplash.com/photo-1776589583473-99a395c74c68?w=2400&q=80&fm=jpg&dl=gilda-voce-conta-a-historia.jpg",
       "alt": "Parede coberta de livros e papéis antigos abertos",
       "note": "Banner 'DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA' (encerramento do Quem Cria / carrinho vazio). Substitui o túnel de livros do Wix. Foto de Jimmy Liu no Unsplash (https://unsplash.com/photos/oiecraZK5Bs), Licença Unsplash: uso comercial livre, crédito opcional. Versão 2400px (~0,8 MB); o original tem 8,6 MB."
+    },
+    "account_carousel": {
+      "alt": "Peças GILDA; vestidas: Camisa Grão e camisa Café",
+      "note": "Carrossel do login/cadastro (Minha conta). Mesmos arquivos de hero/category_camisas/chapter_3: o import reaproveita a mídia, não duplica.",
+      "urls": [
+        "file:images/hero-camisa-grao-cadeira.webp",
+        "file:images/camisa-grao-corpo-inteiro.webp",
+        "file:images/camisa-cafe-flor.webp",
+        "file:images/camisas-punho-bolso.webp",
+        "file:images/camisa-cafe-punho.webp"
+      ]
     }
   }
 }

@@ -1657,6 +1657,14 @@ body.gilda-account-auth-page .gilda-account-auth .gilda-account-tab-panel h2 {
 	font: 400 clamp(30px, 3vw, 38px)/1.15 var(--gilda-display);
 	margin: 0 0 28px;
 }
+/* "Entrar;" e "Cadastre-se;" com o ponto e vírgula da marca */
+.woocommerce-account .u-columns.col2-set > .u-column1 > h2::after,
+.woocommerce-account .u-columns.col2-set > .u-column2 > h2::after { content: ";"; }
+/* Sem asterisco de obrigatório no login, cadastro e recuperação de senha
+   (o asterisco já é aria-hidden; os campos continuam com required/aria-required). */
+.woocommerce-form-login .required,
+.woocommerce-form-register .required,
+.woocommerce-ResetPassword .required { display: none; }
 body.gilda-account-auth-page .gilda-account-tab-panel form.login,
 body.gilda-account-auth-page .gilda-account-tab-panel form.register { box-sizing: border-box; margin: 0 !important; max-width: none; min-width: 0; padding: 0 !important; width: 100%; }
 body.gilda-account-auth-page .gilda-account-tab-panel .form-row { box-sizing: border-box; clear: both; float: none; min-width: 0; width: 100%; }
