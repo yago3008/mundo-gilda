@@ -34,6 +34,7 @@ Atualizado em 26/11/2026.
 | 16 | Apps do Wix que talvez estejam em uso | 🟢 | 🖥️ Wix |
 | 17 | Carrossel da home | 🟢 | Decisão delas |
 | 18 | Conteúdo das páginas institucionais | 🟢 | Elas |
+| 19 | Arquivos originais do Instagram (fotos, vídeos, ilustrações) | 🟡 | Elas / fotógrafo |
 
 ---
 
@@ -237,6 +238,30 @@ O conteúdo atual (Quem Cria, Capítulos / Livro GILDA;) pode ser reaproveitado.
 - [ ] Querem revisar ou atualizar os textos?
 - [ ] Logo em arquivo vetorial (SVG ou PDF) e a borboleta 88.
 - [ ] Fontes da marca (se tiverem as licenças).
+
+---
+
+## 19. Arquivos originais do Instagram (fotos, vídeos e ilustrações) 🟡
+
+O Instagram delas ([@gildapontoevirgula](https://www.instagram.com/gildapontoevirgula/)) tem material ótimo pro site. Mas o Instagram reduz tudo (fotos até 1080 px, vídeos em 720 px). Algumas fotos que vieram do Wix já estão em baixa resolução, e a gente teve que trocar fotos principais por isso. Então o pedido é dos **arquivos originais**, em vez de baixar do Instagram:
+
+**Vídeos (originais em melhor resolução, sem a música do Instagram se possível)**
+- [ ] **"Ritual Brasileiro. Vista o seu próprio capítulo."** (8/nov): livro com marcador GILDA; e café. Seria usado em loop, sem som, na história do Capítulo 3.
+- [ ] **"A peça que você vê. Os detalhes que fazem você querer vestir."** (27/set) e **"Camisa GRÃO; A camisa que transforma o básico em especial"** (21/set). Seriam vídeos curtos na página da Camisa Grão e da Calça Torra.
+- [ ] **"Clara mostra como a Calça Torra pode ganhar novas versões"** (20/out). Seria um bloco "Como usar" na página da Calça Torra.
+- [ ] **"Um novo capítulo, escrito à sua maneira. Em breve."** (22/nov). Perguntar o que é: próximo capítulo? vale-presente? Dá pra preparar a página.
+
+**Fotos**
+- [ ] **Camisa Grão em still** (a peça sozinha sobre fundo marrom, carrossel de 15/set). Seria a foto principal do produto na loja.
+- [ ] Ensaio completo do **Ritual Brasileiro** em alta (as fotos do Capítulo 3 no Wix têm só 1023 px).
+- [ ] Carrossel **"O café começa em flor"** (9/set) e a foto em preto e branco (13/set).
+- [ ] Fotos de produto de todas as peças (frente, costas, detalhe), se existirem.
+
+**Ilustrações**
+- [ ] Os desenhos dos destaques ("elas usam", "sobre nós", calças, camisas, lenços, bermudas), **em vetor (SVG/PDF/AI) ou PNG grande com fundo transparente**. Seriam ícones das categorias no menu e nos filtros, e a ilustração das criadoras entraria na Quem Cria.
+
+**Autorização**
+- [ ] Ok para usar no site as fotos de quem aparece nos posts (modelos e a própria Clara), e o crédito do fotógrafo, se precisar.
 
 ---
 
