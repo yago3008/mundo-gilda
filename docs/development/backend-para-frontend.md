@@ -70,38 +70,48 @@ Quando a cor/tamanho escolhida (ou o produto simples) está esgotada, aparece um
 - **Produto simples esgotado:** o `<form class="gilda-notify__form">` com o bloco dentro, já visível, logo depois do bloco "Adicionar ao carrinho" (onde o tema mostra o botão "Esgotado").
 - Pra colocar em outro lugar: `echo gilda_stock_alert_form( $product );` (imprime só uma vez por produto).
 
-**Marcação**
+**Marcação** (o plugin já traz o estilo em `gilda-stock-alerts/assets/stock-alerts.css`, com as cores da paleta)
+
+- **Logado** (`.gilda-notify--member`): um botão só, que manda o aviso para o e-mail da conta, e a nota "Vamos avisar em …".
+- **Sem login** (`.gilda-notify--guest`): o botão abre um `<dialog class="gilda-notify-modal">` marrom que só pede o e-mail.
+- O consentimento é o próprio pedido: o texto diz que o e-mail serve só para este aviso e linka a política; vai `consent=1` escondido.
+
 ```html
-<div class="gilda-notify gilda-notify--variation" id="gilda-notify-33" data-product-id="33" data-form-id="gilda-notify-form-33" hidden>
-  <p class="gilda-notify__title">Esgotado. Quer saber quando voltar?</p>
-  <p class="gilda-notify__text">Deixe seu e-mail e avisamos assim que <span class="gilda-notify__variation">Marrom / M</span> chegar.</p>
-  <div class="gilda-notify__fields">
-    <label class="gilda-notify__label" for="gilda-notify-email-33">Seu e-mail</label>
-    <input class="gilda-notify__email" type="email" name="email" required …>
-    <label class="gilda-notify__consent"><input class="gilda-notify__consent-input" type="checkbox" required …> <span>Quero receber um único e-mail…</span></label>
-    <span class="gilda-notify__hp" aria-hidden="true" style="position:absolute;left:-10000px…">…</span> <!-- anti-robô: não mostre -->
-    <button type="submit" class="gilda-notify__submit button wp-element-button">Avise-me</button>
-  </div>
-  <p class="gilda-notify__message" role="status" aria-live="polite" hidden></p>
+<div class="gilda-notify gilda-notify--variation gilda-notify--guest" id="gilda-notify-33" data-product-id="33" data-form-id="gilda-notify-form-33" hidden>
+  <p class="gilda-notify__title">Esgotado. <span class="gilda-notify__text">Quer saber quando <span class="gilda-notify__variation">Marrom / M</span> voltar?</span></p>
+  <span class="gilda-notify__hp" aria-hidden="true" …>…</span> <!-- anti-robô: não mostre -->
+  <input type="hidden" name="action|product_id|variation_id|consent|_gilda_nonce" …>
+  <!-- logado: <input type="hidden" name="email"> + <button type="submit" class="gilda-notify__submit gilda-notify__open"> + <p class="gilda-notify__note"> -->
+  <button type="button" class="gilda-notify__open" aria-haspopup="dialog">Avise-me quando chegar</button>
+  <dialog class="gilda-notify-modal">
+    <button class="gilda-notify-modal__close" data-gilda-notify-close>×</button>
+    <p class="gilda-notify-modal__title">Avise-me</p>
+    <p class="gilda-notify-modal__text">Deixe seu e-mail e avisamos quando <span class="gilda-notify__variation">Marrom / M</span> voltar.</p>
+    <div class="gilda-notify-modal__row"><input class="gilda-notify__email" type="email" name="email" required …><button type="submit" class="gilda-notify__submit">Avisar</button></div>
+    <p class="gilda-notify__message" role="status" hidden></p> <!-- erro fica aqui, no modal -->
+    <p class="gilda-notify-modal__privacy">Usamos seu e-mail só para este aviso (política de privacidade).</p>
+  </dialog>
+  <p class="gilda-notify__message gilda-notify__message--inline" role="status" hidden></p> <!-- "Pronto!" -->
 </div>
 ```
 
 | Classe / estado | Quando |
 |---|---|
 | `.gilda-notify--variation` / `.gilda-notify--simple` | tipo de produto |
+| `.gilda-notify--member` / `.gilda-notify--guest` | logado (envia direto) / sem login (abre o modal) |
 | `[hidden]` | variação disponível ou nenhuma escolhida |
 | `.gilda-notify__variation` | texto da combinação escolhida ("Marrom / M"); "este item" no simples |
 | `.is-loading` (no `.gilda-notify`) + `aria-busy` no botão | enviando |
-| `.is-done` (no `.gilda-notify`) | inscrição feita (dá pra esconder `.gilda-notify__fields`) |
+| `.is-done` (no `.gilda-notify`) | inscrição feita (o CSS esconde o botão e deixa só a confirmação) |
 | `.gilda-notify__message.is-success` / `.is-error` | resposta do servidor (texto já pronto, em português) |
 
 Eventos JS disparados no `.gilda-notify` (borbulham): `gilda:notify-show` (`detail.variation`), `gilda:notify-hide`, `gilda:notify-success` e `gilda:notify-error` (`detail.code`, `detail.message`).
 
 Dado nas variações (`data-product_variations` e `found_variation`): `gilda_stock_alert: true` quando aquela variação aceita aviso (está esgotada). Serve, por exemplo, pra marcar o tamanho esgotado com um sininho no seletor (5.6).
 
-Sem JavaScript o formulário do produto simples também funciona: posta em `admin-post.php` e volta pra página com `?gilda_stock_alert=<código>#gilda-notify-<id>`, e a mensagem já vem renderizada.
+Sem JavaScript, logado, o produto simples também funciona: posta em `admin-post.php` e volta pra página com `?gilda_stock_alert=<código>#gilda-notify-<id>`, e a mensagem já vem renderizada. Sem login o modal precisa de JavaScript.
 
-**Regras (backend):** nonce, campo-isca anti-robô, consentimento obrigatório, até 10 tentativas por hora por IP, até 20 avisos pendentes por e-mail, só aceita item que esteja de fato esgotado e o mesmo e-mail na mesma variação não duplica (a resposta é "ok" do mesmo jeito, pra não revelar quem já está na lista).
+**Regras (backend):** nonce, campo-isca anti-robô, consentimento (enviado pelo próprio botão), até 10 tentativas por hora por IP, até 20 avisos pendentes por e-mail, só aceita item que esteja de fato esgotado e o mesmo e-mail na mesma variação não duplica (a resposta é "ok" do mesmo jeito, pra não revelar quem já está na lista).
 
 **E-mail:** WooCommerce → Configurações → E-mails → **"Avise-me: voltou ao estoque"** (ligar/desligar, assunto, título, texto adicional, HTML/texto). Usa o cabeçalho/rodapé/cores dos outros e-mails da loja. Template sobrescrevível no tema: `gilda/woocommerce/emails/gilda-back-in-stock.php` (e `plain/gilda-back-in-stock.php`); as variáveis estão documentadas no topo do template original em `wp-content/mu-plugins/gilda-stock-alerts/templates/emails/`.
 
@@ -170,6 +180,7 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 - **SEO:** a meta description, as tags Open Graph/Twitter e o noindex já são gerados por `gilda-seo.php`. O schema de Produto, Oferta e Breadcrumb vem do WooCommerce. O tema só precisa declarar `title-tag` (temas de blocos já fazem isso) e usar a hierarquia certa de headings (H1 único por página).
 - **Meta Pixel:** `gilda-meta-pixel.php` já dispara PageView, ViewContent, AddToCart, InitiateCheckout e Purchase, **só depois do consentimento de marketing** (seção 6.2). O tema não deve incluir o pixel de novo, nem nenhum outro script de rastreamento sem passar pelo `gildaConsent`.
 - **Banner de cookies:** já existe (seção 6.2). O tema só estiliza e coloca o link de reabrir no rodapé.
+- **Cache do catálogo:** `gilda-catalog-cache.php` guarda por 3 dias o HTML da loja e dos filtros (`?tipo=`, `?capitulo=`, cor, tamanho) para quem está sem login e com o carrinho vazio, então o catálogo abre na hora depois do zoom dos cards. Ele limpa sozinho quando produto, estoque ou categoria muda, ou quando `gilda.js`/`theme.css` mudam. Para conferir, o cabeçalho é `X-Gilda-Cache: HIT/MISS`; para limpar à mão, `wp eval 'gilda_catalog_cache_flush();'`; para desligar, `GILDA_CATALOG_CACHE=0`. Não coloque nada pessoal (nome, carrinho) no HTML do catálogo: o mesmo HTML vai para todos os visitantes sem login.
 - **Cabeçalhos de segurança:** já existem. Se o tema carregar fontes ou scripts de outro domínio, tudo bem: não há Content Security Policy restritiva.
 
 ## 6.2 Banner de cookies (LGPD)

@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'GILDA_STOCK_ALERTS_DIR', __DIR__ . '/gilda-stock-alerts/' );
 define( 'GILDA_STOCK_ALERTS_URL', plugins_url( 'gilda-stock-alerts/', __FILE__ ) );
-const GILDA_STOCK_ALERTS_VERSION = '1.0.0';
+const GILDA_STOCK_ALERTS_VERSION = '1.1.1';
 
 require GILDA_STOCK_ALERTS_DIR . 'store.php';
 require GILDA_STOCK_ALERTS_DIR . 'frontend.php';

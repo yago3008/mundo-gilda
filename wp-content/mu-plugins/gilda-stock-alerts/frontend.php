@@ -51,7 +51,12 @@ function gilda_stock_alerts_messages(): array {
 }
 
 /**
- * HTML do formulário.
+ * HTML do avise-me.
+ *
+ * Logado: um botão só, que manda o pedido para o e-mail da conta.
+ * Sem login: o botão abre um modal simples (marrom) que só pede o e-mail.
+ * O consentimento é o próprio pedido (o texto diz para que o e-mail serve e linka a política);
+ * por isso vai consent=1 escondido.
  *
  * @param WC_Product $product  Produto (simples ou variável).
  * @param bool       $detached Campos ficam dentro de outro form (variável): usa form="…" e começa escondido.
@@ -61,7 +66,7 @@ function gilda_stock_alerts_fields_html( WC_Product $product, bool $detached ): 
 	$form_id = 'gilda-notify-form-' . $pid;
 	$f       = $detached ? ' form="' . esc_attr( $form_id ) . '"' : '';
 	$user    = wp_get_current_user();
-	$email   = $user && $user->exists() ? $user->user_email : '';
+	$email   = $user && $user->exists() ? (string) $user->user_email : '';
 	$privacy = get_privacy_policy_url();
 
 	// Retorno do envio sem JavaScript (?gilda_stock_alert=<código>).
@@ -69,42 +74,60 @@ function gilda_stock_alerts_fields_html( WC_Product $product, bool $detached ): 
 	$messages = gilda_stock_alerts_messages();
 	$message  = isset( $messages[ $result ] ) && ( empty( $_GET['gilda_stock_alert_product'] ) || (int) $_GET['gilda_stock_alert_product'] === $pid ) ? $messages[ $result ] : ''; // phpcs:ignore WordPress.Security.NonceVerification
 
-	$consent = $privacy
+	$privacy_note = $privacy
 		? sprintf(
 			/* translators: %s: link para a política de privacidade */
-			__( 'Quero receber um único e-mail quando este item voltar ao estoque. Meu e-mail só será usado para isso (%s).', 'gilda' ),
+			__( 'Usamos seu e-mail só para este aviso (%s).', 'gilda' ),
 			'<a href="' . esc_url( $privacy ) . '" target="_blank" rel="noopener">' . esc_html__( 'política de privacidade', 'gilda' ) . '</a>'
 		)
-		: esc_html__( 'Quero receber um único e-mail quando este item voltar ao estoque. Meu e-mail só será usado para isso.', 'gilda' );
+		: esc_html__( 'Usamos seu e-mail só para este aviso.', 'gilda' );
+	$kses = array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) );
 
-	$classes = 'gilda-notify' . ( $detached ? ' gilda-notify--variation' : ' gilda-notify--simple' ) . ( 'ok' === $result && $message ? ' is-done' : '' );
+	$classes = 'gilda-notify' . ( $detached ? ' gilda-notify--variation' : ' gilda-notify--simple' ) . ( $email ? ' gilda-notify--member' : ' gilda-notify--guest' ) . ( 'ok' === $result && $message ? ' is-done' : '' );
+	$label   = '<span class="gilda-notify__variation" data-default="' . esc_attr__( 'este item', 'gilda' ) . '">' . esc_html__( 'este item', 'gilda' ) . '</span>';
 
 	ob_start();
 	?>
 	<div class="<?php echo esc_attr( $classes ); ?>" id="gilda-notify-<?php echo esc_attr( $pid ); ?>" data-product-id="<?php echo esc_attr( $pid ); ?>" data-form-id="<?php echo esc_attr( $form_id ); ?>"<?php echo $detached && ! $message ? ' hidden' : ''; ?>>
-		<p class="gilda-notify__title"><?php esc_html_e( 'Esgotado. Quer saber quando voltar?', 'gilda' ); ?></p>
-		<p class="gilda-notify__text">
-			<?php esc_html_e( 'Deixe seu e-mail e avisamos assim que', 'gilda' ); ?>
-			<span class="gilda-notify__variation" data-default="<?php esc_attr_e( 'este item', 'gilda' ); ?>"><?php esc_html_e( 'este item', 'gilda' ); ?></span>
-			<?php esc_html_e( 'chegar.', 'gilda' ); ?>
+		<p class="gilda-notify__title">
+			<?php esc_html_e( 'Esgotado.', 'gilda' ); ?>
+			<span class="gilda-notify__text"><?php echo wp_kses_post( sprintf( /* translators: %s: variação (ex.: Marrom / M) */ __( 'Quer saber quando %s voltar?', 'gilda' ), $label ) ); ?></span>
 		</p>
-		<div class="gilda-notify__fields">
-			<label class="gilda-notify__label" for="gilda-notify-email-<?php echo esc_attr( $pid ); ?>"><?php esc_html_e( 'Seu e-mail', 'gilda' ); ?></label>
-			<input class="gilda-notify__email" type="email" name="email" id="gilda-notify-email-<?php echo esc_attr( $pid ); ?>" value="<?php echo esc_attr( $email ); ?>" autocomplete="email" inputmode="email" maxlength="190" required<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<label class="gilda-notify__consent">
-				<input class="gilda-notify__consent-input" type="checkbox" name="consent" value="1" required<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-				<span><?php echo wp_kses( $consent, array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ); ?></span>
-			</label>
-			<span class="gilda-notify__hp" aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
-				<label><?php esc_html_e( 'Deixe em branco', 'gilda' ); ?> <input type="text" name="website" value="" tabindex="-1" autocomplete="off"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>></label>
-			</span>
-			<input type="hidden" name="action" value="gilda_stock_alert"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<input type="hidden" name="product_id" value="<?php echo esc_attr( $pid ); ?>"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<input type="hidden" name="variation_id" value="0" class="gilda-notify__variation-id"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<input type="hidden" name="_gilda_nonce" value="<?php echo esc_attr( wp_create_nonce( GILDA_STOCK_ALERTS_NONCE ) ); ?>"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<button type="submit" class="gilda-notify__submit button wp-element-button"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php esc_html_e( 'Avise-me', 'gilda' ); ?></button>
-		</div>
-		<p class="gilda-notify__message<?php echo $message ? ( 'ok' === $result ? ' is-success' : ' is-error' ) : ''; ?>" role="status" aria-live="polite"<?php echo $message ? '' : ' hidden'; ?>><?php echo esc_html( $message ); ?></p>
+
+		<span class="gilda-notify__hp" aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+			<label><?php esc_html_e( 'Deixe em branco', 'gilda' ); ?> <input type="text" name="website" value="" tabindex="-1" autocomplete="off"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>></label>
+		</span>
+		<input type="hidden" name="action" value="gilda_stock_alert"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+		<input type="hidden" name="product_id" value="<?php echo esc_attr( $pid ); ?>"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+		<input type="hidden" name="variation_id" value="0" class="gilda-notify__variation-id"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+		<input type="hidden" name="consent" value="1"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+		<input type="hidden" name="_gilda_nonce" value="<?php echo esc_attr( wp_create_nonce( GILDA_STOCK_ALERTS_NONCE ) ); ?>"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+
+		<?php if ( $email ) : ?>
+			<input type="hidden" name="email" value="<?php echo esc_attr( $email ); ?>"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+			<button type="submit" class="gilda-notify__submit gilda-notify__open"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php esc_html_e( 'Avise-me quando chegar', 'gilda' ); ?></button>
+			<p class="gilda-notify__note">
+				<?php
+				/* translators: %s: e-mail da conta */
+				echo esc_html( sprintf( __( 'Vamos avisar em %s.', 'gilda' ), $email ) );
+				?>
+			</p>
+		<?php else : ?>
+			<button type="button" class="gilda-notify__open" aria-haspopup="dialog" aria-controls="gilda-notify-dialog-<?php echo esc_attr( $pid ); ?>"><?php esc_html_e( 'Avise-me quando chegar', 'gilda' ); ?></button>
+			<dialog class="gilda-notify-modal" id="gilda-notify-dialog-<?php echo esc_attr( $pid ); ?>" aria-labelledby="gilda-notify-dialog-title-<?php echo esc_attr( $pid ); ?>">
+				<button type="button" class="gilda-notify-modal__close" data-gilda-notify-close aria-label="<?php esc_attr_e( 'Fechar', 'gilda' ); ?>"><span aria-hidden="true">&times;</span></button>
+				<p class="gilda-notify-modal__title" id="gilda-notify-dialog-title-<?php echo esc_attr( $pid ); ?>"><?php esc_html_e( 'Avise-me', 'gilda' ); ?></p>
+				<p class="gilda-notify-modal__text"><?php echo wp_kses_post( sprintf( /* translators: %s: variação */ __( 'Deixe seu e-mail e avisamos quando %s voltar.', 'gilda' ), $label ) ); ?></p>
+				<label class="screen-reader-text" for="gilda-notify-email-<?php echo esc_attr( $pid ); ?>"><?php esc_html_e( 'Seu e-mail', 'gilda' ); ?></label>
+				<div class="gilda-notify-modal__row">
+					<input class="gilda-notify__email" type="email" name="email" id="gilda-notify-email-<?php echo esc_attr( $pid ); ?>" placeholder="<?php esc_attr_e( 'seu@email.com', 'gilda' ); ?>" autocomplete="email" inputmode="email" maxlength="190" required<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+					<button type="submit" class="gilda-notify__submit"<?php echo $f; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php esc_html_e( 'Avisar', 'gilda' ); ?></button>
+				</div>
+				<p class="gilda-notify__message" role="status" aria-live="polite" hidden></p>
+				<p class="gilda-notify-modal__privacy"><?php echo wp_kses( $privacy_note, $kses ); ?></p>
+			</dialog>
+		<?php endif; ?>
+		<p class="gilda-notify__message gilda-notify__message--inline<?php echo $message ? ( 'ok' === $result ? ' is-success' : ' is-error' ) : ''; ?>" role="status" aria-live="polite"<?php echo $message ? '' : ' hidden'; ?>><?php echo esc_html( $message ); ?></p>
 	</div>
 	<?php
 	return (string) ob_get_clean();
@@ -210,6 +233,7 @@ add_action(
 		if ( ! is_product() ) {
 			return;
 		}
+		wp_enqueue_style( 'gilda-stock-alerts', GILDA_STOCK_ALERTS_URL . 'assets/stock-alerts.css', array(), GILDA_STOCK_ALERTS_VERSION );
 		wp_enqueue_script(
 			'gilda-stock-alerts',
 			GILDA_STOCK_ALERTS_URL . 'assets/stock-alerts.js',

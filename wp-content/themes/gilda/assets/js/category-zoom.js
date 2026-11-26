@@ -9,8 +9,9 @@
  *    já na primeira pintura e o zoom entra numa letra revelando o próprio catálogo.
  *    Os dados do quadro passam pelo sessionStorage ('gilda-czoom').
  *
- * Login e cadastro (Minha conta): ao enviar, o "GILDA;" do topo cresce até o centro e, já logado, a página
- * seguinte mergulha no ";", como na abertura do Quem Cria. Se o login falhar, a página volta sem o mergulho.
+ * Login e cadastro (Minha conta): o formulário é enviado em segundo plano; se a resposta já vier logada, o
+ * "GILDA;" do topo cresce até o centro e a página seguinte mergulha no ";", como na abertura do Quem Cria.
+ * Se falhar (senha errada, bloqueio por tentativas), só aparece a mensagem de erro, sem animação.
  *
  * Com "menos movimento" no sistema, ctrl/cmd/shift/clique do meio ou nova aba, o link funciona normal.
  * Sem dependências.
@@ -274,34 +275,78 @@
 		if (ok) e.preventDefault();
 	});
 
-	// Login e cadastro: "GILDA;" do topo → centro; depois do envio, mergulho no ";" já logado.
-	let resubmitting = false;
-	document.addEventListener('submit', (e) => {
-		const form = e.target.closest && e.target.closest(AUTH_FORMS);
-		if (!form || resubmitting || e.defaultPrevented) return;
-		if (overlay) { e.preventDefault(); return; }
-		const brand = document.querySelector('.gilda-account-auth__brand');
-		if (!brand || !brand.getClientRects().length) return; // sem a marca visível, envio normal
-		const submitter = e.submitter;
-		let ok = false;
-		try {
-			ok = play(brand, {
-				zoomInto: 'last',
-				requireLogin: true,
-				go: () => {
-					resubmitting = true;
-					// requestSubmit mantém o botão (o WooCommerce precisa do name="login"/"register" no POST)
-					let leaving = false;
-					window.addEventListener('beforeunload', () => { leaving = true; }, { once: true });
-					if (form.requestSubmit) form.requestSubmit(submitter && submitter.form === form ? submitter : undefined);
-					else form.submit();
-					// Se outro script barrou o envio, a página não sai: tira a tela creme.
-					setTimeout(() => { if (!leaving) { cleanup(); resubmitting = false; } }, 1500);
-				},
-			});
-		} catch (err) {
-			cleanup();
+	// Login e cadastro: o formulário vai antes, em segundo plano. Só se a resposta já vier logada o "GILDA;"
+	// cresce até o centro e a página seguinte mergulha no ";". Se der erro (senha errada, "Muitas tentativas"…),
+	// a mensagem aparece aqui mesmo, sem animação começar e parar no meio.
+	let authBusy = false;
+	const setAuthBusy = (form, button, on) => {
+		form.classList.toggle('is-loading', on);
+		form.setAttribute('aria-busy', on ? 'true' : 'false');
+		if (button) button.disabled = on;
+	};
+	const showAuthNotices = (form, doc) => {
+		const source = Array.from(doc.querySelectorAll('.woocommerce-notices-wrapper')).find((w) => w.textContent.trim())
+			|| doc.querySelector('.woocommerce-error');
+		let target = document.querySelector('.woocommerce-notices-wrapper');
+		if (!target) {
+			target = document.createElement('div');
+			target.className = 'woocommerce-notices-wrapper';
+			form.before(target);
 		}
-		if (ok) e.preventDefault();
+		if (source) {
+			target.innerHTML = source.classList.contains('woocommerce-notices-wrapper') ? source.innerHTML : source.outerHTML;
+		} else {
+			target.innerHTML = '<ul class="woocommerce-error" role="alert"><li>Não deu certo agora. Tente de novo.</li></ul>';
+		}
+		const notice = target.firstElementChild;
+		if (notice) {
+			notice.setAttribute('tabindex', '-1');
+			notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			notice.focus({ preventScroll: true });
+		}
+	};
+	document.addEventListener('submit', async (e) => {
+		const form = e.target.closest && e.target.closest(AUTH_FORMS);
+		if (!form || e.defaultPrevented) return;
+		if (authBusy || overlay) { e.preventDefault(); return; }
+		const brand = document.querySelector('.gilda-account-auth__brand');
+		if (!brand || !brand.getClientRects().length || !window.fetch || !window.DOMParser) return; // envio normal
+		e.preventDefault();
+		authBusy = true;
+		const button = (e.submitter && e.submitter.form === form) ? e.submitter : form.querySelector('[type="submit"][name]');
+		const data = new FormData(form);
+		// o WooCommerce precisa do name="login"/"register" do botão no POST
+		if (button && button.name && !data.has(button.name)) data.append(button.name, button.value);
+		setAuthBusy(form, button, true);
+
+		let res = null;
+		let doc = null;
+		try {
+			res = await fetch(form.action || window.location.href, { method: 'POST', body: data, credentials: 'same-origin' });
+			doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+		} catch (err) {
+			// sem rede/resposta estranha: envio normal, sem animação
+			authBusy = false;
+			setAuthBusy(form, button, false);
+			HTMLFormElement.prototype.submit.call(form);
+			return;
+		}
+
+		if (doc.body && doc.body.classList.contains('logged-in')) {
+			const next = res.url || window.location.href;
+			let ok = false;
+			try {
+				ok = play(brand, { zoomInto: 'last', requireLogin: true, go: () => window.location.assign(next) });
+			} catch (err) {
+				cleanup();
+			}
+			if (!ok) window.location.assign(next);
+			return;
+		}
+
+		showAuthNotices(form, doc);
+		form.querySelectorAll('input[type="password"]').forEach((input) => { input.value = ''; });
+		authBusy = false;
+		setAuthBusy(form, button, false);
 	}, true);
 })();
