@@ -1115,6 +1115,14 @@ select.gilda-select,
 .gilda-category:hover a,
 .gilda-category a:focus-visible { text-decoration: underline; text-underline-offset: 8px; }
 
+/* Transição ao clicar num card de categoria (assets/js/category-zoom.js) */
+.gilda-czoom { inset: 0; overflow: hidden; pointer-events: auto; position: fixed; z-index: 100000; }
+.gilda-czoom__photo { overflow: hidden; position: absolute; }
+.gilda-czoom__photo img { display: block; height: 100%; max-width: none; object-fit: cover; transform-origin: center; width: 100%; }
+.gilda-czoom__shade { inset: 0; position: absolute; }
+.gilda-czoom__svg { display: block; height: 100%; inset: 0; position: absolute; width: 100%; }
+.gilda-czoom__cover { fill: var(--gilda-cream); }
+
 .gilda-chapter-showcase {
 	background: var(--gilda-white);
 	padding: clamp(54px, 7vw, 96px) 24px;
