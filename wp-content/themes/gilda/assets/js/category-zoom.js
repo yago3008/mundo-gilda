@@ -1,11 +1,13 @@
 /*
  * Cards de categoria (pattern gilda/categories): ao clicar, a tela "entra" no nome do card
- * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e depois abre o catálogo.
+ * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai no catálogo.
  *
- * 1. abertura: o card vira creme com o nome vazado (a foto aparece pelas letras), cresce até ocupar
- *    a tela e o nome vai para o centro, grande;
- * 2. mergulho: zoom dentro da parte mais grossa de uma letra até a foto tomar a tela;
- * 3. navega para o link do card.
+ * 1. abertura (aqui): o card vira creme com o nome vazado (a foto aparece pelas letras), cresce até
+ *    ocupar a tela e o nome vai para o centro, grande;
+ * 2. navega para o link do card. Enquanto o catálogo carrega, o navegador segura esse último quadro;
+ * 3. mergulho (no catálogo, assets/js/category-zoom-arrive.js): a mesma tela creme com o nome aparece
+ *    já na primeira pintura e o zoom entra numa letra revelando o próprio catálogo.
+ *    Os dados do quadro passam pelo sessionStorage ('gilda-czoom').
  *
  * Com "menos movimento" no sistema, ctrl/cmd/shift/clique do meio ou nova aba, o link funciona normal.
  * Sem dependências.
@@ -16,13 +18,12 @@
 	if (!document.querySelector('.gilda-category a[href]')) return;
 
 	const NS = 'http://www.w3.org/2000/svg';
-	const OPEN_MS = 600;
-	const DIVE_MS = 1200;
+	const OPEN_MS = 650;
+	const KEY = 'gilda-czoom';
 	const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 	const lerp = (a, b, t) => a + (b - a) * t;
 	const smooth = (t) => t * t * (3 - 2 * t);
 	const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-	const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
 	let overlay = null;
 	const cleanup = () => {
@@ -146,7 +147,7 @@
 		const center = { x: vw / 2, y: vh / 2 };
 		word.setAttribute('font-size', size);
 		word.setAttribute('x', center.x);
-		word.setAttribute('y', center.y + size * 0.35); // linha de base ≈ centro + metade da altura das maiúsculas
+		word.setAttribute('y', center.y + size * 0.35); // linha de base ≈ centro + metade da altura das maiúsculas (= baseline abaixo)
 
 		// ---- por onde o zoom entra: a letra mais grossa entre as do meio
 		let origin = { x: center.x, y: center.y }, radius = size * 0.08;
@@ -170,6 +171,7 @@
 			}
 		} catch (e) { /* fica no centro */ }
 		const maxScale = Math.max(8, (Math.hypot(vw, vh) * 0.7) / radius);
+		const baseline = center.y + size * 0.35;
 
 		const labelCenter = { x: labelBox.left + labelBox.width / 2, y: labelBox.top + labelBox.height / 2 };
 		const startScale = labelSize / size;
@@ -197,15 +199,19 @@
 			shade.style.opacity = shadeFrom * (1 - 0.5 * t);
 		};
 
-		const dive = (p) => {
-			const s = Math.pow(maxScale, p * p);
-			const slide = smooth(p);
-			const px = lerp(origin.x, center.x, slide);
-			const py = lerp(origin.y, center.y, slide);
-			zoom.setAttribute('transform', `translate(${px} ${py}) scale(${s}) translate(${-origin.x} ${-origin.y})`);
-			pic.style.transform = `scale(${lerp(1.2, 1, easeOut(p))})`;
-			shade.style.opacity = shadeFrom * 0.5 * (1 - p);
-			svg.style.visibility = p >= 0.999 ? 'hidden' : 'visible';
+		// O catálogo continua daqui: mesmo nome, mesma posição, mesmo ponto de entrada do zoom.
+		const handOff = () => {
+			try {
+				sessionStorage.setItem(KEY, JSON.stringify({
+					t: Date.now(),
+					force,
+					text,
+					font: { family: labelStyle.fontFamily, weight: labelStyle.fontWeight, style: labelStyle.fontStyle, spacingEm },
+					vw, vh, size,
+					x: center.x, y: baseline,
+					origin, maxScale,
+				}));
+			} catch (e) { /* sem sessionStorage: o catálogo abre sem o mergulho */ }
 		};
 
 		open(0);
@@ -215,15 +221,11 @@
 			if (!overlay) return;
 			if (!started) started = now;
 			const ms = now - started;
+			open(clamp(ms / OPEN_MS));
 			if (ms < OPEN_MS) {
-				open(ms / OPEN_MS);
-			} else {
-				open(1);
-				dive(clamp((ms - OPEN_MS) / DIVE_MS));
-			}
-			if (ms < OPEN_MS + DIVE_MS) {
 				requestAnimationFrame(frame);
 			} else {
+				handOff();
 				window.location.assign(href);
 			}
 		};
