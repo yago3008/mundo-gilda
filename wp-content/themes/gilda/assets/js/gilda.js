@@ -717,6 +717,9 @@
 
 	function initCheckoutStepper() {
 		const form = $( 'form.checkout' );
+		if ( ! form ) {
+			return; // fora do checkout: sem isso o erro interrompe o boot() e as funções seguintes não rodam
+		}
 		const customer = $( '#customer_details', form );
 		const orderHeading = $( '#order_review_heading', form );
 		const orderReview = $( '#order_review', form );
