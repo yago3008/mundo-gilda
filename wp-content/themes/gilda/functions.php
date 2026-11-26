@@ -16,6 +16,8 @@ require GILDA_DIR . '/inc/template-tags.php';
 require GILDA_DIR . '/inc/shortcodes.php';
 require GILDA_DIR . '/inc/pages.php';
 require GILDA_DIR . '/inc/images.php';
+require GILDA_DIR . '/inc/book-chapters.php';
+require GILDA_DIR . '/inc/transitions.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require GILDA_DIR . '/inc/woocommerce.php';

@@ -10,55 +10,7 @@
  * @package gilda
  */
 
-$gilda_chapters = array(
-	array(
-		'title' => __( 'CAPÍTULO 1', 'gilda' ),
-		'key'   => 'chapter_1',
-		'anchor' => 'capitulo-1',
-		'text'  => array(
-			'A GILDA; apresenta seu primeiro capítulo, inspirado na borboleta 88.',
-			'Símbolo de transformação e movimento, a borboleta conduz este capítulo a partir de suas formas, cores e delicadezas. Seu desenho singular se desdobra em peças que traduzem a leveza sem abrir mão da estrutura característica da alfaiataria.',
-			'O capítulo apresenta duas camisas, em branco e azul, e um lenço com estampa exclusiva em aquarela, criada a partir das formas circulares presentes nas asas da borboleta 88.',
-			'Este capítulo marca o início de um percurso: o instante em que algo deixa de ser apenas ideia, ganha forma e se prepara para seguir adiante.',
-			'<em>Um começo. Um movimento. Um novo voo.</em>',
-		),
-		'links' => array(
-			array( __( 'peças disponíveis', 'gilda' ), gilda_product_url( 'camisa-casulo' ) ),
-		),
-	),
-	array(
-		'title' => __( 'CAPÍTULO 2', 'gilda' ),
-		'key'   => 'chapter_2',
-		'anchor' => 'capitulo-2',
-		'text'  => array(
-			'No segundo capítulo, a GILDA; continua a observar a borboleta, agora mais de perto.',
-			'A inspiração parte dos filetes que percorrem suas asas: linhas delicadas que sustentam, delimitam e conduzem o movimento. Essa construção se traduz na bermuda ENVOLTO, com pregas frontais e passantes integrados, e no lenço MANACÁ, cuja estampa em aquarela reinterpreta os traços das asas.',
-			'Entre linhas precisas e formas fluidas, o capítulo aproxima a estrutura da alfaiataria da leveza encontrada na natureza.',
-			'<em>Mais do que contornar uma forma, os filetes revelam os caminhos que existem dentro dela.</em>',
-		),
-		'links' => array(
-			array( __( 'peças disponíveis: Bermuda Envolto', 'gilda' ), gilda_product_url( 'bermuda-envolto' ) ),
-			array( __( 'peças disponíveis: Lenço Manacá', 'gilda' ), gilda_product_url( 'lenco-manaca' ) ),
-		),
-	),
-	array(
-		'title' => __( 'CAPÍTULO 3', 'gilda' ),
-		'key'   => 'chapter_3',
-		'anchor' => 'capitulo-3',
-		'text'  => array(
-			'Agora, a GILDA; apresenta um novo capítulo: RITUAL BRASILEIRO.',
-			'Inspirado no café, mas, sobretudo, no tempo que se cria ao redor dele, o capítulo parte de um gesto cotidiano profundamente presente na cultura brasileira: fazer uma pausa. Na companhia de alguém ou de si mesma, esse é o momento de observar, conversar, descansar, respirar ou simplesmente passar um café.',
-			'RITUAL BRASILEIRO apresenta as camisas GRÃO e CAFÉ, confeccionadas em algodão egípcio e marcadas por um desenho especial nos punhos, além de uma calça de alfaiataria com pregas frontais profundas.',
-			'Mais do que uma referência ao café, este capítulo é um convite para reconhecer o valor dos pequenos rituais que atravessam os nossos dias.',
-			'<em>Uma pausa. Uma conversa. Um café.</em>',
-		),
-		'links' => array(
-			array( __( 'peças disponíveis: Camisa Grão', 'gilda' ), gilda_product_url( 'camisa-grao' ) ),
-			array( __( 'peças disponíveis: Bermuda Envolto', 'gilda' ), gilda_product_url( 'bermuda-envolto' ) ),
-			array( __( 'peças disponíveis: Camisa Casulo', 'gilda' ), gilda_product_url( 'camisa-casulo' ) ),
-		),
-	),
-);
+$gilda_chapters = gilda_book_chapters();
 
 /**
  * Gallery block (core/gallery with nested images; lightbox comes from theme.json).

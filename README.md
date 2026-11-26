@@ -82,6 +82,7 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-account-fields.php        # nome + confirmar senha no cadastro (7.2)
   gilda-meta-pixel.php            # Meta Pixel com eventos de e-commerce (só em produção)
   gilda-buy-now.php               # botão "Comprar" → checkout (5.9)
+  gilda-images.php                # versões das fotos geradas em WebP (q82)
   gilda-seo.php                   # meta description, Open Graph, sitemap limpo, noindex fora de produção (11.3)
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css

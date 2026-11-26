@@ -1,0 +1,153 @@
+/* Transições de scroll — ver inc/transitions.php */
+
+/* ---------- Zoom Parallax ---------- */
+.gilda-zp { position: relative; height: 320svh; margin-block: 0 !important; max-width: none !important; }
+.gilda-zp__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--gilda-cream); }
+/* sem will-change: com ele o navegador congela a foto no tamanho pequeno e ela borra ao crescer */
+.gilda-zp__layer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.gilda-zp__layer:first-child .gilda-zp__frame img { object-position: center 30%; }
+.gilda-zp__frame { position: relative; width: 25vw; height: 25svh; overflow: hidden; }
+.gilda-zp__frame img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.gilda-zp__layer:nth-child(2) .gilda-zp__frame { top: -30svh; left: 5vw; width: 35vw; height: 30svh; }
+.gilda-zp__layer:nth-child(3) .gilda-zp__frame { top: -10svh; left: -25vw; width: 20vw; height: 45svh; }
+.gilda-zp__layer:nth-child(4) .gilda-zp__frame { left: 27.5vw; width: 25vw; height: 25svh; }
+.gilda-zp__layer:nth-child(5) .gilda-zp__frame { top: 27.5svh; left: 5vw; width: 20vw; height: 25svh; }
+.gilda-zp__layer:nth-child(6) .gilda-zp__frame { top: 27.5svh; left: -22.5vw; width: 30vw; height: 25svh; }
+.gilda-zp__layer:nth-child(7) .gilda-zp__frame { top: 22.5svh; left: 25vw; width: 15vw; height: 15svh; }
+.gilda-zp__title {
+	position: absolute; inset: auto 0 9svh; text-align: center; color: var(--gilda-cream); pointer-events: none;
+	opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease;
+	text-shadow: 0 2px 30px rgba(36, 26, 22, .35);
+}
+.gilda-zp__title.is-on { opacity: 1; transform: none; }
+.gilda-zp__title small { display: block; font: 500 12px/1 var(--wp--preset--font-family--sans); letter-spacing: .24em; text-transform: uppercase; margin-bottom: 14px; }
+.gilda-zp__title span { font: 400 clamp(36px, 7vw, 104px)/.9 var(--gilda-headline); letter-spacing: -.01em; }
+
+/* ---------- Mask Section Transition ---------- */
+.gilda-mask { position: relative; height: 320svh; margin-block: 0 !important; max-width: none !important; }
+.gilda-mask__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--gilda-terracotta); }
+.gilda-mask__photo { position: absolute; inset: 0; will-change: transform; }
+.gilda-mask__photo img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.gilda-mask__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gilda-mask__svg text { font-family: var(--gilda-headline); }
+.gilda-mask__cover { fill: var(--gilda-cream); }
+/* véu para o texto creme ler bem sobre a foto clara dos livros */
+.gilda-mask__shade {
+	position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .8s ease;
+	background: linear-gradient(to bottom, rgba(36, 26, 22, .72) 0%, rgba(36, 26, 22, .38) 32%, rgba(36, 26, 22, 0) 58%);
+}
+.gilda-mask__shade.is-on { opacity: 1; }
+.gilda-mask__band {
+	position: absolute; left: 0; right: 0; top: 0; padding: 22px 16px 18px;
+	background: var(--gilda-terracotta); color: var(--gilda-cream); text-align: center;
+	transform: translateY(-101%); transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+}
+.gilda-mask__band.is-on { transform: none; }
+.gilda-mask__band p { margin: 0; font: italic 400 clamp(22px, 3.4vw, 52px)/1 var(--gilda-display); }
+.gilda-mask__headline {
+	position: absolute; left: 0; right: 0; top: calc(40px + clamp(22px, 3.4vw, 52px)); padding: 0 16px;
+	opacity: 0; transform: translateY(20px); transition: opacity .6s .15s ease, transform .6s .15s ease;
+}
+.gilda-mask__headline.is-on { opacity: 1; transform: none; }
+.gilda-mask__headline h2 {
+	margin: 0 auto; max-width: 1400px; text-align: center; color: var(--gilda-cream);
+	font: italic 900 clamp(38px, 6.4vw, 112px)/.95 var(--gilda-headline); text-shadow: 0 3px 30px rgba(36, 26, 22, .45); text-wrap: balance;
+}
+.gilda-mask__semi {
+	position: absolute; right: 6vw; bottom: 12svh; color: var(--gilda-terracotta);
+	font: 400 clamp(140px, 24vw, 340px)/.8 var(--gilda-display); opacity: 0; transition: opacity .8s .3s ease;
+}
+.gilda-mask__semi.is-on { opacity: 1; }
+
+
+/* ---------- História contínua dos capítulos ([gilda_book_story]) ---------- */
+/* título do capítulo quando a foto central toma a tela (mesma tipografia de "LIVRO GILDA;") */
+.gilda-zp__title--chapter { inset: auto 0 10svh; z-index: 2; }
+.gilda-zp__title--chapter h2 {
+	margin: 0; color: var(--gilda-cream); font: 400 clamp(40px, 7.5vw, 112px)/1 var(--gilda-display);
+	text-shadow: 0 2px 24px rgba(36, 26, 22, .55);
+	letter-spacing: .12em; text-transform: uppercase;
+}
+.gilda-zp__title--chapter .gilda-semi { color: var(--gilda-terracotta); margin-left: .04em; text-shadow: none; }
+.gilda-zp__title--chapter p { text-shadow: 0 1px 12px rgba(36, 26, 22, .7); margin: 14px 0 0; font: italic 500 clamp(20px, 2.4vw, 32px)/1.2 var(--gilda-serif); letter-spacing: .02em; }
+.gilda-zp--chapter .gilda-zp__sticky::after {
+	/* véu na base para o título ler bem sobre qualquer foto */
+	content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .6s ease;
+	background:
+		linear-gradient(to top, rgba(36, 26, 22, .72) 0%, rgba(36, 26, 22, .3) 34%, rgba(36, 26, 22, 0) 60%),
+		rgba(36, 26, 22, .38);
+}
+.gilda-zp--chapter.is-full .gilda-zp__sticky::after { opacity: 1; }
+
+/* narrativa: foto fixa à esquerda trocando, parágrafos entrando à direita */
+.gilda-story { position: relative; height: calc(100svh + var(--steps, 5) * 65svh); margin-block: 0 !important; max-width: none !important; background: var(--gilda-linen); }
+.gilda-story__sticky {
+	position: sticky; top: 0; height: 100svh; overflow: hidden;
+	display: grid; grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
+}
+.gilda-story__media { position: relative; overflow: hidden; background: var(--gilda-ink); }
+.gilda-story__img { position: absolute; inset: 0; margin: 0; opacity: 0; transition: opacity .9s ease; }
+.gilda-story__img.is-on { opacity: 1; }
+.gilda-story__img img { width: 100%; height: 100%; max-width: none; object-fit: cover; display: block; transform: scale(var(--kb, 1.06)); transition: transform 1.2s ease; }
+.gilda-story__text {
+	position: relative; display: grid; align-content: center; gap: 28px;
+	padding: calc(var(--gilda-header-h, 80px) + 24px) clamp(24px, 5vw, 88px) 64px;
+}
+.gilda-story__eyebrow { margin: 0; font: 500 12px/1 var(--gilda-sans); letter-spacing: .24em; text-transform: uppercase; color: var(--gilda-terracotta); }
+.gilda-story__steps { display: grid; }
+.gilda-story__step {
+	grid-area: 1 / 1; align-self: start; margin: 0; max-width: 34ch;
+	font: 400 clamp(20px, 1.9vw, 28px)/1.45 var(--gilda-serif); color: var(--gilda-ink);
+	opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease;
+}
+.gilda-story__step.is-on { opacity: 1; transform: none; }
+.gilda-story__step.is-past { opacity: 0; transform: translateY(-28px); }
+.gilda-story__step em { color: var(--gilda-terracotta); }
+.gilda-story__links { display: grid; gap: 4px; justify-items: start; }
+.gilda-story__links a {
+	display: inline-flex; align-items: center; min-height: var(--gilda-touch, 44px);
+	font: italic 400 20px/1.2 var(--gilda-serif); color: var(--gilda-terracotta);
+	text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+}
+.gilda-story__links a:hover { color: var(--gilda-terracotta-900); }
+.gilda-story__links a:focus-visible { outline: 2px solid var(--gilda-ink); outline-offset: 3px; }
+.gilda-story__bar { height: 2px; background: color-mix(in srgb, var(--gilda-ink) 15%, transparent); max-width: 34ch; }
+.gilda-story__bar span { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--gilda-terracotta); }
+
+@media (max-width: 781px) {
+	.gilda-story__sticky { grid-template-columns: 1fr; grid-template-rows: 54svh 1fr; }
+	.gilda-story__text { padding: 22px 20px 28px; align-content: start; gap: 18px; }
+	.gilda-story__step { font-size: 19px; }
+}
+
+
+/* botão da leitura automática (Capítulos) */
+.gilda-autoscroll {
+	position: fixed; z-index: 50;
+	right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+	display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 16px;
+	border: 1px solid var(--gilda-terracotta); border-radius: 999px; cursor: pointer;
+	background: var(--gilda-cream); color: var(--gilda-terracotta);
+	font: 500 12px/1 var(--gilda-sans); letter-spacing: .14em; text-transform: uppercase;
+	box-shadow: 0 6px 24px rgba(36, 26, 22, .18);
+}
+.gilda-autoscroll:hover { background: var(--gilda-terracotta); color: var(--gilda-cream); }
+.gilda-autoscroll:focus-visible { outline: 2px solid var(--gilda-ink); outline-offset: 3px; }
+.gilda-autoscroll__icon { width: 10px; height: 12px; display: inline-block; border-inline: 3px solid currentColor; box-sizing: border-box; }
+.gilda-autoscroll.is-paused .gilda-autoscroll__icon { border: 0; border-left: 10px solid currentColor; border-block: 6px solid transparent; width: 0; height: 0; }
+
+/* Quem gosta de menos movimento vê as seções paradas, no estado final */
+@media (prefers-reduced-motion: reduce) {
+	:root:not(.gilda-force-motion) .gilda-zp, :root:not(.gilda-force-motion) .gilda-mask { height: auto; }
+	:root:not(.gilda-force-motion) .gilda-zp__sticky, :root:not(.gilda-force-motion) .gilda-mask__sticky { position: relative; height: 100svh; }
+	:root:not(.gilda-force-motion) .gilda-zp__layer:not(:first-child) { display: none; }
+	:root:not(.gilda-force-motion) .gilda-zp__layer:first-child .gilda-zp__frame { width: 100vw; height: 100svh; }
+	:root:not(.gilda-force-motion) .gilda-zp__title, :root:not(.gilda-force-motion) .gilda-mask__band, :root:not(.gilda-force-motion) .gilda-mask__headline, :root:not(.gilda-force-motion) .gilda-mask__semi, :root:not(.gilda-force-motion) .gilda-mask__shade { opacity: 1; transform: none; transition: none; }
+	:root:not(.gilda-force-motion) .gilda-mask__svg { display: none; }
+	:root:not(.gilda-force-motion) .gilda-story { height: auto; }
+	:root:not(.gilda-force-motion) .gilda-story__sticky { position: relative; height: auto; min-height: 100svh; }
+	:root:not(.gilda-force-motion) .gilda-story__steps { gap: 1em; }
+	:root:not(.gilda-force-motion) .gilda-story__step { grid-area: auto; opacity: 1; transform: none; transition: none; }
+	:root:not(.gilda-force-motion) .gilda-story__bar { display: none; }
+	:root:not(.gilda-force-motion) .gilda-zp--chapter .gilda-zp__sticky::after { opacity: 1; }
+}

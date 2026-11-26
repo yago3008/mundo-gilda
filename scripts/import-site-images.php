@@ -4,7 +4,7 @@
  * listadas em data/site-images.json para a biblioteca de mídia, e grava os IDs na
  * opção `gilda_site_images`, que o tema usa nos patterns (wp-content/themes/gilda/inc/images.php).
  *
- * Uso: IMPORT_IMAGES=1 ./scripts/setup.sh
+ * Uso: SITE_IMAGES=1 ./scripts/setup.sh
  *      (ou: docker compose run --rm wpcli wp eval-file /scripts/import-site-images.php)
  *
  * Idempotente: cada URL é baixada uma vez (meta _gilda_source_url, igual ao import-products.php).

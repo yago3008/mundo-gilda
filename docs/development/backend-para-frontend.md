@@ -112,13 +112,44 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 - Pra testar o checkout: CEP `01310-100`, CPF de teste `529.982.247-25` e o "Pagamento de teste".
 - Pra recomeçar do zero: `docker compose down -v && ./scripts/setup.sh`.
 
-## 9. Protótipo de transições (referência de front)
+## 9. Transições de scroll (já no tema)
 
-Em `prototypes/zoom-mask/` tem um protótipo, feito a pedido do Yago, de duas transições de scroll com as fotos do Capítulo 3 e as fontes e cores do tema:
+O Yago aprovou e elas estão no tema `gilda`. O protótipo original continua em `prototypes/zoom-mask/`, como referência.
 
-1. **Zoom Parallax:** colagem de 7 fotos; a do centro cresce até ocupar a tela e aparece "RITUAL BRASILEIRO".
-2. **Mask Section Transition:** "GILDA;" vazado em creme sobre a foto dos livros (`story_banner`). A câmera mergulha no ponto e vírgula e termina no banner "DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA".
+**Onde estão**
+- `inc/transitions.php`: shortcodes e a lógica PHP.
+- `assets/css/transitions.css` e `assets/js/transitions.js`: carregados só nas páginas `capitulos` e `quem-cria`, sem bibliotecas (CSS `sticky` mais `requestAnimationFrame`).
+- `inc/book-chapters.php`: `gilda_book_chapters()`. Os textos, os links e as fotos dos capítulos saíram do `patterns/book.php` e são usados por ele e pela história contínua. **Pra mudar texto ou foto de capítulo, edite aqui.**
 
-Sem bibliotecas: CSS `position: sticky` mais um `requestAnimationFrame`. Respeita `prefers-reduced-motion` e não dá rolagem lateral no celular. Para ver: `node prototypes/serve.mjs` e abrir http://localhost:5500 (precisa do Docker no ar e das imagens importadas).
+**Capítulos (`templates/page-capitulos.html` → `[gilda_book_story]`)**
+- Pra cada capítulo, nessa ordem:
+  1. colagem de 7 fotos (`zoom`);
+  2. a primeira foto cresce até a tela cheia e aparece "CAPÍTULO N;" com o nome do capítulo;
+  3. narrativa com a foto fixa e os parágrafos entrando conforme a rolagem, trocando a foto (`story`) e com barra de progresso;
+  4. os links "peças disponíveis: …".
+- No fim vem o pattern `gilda/book` ("LIVRO GILDA;").
+- **Leitura automática:** a página rola sozinha (zoom a 190, texto a 75 e o resto a 130 px/s). Pausa quando a pessoa rola e volta depois de 4 s parada. Tem o botão `.gilda-autoscroll` (Pausar/Continuar). Não liga se a pessoa chegou por um link com `#âncora`, se já rolou a página ou se o sistema pede menos movimento.
 
-**Não está no tema.** Se for usar, o código está separado em blocos `[ZOOM]` e `[MASK]` (HTML, CSS e JS) pra você adaptar aos patterns. As URLs das fotos viram `gilda_image(...)`.
+**Quem Cria (`patterns/about.php` → `[gilda_mask_transition]`)**
+- "GILDA;" vazado sobre a foto `story_banner`; a rolagem mergulha no ";" e termina no banner "DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA".
+- Se a foto não existir, volta pro banner fixo antigo.
+
+**Home: cards de capítulos (`initChapterShowcase` em `gilda.js`)**
+- Trocam um card por vez (1, 2, 3…, a cada 2,6 s), com crossfade de 1,2 s.
+- A foto nova é carregada antes e entra por cima, então o fundo nunca aparece.
+- Pausa fora da tela.
+
+**Acessibilidade e testes**
+- Com `prefers-reduced-motion`, tudo aparece parado, no estado final.
+- `?anima=1` no endereço força a animação mesmo assim (só pra testar).
+
+**Fotos**
+- As fotos principais de cada capítulo foram escolhidas pela resolução. As do Capítulo 3 que vieram do Wix têm só 1023 px ou estão muito comprimidas. Por isso a principal dele é a `chapter_3_hd` (fotos de produto Camisa Grão e Calça Torra, em alta).
+- O mu-plugin `gilda-images.php` gera as versões das fotos em **WebP** (qualidade 82). Um PNG de 4,8 MB vira cerca de 170 KB.
+
+**No seu ambiente, depois do `git pull`** (uma vez só):
+
+```bash
+SITE_IMAGES=1 ./scripts/setup.sh                          # importa chapter_3_hd (e o que faltar)
+docker compose run --rm wpcli wp media regenerate --yes   # refaz as versões das fotos em WebP
+```

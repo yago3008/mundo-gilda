@@ -1051,44 +1051,89 @@
 		}
 	}
 
+	/**
+	 * Cards de capítulos da home: troca uma foto por vez (card 1, 2, 3, 1…), em crossfade.
+	 * A foto nova é carregada e decodificada antes e aparece POR CIMA da antiga,
+	 * então o fundo nunca fica à mostra. Pausa fora da tela e com a aba escondida.
+	 */
 	function initChapterShowcase() {
 		if ( reduceMotion ) {
 			return;
 		}
-		$$( '[data-chapter-slides]' ).forEach( ( card ) => {
-			let slides;
-			try {
-				slides = JSON.parse( card.dataset.chapterSlides );
-			} catch ( e ) {
+		const FADE_MS = 1200;
+		const STEP_MS = 2600; // intervalo entre um card e o próximo (cada card troca a cada ~7,8 s)
+
+		const cards = $$( '[data-chapter-slides]' )
+			.map( ( card ) => {
+				let slides;
+				try {
+					slides = JSON.parse( card.dataset.chapterSlides );
+				} catch ( e ) {
+					return null;
+				}
+				const base = $( '.gilda-chapter-card__image', card );
+				if ( ! base || ! Array.isArray( slides ) || slides.length < 2 ) {
+					return null;
+				}
+				const top = base.cloneNode( false );
+				top.classList.add( 'is-next' );
+				top.setAttribute( 'src', base.getAttribute( 'src' ) );
+				top.setAttribute( 'aria-hidden', 'true' );
+				base.after( top );
+				return { slides, base, top, index: 0, busy: false };
+			} )
+			.filter( Boolean );
+		if ( ! cards.length ) {
+			return;
+		}
+
+		const ready = ( src ) => {
+			const photo = new Image();
+			photo.src = src;
+			const done = photo.decode ? photo.decode() : new Promise( ( resolve ) => { photo.onload = resolve; photo.onerror = resolve; } );
+			return done.catch( () => {} ).then( () => src );
+		};
+
+		const swap = ( c ) => {
+			if ( c.busy ) {
 				return;
 			}
-			const image = $( '.gilda-chapter-card__image', card );
-			if ( ! image || ! Array.isArray( slides ) || slides.length < 2 ) {
-				return;
-			}
-			const preloaded = slides.map( ( src ) => {
-				const photo = new Image();
-				photo.src = src;
-				return photo;
-			} );
-			let index = 0;
-			window.setInterval( () => {
-				const next = ( index + 1 ) % slides.length;
-				image.classList.add( 'is-changing' );
+			c.busy = true;
+			const next = ( c.index + 1 ) % c.slides.length;
+			ready( c.slides[ next ] ).then( ( src ) => {
+				c.top.src = src;
+				window.requestAnimationFrame( () => c.top.classList.add( 'is-visible' ) );
 				window.setTimeout( () => {
-					const showNext = () => {
-						image.src = slides[next];
-						image.classList.remove( 'is-changing' );
-						index = next;
-					};
-					if ( preloaded[next].complete ) {
-						showNext();
-					} else {
-						preloaded[next].addEventListener( 'load', showNext, { once: true } );
-					}
-				}, 350 );
-			}, 4500 );
-		} );
+					// a de baixo vira a nova (já está em cache) e a de cima volta a ficar invisível sem animação
+					c.base.src = src;
+					c.top.style.transition = 'none';
+					c.top.classList.toggle( 'is-visible', false );
+					void c.top.offsetWidth;
+					c.top.style.transition = '';
+					c.index = next;
+					c.busy = false;
+					ready( c.slides[ ( next + 1 ) % c.slides.length ] ); // já deixa a seguinte carregando
+				}, FADE_MS + 60 );
+			} );
+		};
+
+		let visible = false;
+		const section = cards[ 0 ].base.closest( '.gilda-chapter-showcase' ) || cards[ 0 ].base;
+		if ( 'IntersectionObserver' in window ) {
+			new IntersectionObserver( ( entries ) => { visible = entries[ 0 ].isIntersecting; } ).observe( section );
+		} else {
+			visible = true;
+		}
+		cards.forEach( ( c ) => ready( c.slides[ 1 ] ) );
+
+		let turn = 0;
+		window.setInterval( () => {
+			if ( ! visible || document.hidden ) {
+				return;
+			}
+			swap( cards[ turn % cards.length ] );
+			turn++;
+		}, STEP_MS );
 	}
 
 	function initProductDescriptionToggle() {

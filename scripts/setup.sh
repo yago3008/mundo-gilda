@@ -60,6 +60,13 @@ else
   echo "  (sem data/products.json — rode: node scripts/export-wix-products.mjs)"
 fi
 
+# Fotos do site (logo, banners, capítulos, Quem Cria) de data/site-images.json.
+# Baixa só o que ainda não foi importado. Opção separada de IMPORT_IMAGES (que traz as fotos dos produtos).
+if [ "${SITE_IMAGES:-}" = "1" ]; then
+  echo "==> Fotos do site"
+  wp eval-file /scripts/import-site-images.php
+fi
+
 echo
 echo "Pronto!"
 echo "  Site:        http://localhost:${WP_PORT:-8080}"

@@ -1155,6 +1155,9 @@ select.gilda-select,
 	width: 100%;
 }
 .gilda-chapter-card__image.is-changing { opacity: 0; }
+/* crossfade: a foto nova entra por cima da antiga (assets/js/gilda.js → initChapterShowcase) */
+.gilda-chapter-card__image.is-next { opacity: 0; transition: opacity 1.2s ease, transform .7s var(--gilda-ease); }
+.gilda-chapter-card__image.is-next.is-visible { opacity: 1; }
 .gilda-chapter-card:hover .gilda-chapter-card__image { transform: scale(1.025); }
 .gilda-chapter-card__title {
 	bottom: clamp(18px, 2.2vw, 30px);

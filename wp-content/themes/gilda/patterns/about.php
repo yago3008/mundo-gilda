@@ -76,6 +76,12 @@ if ( $gilda_photo ) {
 <!-- /wp:columns --></div>
 <!-- /wp:group -->
 
+<?php
+// Transição com máscara (inc/transitions.php) no lugar do banner fixo; volta ao banner se a foto não existir.
+if ( function_exists( 'gilda_mask_transition_shortcode' ) && gilda_transition_image_id( 'story_banner' ) ) :
+	echo gilda_mask_transition_shortcode( array() ); // phpcs:ignore WordPress.Security.EscapeOutput
+else :
+	?>
 <!-- wp:group {"align":"full","className":"gilda-about__closing","layout":{"type":"default"}} -->
 <div class="wp-block-group alignfull gilda-about__closing">
 <div class="gilda-about__closing-title"><p>DEPOIS DO PONTO E VÍRGULA,</p></div>
@@ -84,3 +90,4 @@ if ( $gilda_photo ) {
 </div>
 </div>
 <!-- /wp:group -->
+<?php endif; ?>
