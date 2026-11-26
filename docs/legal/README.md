@@ -7,6 +7,8 @@ Rascunhos das páginas exigidas pela LGPD e pelo Código de Defesa do Consumidor
 | [politica-de-privacidade.md](politica-de-privacidade.md) | `/politica-de-privacidade/` | dados do checkout, Correios/Infixs, consulta de CEP, pagamento, Meta Pixel, e-mail (SMTP), cookies, direitos LGPD |
 | [trocas-e-devolucoes.md](trocas-e-devolucoes.md) | `/trocas-e-devolucoes/` | arrependimento de 7 dias (CDC art. 49), troca por tamanho, defeito (90 dias), reembolso |
 | [termos-de-uso.md](termos-de-uso.md) | `/termos-de-uso/` | condições de venda, cupom, estoque e **entrega** (faz o papel da política de frete) |
+| [cuidados-com-as-pecas.md](cuidados-com-as-pecas.md) | `/cuidados-com-as-pecas/` | institucional, publicada (link no rodapé) |
+| [duvidas-frequentes.md](duvidas-frequentes.md) | `/duvidas-frequentes/` | institucional, publicada (link no rodapé) |
 
 ## O que as donas precisam decidir ou informar
 
@@ -35,4 +37,4 @@ Tudo o que está marcado com **[PREENCHER]** nos arquivos. Na política de priva
 docker compose run --rm wpcli wp eval-file /scripts/import-legal-pages.php --user=admin
 ```
 
-Roda sozinho no `./scripts/setup.sh`. Páginas com `status: publicar` no cabeçalho do .md são publicadas e atualizadas a cada execução (o .md é a fonte: edite aqui, não no painel). As outras ficam **como rascunho** e uma página já publicada sem `status: publicar` não é tocada. Para publicar uma nova: preencher os [PREENCHER], apagar o aviso de RASCUNHO e acrescentar `status: publicar`. Ao publicar os termos, ligue a página em WooCommerce → Configurações → Avançado → "Termos e condições" (o script não faz isso para o checkout não linkar um rascunho).
+Roda sozinho no `./scripts/setup.sh` e funciona como **semente**: cria a página que não existe e atualiza as que ainda estão em rascunho. Com `status: publicar` no cabeçalho do .md, a página é publicada na primeira vez. **Página publicada nunca é sobrescrita**: a partir daí as donas editam pelo painel e o .md fica só como texto de partida. Para publicar uma nova: preencher os [PREENCHER], apagar o aviso de RASCUNHO e acrescentar `status: publicar`. Ao publicar os termos, ligue a página em WooCommerce → Configurações → Avançado → "Termos e condições" (o script não faz isso para o checkout não linkar um rascunho).
