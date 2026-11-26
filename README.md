@@ -35,6 +35,42 @@ docker compose down        # para (mantém banco e arquivos)
 docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode ./scripts/setup.sh
 ```
 
+## Testes automáticos (ponta a ponta)
+
+A suíte em [`tests/e2e/`](tests/e2e) usa [Playwright](https://playwright.dev) e roda contra o ambiente local. Ela cobre os fluxos de negócio:
+
+| Arquivo | O que testa |
+|---|---|
+| `specs/account.spec.ts` | Cadastro em `/minha-conta/` (e o erro "As senhas não coincidem."), login e recuperação de senha com o link que chega no Mailpit |
+| `specs/purchase.spec.ts` | Produto variável (cor + tamanho), "Adicionar ao carrinho", botão de compra direta (`gilda_buy_now`) indo para `/finalizar-compra/`, checkout com CEP 01310-100 preenchendo o endereço, CPF de teste, PAC/SEDEX com preço, cupom `primeiracompra` (10%), "Pagamento de teste", pedido recebido, e-mails do pedido e estoque da variação baixando. Depois, o mesmo e-mail tentando usar o cupom de novo (tem que ser recusado) |
+| `specs/shipping-simulator.spec.ts` | Simulador de frete da página do produto mostrando PAC e SEDEX |
+| `specs/filters.spec.ts` | Filtros por URL (`?filter_cor=…`, cores com OU, `?filter_tamanho=…`, categoria) contra os atributos dos produtos |
+
+Para rodar (com o ambiente de pé, via `./scripts/setup.sh`):
+
+```bash
+cd tests/e2e
+npm ci
+npx playwright install chromium   # só na primeira vez
+npx playwright test               # roda tudo (≈1–2 min)
+npx playwright test specs/purchase.spec.ts --headed   # um arquivo, vendo o navegador
+npx playwright show-report        # relatório HTML com print, vídeo e trace das falhas
+```
+
+- URLs e credenciais vêm do `.env` da raiz (`WP_PORT`, `MAIL_PORT`, `WP_ADMIN_*`). Pra apontar pra outro lugar: `E2E_BASE_URL`, `E2E_MAILPIT_URL` ou `E2E_ENV_FILE`.
+- Cada execução usa e-mails únicos (`e2e-…@mundogilda.test`). No fim, os testes apagam as contas, os pedidos e os e-mails que criaram e devolvem o estoque da variação comprada. Para isso usam a API REST do WooCommerce logados como admin.
+- Os seletores usam papéis, rótulos e textos (o que a cliente vê), não classes do tema. Os contratos de backend usados de propósito são `name="gilda_buy_now"` e o `data-product_variations` do formulário de compra.
+- Mais de um ambiente na mesma máquina (ex.: uma worktree do git): no `.env` daquela pasta, mude `WP_PORT`/`MAIL_PORT`/`PMA_PORT` e acrescente `COMPOSE_PROJECT_NAME=<nome>`. Assim o `setup.sh` cria containers e volumes separados.
+
+### CI (GitHub Actions)
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo pull request e push na `main`:
+
+1. `php -l` em `wp-content/mu-plugins/` e `scripts/`, e `bash -n` nos scripts;
+2. cria o `.env` a partir do `.env.example`, sobe o Docker e roda `./scripts/setup.sh` (sem `IMPORT_IMAGES`);
+3. `./scripts/security-check.sh` (falha se tiver algum FAIL);
+4. a suíte Playwright. O relatório HTML fica nos artefatos da execução (`playwright-report`), e quando algo falha vão junto os traces/vídeos (`playwright-test-results`) e os logs do WordPress.
+
 ## O que já funciona
 
 - **Contas de cliente:** cadastro com nome, e-mail, senha (com medidor de força) e confirmação de senha; login, recuperação de senha por e-mail, histórico de pedidos e endereços. Também dá pra criar a conta no checkout ou comprar sem cadastro.
@@ -88,6 +124,8 @@ wp-content/mu-plugins/      # nosso código que roda sempre
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
 scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)
 scripts/restore.sh          # restaura um backup
+tests/e2e/                  # testes ponta a ponta (Playwright), com package.json próprio
+.github/workflows/ci.yml    # lint, setup, security-check e testes a cada PR
 docs/
   requisitos-cliente.md           # o que pedir/conversar com as donas
   development/tasks.md            # backlog (K1venn)

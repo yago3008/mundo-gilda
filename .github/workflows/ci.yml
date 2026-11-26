@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (PHP e shell)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3' # mesma versão da imagem wordpress:php8.3-apache
+          tools: none
+          coverage: none
+
+      - name: php -l (mu-plugins e scripts)
+        run: |
+          status=0
+          while IFS= read -r -d '' file; do
+            php -l "$file" >/dev/null || { php -l "$file"; status=1; }
+          done < <(find wp-content/mu-plugins scripts -name '*.php' -print0)
+          exit $status
+
+      - name: bash -n (scripts)
+        run: for f in scripts/*.sh; do bash -n "$f"; done
+
+  e2e:
+    name: Setup, segurança e testes ponta a ponta
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .env a partir do .env.example
+        run: cp .env.example .env
+
+      - name: Subir e configurar a loja (./scripts/setup.sh, sem IMPORT_IMAGES)
+        run: ./scripts/setup.sh
+
+      - name: Bateria de segurança (0 FAIL)
+        run: ./scripts/security-check.sh http://localhost:8080
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+
+      - name: Instalar Playwright
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Typecheck dos testes
+        working-directory: tests/e2e
+        run: npm run typecheck
+
+      - name: Testes ponta a ponta
+        working-directory: tests/e2e
+        run: npx playwright test
+
+      - name: Relatório do Playwright
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/e2e/playwright-report/
+          retention-days: 14
+
+      - name: Traces e vídeos das falhas
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: tests/e2e/test-results/
+          retention-days: 7
+
+      - name: Logs dos containers
+        if: ${{ failure() }}
+        run: |
+          docker compose ps
+          docker compose logs --no-color --tail=300 wordpress
+          docker compose exec -T wordpress sh -c 'tail -n 200 /tmp/wp-debug.log 2>/dev/null || true'
