@@ -13,6 +13,8 @@
 	}
 	if (!s || !s.text || Date.now() - s.t > 10000) return;
 	if (!s.force && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	// Login/cadastro: só mergulha se deu certo (a página seguinte já está logada).
+	if (s.requireLogin && !(document.body && document.body.classList.contains('logged-in'))) return;
 
 	const DIVE_MS = 1200;
 	const NS = 'http://www.w3.org/2000/svg';
@@ -92,6 +94,8 @@
 		};
 		// um respiro curto: a página por baixo termina de montar antes do mergulho
 		setTimeout(() => requestAnimationFrame(frame), 150);
+		// aba em segundo plano (sem requestAnimationFrame): não deixa a tela creme presa
+		setTimeout(() => overlay.remove(), 150 + DIVE_MS + 1500);
 	});
 
 	// Voltar/avançar pelo navegador não pode reaparecer com a tela creme.
