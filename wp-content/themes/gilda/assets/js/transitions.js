@@ -109,6 +109,21 @@
 		});
 	});
 
+	/* Quem Cria: os nomes das criadoras vão sendo pintados de marrom, de baixo pra cima, com o scroll.
+	   Começa quando o nome entra pela base da tela e termina quando ele chega perto do meio. */
+	document.querySelectorAll('.gilda-founder__signature').forEach((name) => {
+		name.classList.add('is-paintable');
+		effects.push({
+			el: name,
+			update() {
+				const r = name.getBoundingClientRect();
+				const vh = window.innerHeight;
+				const t = clamp((vh - r.bottom) / (vh * 0.45));
+				name.style.setProperty('--paint', `${(t * 100).toFixed(2)}%`);
+			},
+		});
+	});
+
 	if (!effects.length) return;
 
 	let ticking = false;
