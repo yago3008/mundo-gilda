@@ -17,7 +17,8 @@ PLUGINS=(
 # Tema: o da GILDA; (K1venn) assim que existir wp-content/themes/gilda/style.css; senão o padrão.
 if [ -f wp-content/themes/gilda/style.css ]; then THEME="gilda"; else THEME="twentytwentyfive"; fi
 
-wp() { docker compose run --rm -T wpcli wp "$@"; }
+# IMPORT_IMAGES precisa chegar ao container: o import-products.php lê a variável lá dentro.
+wp() { docker compose run --rm -T -e IMPORT_IMAGES="${IMPORT_IMAGES:-}" wpcli wp "$@"; }
 
 echo "==> Subindo containers"
 docker compose up -d --wait

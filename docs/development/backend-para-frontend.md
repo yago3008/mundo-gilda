@@ -97,7 +97,7 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 
 - **`story_banner`** (em `data/site-images.json`): foto escolhida pelo Yago pra substituir o "túnel de livros" do Wix no banner **"DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA"**. No site atual ele aparece no fim do Quem Cria e no carrinho vazio; no tema esses dois lugares hoje só têm texto.
   - É uma parede de livros e papéis antigos abertos, em tons creme. Foto de Jimmy Liu, licença Unsplash (uso comercial livre).
-  - Entra na biblioteca de mídia junto com as outras pelo `scripts/import-site-images.php` (`IMPORT_IMAGES=1 ./scripts/setup.sh`). No tema: `gilda_image( 'story_banner' )`.
+  - Entra na biblioteca de mídia junto com as outras pelo `scripts/import-site-images.php` (`SITE_IMAGES=1 ./scripts/setup.sh`). No tema: `gilda_image( 'story_banner' )`.
   - Onde e como usar (faixa terracota, texto por cima, corte) é decisão de design, ou seja, sua.
 
 ## 7. E-mails da loja

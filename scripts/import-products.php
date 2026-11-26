@@ -4,7 +4,8 @@
  * Idempotente: atualiza pelo slug; recria as variações conforme o JSON.
  *
  * Uso: docker compose run --rm wpcli wp eval-file /scripts/import-products.php
- *      IMPORT_IMAGES=1 → também baixa as fotos do CDN do Wix para a biblioteca de mídia.
+ *      IMPORT_IMAGES=1 → também baixa as fotos do CDN do Wix para a biblioteca de mídia
+ *      (IMPORT_IMAGES=1 ./scripts/setup.sh, ou: docker compose run --rm -e IMPORT_IMAGES=1 wpcli wp eval-file …).
  *
  * Peso e dimensões: o Wix não tem esses dados. Usamos valores PROVISÓRIOS por categoria
  * (necessários para o cálculo de frete) até a GILDA; mandar as medidas reais das embalagens.
