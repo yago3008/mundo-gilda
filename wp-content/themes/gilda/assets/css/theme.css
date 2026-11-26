@@ -1965,8 +1965,6 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	}
 }
 
-.gilda-lookbook .wp-block-image { margin: 0; }
-.gilda-lookbook img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
 
 /* Keep shortcode actions vertically aligned with the header navigation and logo. */
 .gilda-header__nav,
