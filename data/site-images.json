@@ -97,6 +97,11 @@
         "https://static.wixstatic.com/media/ff503a_6c5f31b304a0428a8bf9b56ed3990a4d~mv2.png",
         "https://static.wixstatic.com/media/ff503a_f6f0ac6922f04e8eb7c7a5a0a80d957f~mv2.jpg"
       ]
+    },
+    "story_banner": {
+      "url": "https://images.unsplash.com/photo-1776589583473-99a395c74c68?w=2400&q=80&fm=jpg&dl=gilda-voce-conta-a-historia.jpg",
+      "alt": "Parede coberta de livros e papéis antigos abertos",
+      "note": "Banner 'DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA' (encerramento do Quem Cria / carrinho vazio). Substitui o túnel de livros do Wix. Foto de Jimmy Liu no Unsplash (https://unsplash.com/photos/oiecraZK5Bs), Licença Unsplash: uso comercial livre, crédito opcional. Versão 2400px (~0,8 MB); o original tem 8,6 MB."
     }
   }
 }

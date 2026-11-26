@@ -93,6 +93,13 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 - **Meta Pixel:** `gilda-meta-pixel.php` já dispara PageView, ViewContent, AddToCart, InitiateCheckout e Purchase. O tema não deve incluir o pixel de novo.
 - **Cabeçalhos de segurança:** já existem. Se o tema carregar fontes ou scripts de outro domínio, tudo bem: não há Content Security Policy restritiva.
 
+## 6.1 Imagens novas para o tema
+
+- **`story_banner`** (em `data/site-images.json`): foto escolhida pelo Yago pra substituir o "túnel de livros" do Wix no banner **"DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA"**. No site atual ele aparece no fim do Quem Cria e no carrinho vazio; no tema esses dois lugares hoje só têm texto.
+  - É uma parede de livros e papéis antigos abertos, em tons creme. Foto de Jimmy Liu, licença Unsplash (uso comercial livre).
+  - Entra na biblioteca de mídia junto com as outras pelo `scripts/import-site-images.php` (`IMPORT_IMAGES=1 ./scripts/setup.sh`). No tema: `gilda_image( 'story_banner' )`.
+  - Onde e como usar (faixa terracota, texto por cima, corte) é decisão de design, ou seja, sua.
+
 ## 7. E-mails da loja
 
 - Os e-mails do WooCommerce (pedido, conta, senha) usam o template padrão. Cores, logo e rodapé se configuram em **WooCommerce → Configurações → E-mails**. Também dá pra sobrescrever os templates no tema, em `gilda/woocommerce/emails/`.
