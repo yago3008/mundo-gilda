@@ -47,7 +47,7 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 - **Botão "Comprar"** na página do produto: adiciona e vai direto pro checkout (5.9).
 - **Filtros da loja** por categoria, cor, tamanho e preço, via URL (`?filter_cor=marrom`, `?min_price=…`). Cada cor tem o código hex salvo para as bolinhas de cor. Detalhes em [backend-para-frontend.md](docs/development/backend-para-frontend.md).
 - **SEO:** meta description (editável por página/produto/categoria), Open Graph para prévia no WhatsApp/Instagram, sitemap sem páginas de sistema nem usuários, schema de Produto. Fora de produção nada é indexado.
-- **Segurança:** bloqueio após 5 logins errados, sem XML-RPC, sem expor usuários, cabeçalhos de segurança, editor de código do painel desligado.
+- **Segurança:** bloqueio após 5 logins errados, sem XML-RPC, sem expor usuários (inclusive na recuperação de senha), cabeçalhos de segurança, editor de código do painel desligado. O servidor bloqueia arquivos de versão, logs e backups, e PHP em uploads não executa (`config/apache`, `config/php`). Bateria de testes: `./scripts/security-check.sh [url]`. Resultado atual no local: 78 PASS, 0 FAIL.
 - **Backup:** `./scripts/backup.sh` e `./scripts/restore.sh` (banco + uploads). Produção: ver [deploy.md](docs/development/deploy.md).
 - **Meta Pixel:** usa o mesmo ID do site atual (`2143468076438110`) e manda PageView, ViewContent, AddToCart, InitiateCheckout e Purchase (sem duplicar se o cliente recarregar a página). **Só envia em produção.** Localmente, com `META_PIXEL_DEBUG=1`, os eventos aparecem no console do navegador.
 

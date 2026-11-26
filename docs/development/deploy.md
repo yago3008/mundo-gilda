@@ -33,6 +33,37 @@ define( 'WP_AUTO_UPDATE_CORE', 'minor' );      // só correções de segurança 
 // Chaves/salts novos: https://api.wordpress.org/secret-key/1.1/salt/
 ```
 
+## 2.1 Regras do servidor web (obrigatório)
+
+Sem isso, a bateria de segurança falha: arquivos de versão ficam expostos, o `debug.log` fica público e **PHP enviado por upload é executado**.
+
+- **Apache:** usar [`config/apache/gilda-security.conf`](../../config/apache/gilda-security.conf). Incluir no vhost e ajustar `/var/www/html` para o caminho real. Se o host só permite `.htaccess`, adaptar: tirar os blocos `<Directory>`, colocar um `.htaccess` em `wp-content/uploads/` com o bloco de PHP e deixar as regras `<FilesMatch>` no `.htaccess` da raiz.
+- **PHP:** [`config/php/gilda.ini`](../../config/php/gilda.ini). O essencial é `expose_php = Off` e `display_errors = Off`.
+- **Nginx** (equivalente):
+
+```nginx
+server_tokens off;
+location ~* ^/(readme\.html|license\.txt|wp-config-sample\.php)$ { deny all; }
+location ~* /(readme\.txt|changelog\.txt|README\.md|composer\.(json|lock)|package(-lock)?\.json)$ { deny all; }
+location ~* \.(log|sql|sql\.gz|bak|old|orig|save|swp|dist|ini|sh)$ { deny all; }
+location ~ /\.(?!well-known) { deny all; }
+location = /wp-config.php { deny all; }
+location ~ ^/wp-admin/(install|setup-config)\.php$ { deny all; }
+location ~* ^/wp-content/uploads/.*\.(php[0-9]?|phtml|phar|pht|phps)$ { deny all; }
+location ~* ^/wp-includes/(?!js/tinymce/wp-tinymce\.php$|ms-files\.php$).*\.php$ { deny all; }
+autoindex off;
+```
+
+- `WP_DEBUG_LOG`: em produção fica `false`. Se precisar ligar para investigar algo, aponte para um caminho **fora** da pasta pública (ex.: `define( 'WP_DEBUG_LOG', '/home/usuario/logs/wp-debug.log' );`).
+
+**Depois do deploy, rodar a bateria contra o site real:**
+
+```bash
+./scripts/security-check.sh https://www.mundogilda.com.br
+```
+
+Deve terminar com **0 FAIL**. O teste de PHP em uploads só roda de verdade no Docker local; no servidor, conferir à mão que um `.php` colocado em `wp-content/uploads/` responde 403.
+
 ## 3. Variáveis de ambiente
 
 Os mu-plugins leem configuração por variável de ambiente (`getenv`). Se o host não permitir variáveis de ambiente, defina-as no topo do `wp-config.php` com `putenv( 'NOME=valor' );`.

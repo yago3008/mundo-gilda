@@ -22,13 +22,8 @@ x-wp-env: &wp-env
   WORDPRESS_DEBUG: 1
   WORDPRESS_CONFIG_EXTRA: |
     define( 'WP_ENVIRONMENT_TYPE', 'local' );
-    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_DEBUG_LOG', '/tmp/wp-debug.log' ); // fora da pasta pública
     define( 'WP_DEBUG_DISPLAY', false );
-
-x-wp-volumes: &wp-volumes
-  - wp_core:/var/www/html
-  - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
-  - ./wp-content/themes/gilda:/var/www/html/wp-content/themes/gilda # tema do K1venn
 
 services:
   db:
@@ -58,7 +53,12 @@ services:
     ports:
       - "${WP_PORT:-8080}:80"
     environment: *wp-env
-    volumes: *wp-volumes
+    volumes:
+      - wp_core:/var/www/html
+      - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ./wp-content/themes/gilda:/var/www/html/wp-content/themes/gilda # tema do K1venn
+      - ./config/apache/gilda-security.conf:/etc/apache2/conf-enabled/zz-gilda-security.conf:ro
+      - ./config/php/gilda.ini:/usr/local/etc/php/conf.d/zz-gilda.ini:ro
 
   mailpit:
     image: axllent/mailpit:v1.34.0

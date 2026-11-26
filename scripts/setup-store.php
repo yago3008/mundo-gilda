@@ -106,6 +106,25 @@ $log( 'Checkout BR: CPF, número, bairro, telefone e autopreenchimento por CEP' 
  * Páginas do WooCommerce (Loja, Carrinho, Finalizar compra, Minha conta)
  * ------------------------------------------------------------------------ */
 WC_Install::create_pages();
+
+// Imagem "sem foto" do WooCommerce: recria se o arquivo sumiu (ex.: volume novo).
+$placeholder_id = (int) get_option( 'woocommerce_placeholder_image', 0 );
+if ( ! $placeholder_id || ! file_exists( (string) get_attached_file( $placeholder_id ) ) ) {
+	if ( $placeholder_id ) {
+		wp_delete_attachment( $placeholder_id, true );
+	}
+	delete_option( 'woocommerce_placeholder_image' );
+	$src = WC()->plugin_path() . '/assets/images/placeholder.webp';
+	$src = file_exists( $src ) ? $src : WC()->plugin_path() . '/assets/images/placeholder.png';
+	$upl = wp_upload_dir();
+	$dst = trailingslashit( $upl['basedir'] ) . 'woocommerce-placeholder.' . pathinfo( $src, PATHINFO_EXTENSION );
+	if ( file_exists( $src ) && wp_mkdir_p( $upl['basedir'] ) && copy( $src, $dst ) ) {
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$att = wp_insert_attachment( array( 'post_mime_type' => wp_check_filetype( $dst )['type'], 'post_title' => 'woocommerce-placeholder', 'post_status' => 'inherit' ), $dst );
+		wp_update_attachment_metadata( $att, wp_generate_attachment_metadata( $att, $dst ) );
+		update_option( 'woocommerce_placeholder_image', $att );
+	}
+}
 $pt_pages = array(
 	'woocommerce_shop_page_id'      => array( 'Loja', 'loja' ),
 	'woocommerce_cart_page_id'      => array( 'Carrinho', 'carrinho' ),

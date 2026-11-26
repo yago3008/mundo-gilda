@@ -75,6 +75,41 @@ add_filter(
 	}
 );
 
+/*
+ * Recuperação de senha sem revelar se o e-mail/usuário existe: para um usuário inexistente,
+ * responde exatamente como no sucesso ("link enviado"), sem mandar e-mail nenhum.
+ */
+// "Minha conta" (WooCommerce) — roda antes do handler do WooCommerce (wp_loaded, prioridade 20).
+add_action(
+	'wp_loaded',
+	static function () {
+		if ( empty( $_POST['wc_reset_password'] ) || empty( $_POST['user_login'] ) || ! function_exists( 'wc_get_account_endpoint_url' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		$nonce = isset( $_POST['woocommerce-lost-password-nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce-lost-password-nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'lost_password' ) ) {
+			return; // o WooCommerce trata o nonce inválido
+		}
+		$login = trim( sanitize_text_field( wp_unslash( $_POST['user_login'] ) ) );
+		$user  = is_email( $login ) ? get_user_by( 'email', $login ) : get_user_by( 'login', $login );
+		if ( ! $user ) {
+			wp_safe_redirect( add_query_arg( 'reset-link-sent', 'true', wc_get_account_endpoint_url( 'lost-password' ) ) );
+			exit;
+		}
+	},
+	19
+);
+// wp-login.php?action=lostpassword
+add_action(
+	'lost_password',
+	static function ( $errors ) {
+		if ( $errors instanceof WP_Error && array_intersect( $errors->get_error_codes(), array( 'invalidcombo', 'invalid_email' ) ) ) {
+			wp_safe_redirect( add_query_arg( 'checkemail', 'confirm', wp_login_url() ) );
+			exit;
+		}
+	}
+);
+
 // Cabeçalhos de segurança.
 add_action(
 	'send_headers',
