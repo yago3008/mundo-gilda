@@ -47,7 +47,7 @@ Hoje existem **três listas de capítulos separadas**, que não conversam entre 
 ### Ao adicionar um capítulo, ele precisa aparecer em
 1. Página **Capítulos**: abertura (colagem de até 7 fotos que dá zoom na principal + "CAPÍTULO N;" + nome), narrativa (um parágrafo por passo, fotos trocando), leitura automática.
 2. **Livro GILDA;** (mesma página, abaixo): título vertical, galeria, botões das peças, textos, lookbook (hoje só o capítulo 3 tem, fixo em `book.php:64`).
-3. **Home**: card do capítulo com fotos trocando.
+3. **Home**: card do capítulo com fotos trocando (os **5 mais recentes**, decisão §16).
 4. **Loja**: opção no filtro "Capítulo" com as peças do capítulo.
 5. **Página da peça** (novo, sugestão): "Esta peça é do Capítulo 3 — Ritual Brasileiro".
 6. Faixa de avisos ("Novas peças a cada capítulo") e menus continuam genéricos, sem mudança.
@@ -58,9 +58,9 @@ Hoje existem **três listas de capítulos separadas**, que não conversam entre 
 | Número / ordem | número | todos | Gera "CAPÍTULO N" e a âncora `capitulo-N`. Não digitar à mão. |
 | Nome | texto curto | abertura, narrativa, card da home, filtro | Ex.: "Ritual Brasileiro" |
 | Textos | lista de parágrafos (itálico permitido) | narrativa (cada parágrafo é um passo e aumenta a altura da seção), Livro | |
-| Peças do capítulo | relação com produtos do WooCommerce | botões, filtro da loja, página da peça | Hoje é por **slug** e com rótulo escrito à mão ("peças disponíveis: Camisa Casulo"): renomear a peça quebra. Passa a ser por ID e o rótulo vem do nome da peça. |
+| Peças do capítulo | campo "Capítulo" **na peça** (uma peça → no máximo um capítulo, decisão §16) | botões, filtro da loja, página da peça | Hoje é por **slug** e com rótulo escrito à mão ("peças disponíveis: Camisa Casulo"): renomear a peça quebra. Passa a ser por ID e o rótulo vem do nome da peça. |
 | Foto principal | 1 imagem | abertura (tela cheia) | **Alta resolução** (≥ 2560 px no lado maior; originais 4000×6000). Recortada para paisagem no desktop, foco em `center 30%`. |
-| Fotos da abertura | lista de **até 6** (+ a principal = 7) | colagem do zoom | Desenho fixo de 7 posições (`transitions.css:11-16`, `transitions.php:53,58`). Com menos, a colagem fica com buracos; com mais, sobra. ≥ 1536 px. |
+| Fotos da abertura | **exatamente 6** (+ a principal = 7, decisão §16) | colagem do zoom | Desenho fixo de 7 posições (`transitions.css:11-16`, `transitions.php:53,58`). O formulário exige as 7. ≥ 1536 px. |
 | Fotos da narrativa | lista | narrativa | Útil ter ≤ número de parágrafos; fotos a mais nunca aparecem (`transitions.js:34-59`). |
 | Galeria | lista | Livro GILDA; (recorte 3:4) e card da home | ≥ 768 px, retrato funciona melhor. |
 | Lookbook (opcional) | lista | Livro GILDA; e card da home | Generalizar o que hoje é só do capítulo 3. |
@@ -254,16 +254,22 @@ Plugins, temas, configurações técnicas e o editor de blocos ficam escondidos 
 
 Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 
-## 16. Decisões em aberto
+## 16. Decisões
 
-1. **Capítulo ↔ peça:** uma peça pode estar em mais de um capítulo? (Hoje Camisa Casulo e Bermuda Envolto estão em dois.) E o texto do capítulo 3 cita a camisa Café e uma calça que não estão ligadas a ele: qual é a lista certa?
-2. **Colagem do zoom:** exigir exatamente 7 fotos por capítulo ou o desenho se adapta a 3–7?
-3. **Lookbook:** todo capítulo pode ter, ou é algo especial?
-4. **Cards da home:** quantos capítulos mostrar (os 3 últimos? todos?) e quantas categorias?
-5. **Cor oficial** de Marrom e Off White (tema × Wix).
-6. **Depois da virada**, os textos legais passam a ser editados só no painel? (Hoje o `.md` do git manda.)
-7. **Páginas do rodapé** que não existem: criar ou remover os links?
-8. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
+### Tomadas (26/11/2026)
+
+1. **Uma peça pertence a no máximo um capítulo.** No painel, o capítulo é um campo da peça (escolher um). O capítulo lista as peças que apontam para ele.
+2. **Colagem do zoom fixa em 7 fotos** (1 principal + 6). O formulário do capítulo exige as 7 e avisa se faltar, para a colagem nunca ficar com buracos.
+3. **Home com no máximo 5 cards** (os 5 capítulos mais recentes; a mesma regra de 5 vale para os cards de categoria marcados "na home"). A grade da home passa de 3 para até 5 colunas.
+
+### Em aberto
+
+4. **Peças hoje em dois capítulos:** Camisa Casulo (capítulos 1 e 3) e Bermuda Envolto (capítulos 2 e 3) precisam ficar com um só. Qual de cada? E o texto do capítulo 3 cita a camisa Café e uma calça, que não estão ligadas a ele: elas são do capítulo 3?
+5. **Quem manda nos textos legais depois que a loja for ao ar.** Hoje o texto da política de privacidade fica num arquivo do código (`docs/legal/politica-de-privacidade.md`) e o setup copia esse arquivo para o site, apagando o que tiver sido mudado no painel. Proposta: até a virada, o arquivo manda (fica fácil revisar com advogado/contador); depois da virada, o setup para de copiar e as donas editam política, trocas e termos direto no painel.
+6. **Lookbook:** todo capítulo pode ter, ou é algo especial?
+7. **Cor oficial** de Marrom e Off White (tema × Wix).
+8. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
+9. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
 
 ## 17. Achados no caminho (fora do painel)
 
