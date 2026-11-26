@@ -1,0 +1,17 @@
+{
+  "name": "gilda-e2e",
+  "private": true,
+  "description": "Testes ponta a ponta (Playwright) da loja GILDA; contra o ambiente local",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "22.19.1",
+    "dotenv": "16.4.7",
+    "typescript": "5.9.3"
+  }
+}
