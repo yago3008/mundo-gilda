@@ -13,7 +13,7 @@
 $gilda_featured_chapters = array(
 	array( 'title' => __( 'CAPÍTULO 1', 'gilda' ), 'key' => 'chapter_1', 'anchor' => 'capitulo-1' ),
 	array( 'title' => __( 'CAPÍTULO 2', 'gilda' ), 'key' => 'chapter_2', 'anchor' => 'capitulo-2' ),
-	array( 'title' => __( 'CAPÍTULO 3', 'gilda' ), 'key' => 'chapter_3', 'extra_key' => 'chapter_3_lookbook', 'anchor' => 'capitulo-3' ),
+	array( 'title' => __( 'CAPÍTULO 3', 'gilda' ), 'key' => 'chapter_3', 'anchor' => 'capitulo-3' ),
 );
 ?>
 <!-- wp:group {"align":"full","className":"gilda-chapter-showcase","backgroundColor":"white","layout":{"type":"constrained","contentSize":"1170px"}} -->
@@ -23,9 +23,6 @@ $gilda_featured_chapters = array(
 <div class="gilda-chapter-showcase__grid">
 <?php foreach ( $gilda_featured_chapters as $gilda_featured_chapter ) :
 	$gilda_ids = (array) gilda_image( $gilda_featured_chapter['key'] );
-	if ( ! empty( $gilda_featured_chapter['extra_key'] ) ) {
-		$gilda_ids = array_merge( $gilda_ids, (array) gilda_image( $gilda_featured_chapter['extra_key'] ) );
-	}
 	$gilda_slides = array_values( array_filter( array_map( static function ( $gilda_id ) {
 		return gilda_image_url( $gilda_id, 'large' );
 	}, $gilda_ids ) ) );
