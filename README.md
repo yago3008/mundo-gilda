@@ -10,7 +10,17 @@ Requisitos: Docker Desktop e Git Bash (Windows) ou qualquer shell bash (Linux/ma
 ./scripts/setup.sh
 ```
 
-Esse comando sobe os containers, instala o WordPress em pt_BR, instala os plugins (versões fixas), configura a loja e importa os produtos. Ele é **idempotente**, então pode rodar de novo sempre que quiser (por exemplo, depois de um `git pull`).
+Esse comando sobe os containers, instala o WordPress em pt_BR, instala os plugins (versões fixas), configura a loja e importa os produtos. Pode rodar de novo sempre que quiser (por exemplo, depois de um `git pull`):
+
+- **A parte técnica é reaplicada sempre:** plugins, tema, moeda, checkout brasileiro, frete PAC/SEDEX, URLs e atributos.
+- **O conteúdo é só semente:** peças, cupom `primeiracompra`, endereço da loja, remetente dos e-mails, avisos de privacidade, slogan, fotos do site e páginas legais só são criados quando ainda não existem. O que as donas editarem no painel (preço, estoque, cupom, textos, fotos, uma peça apagada) **nunca é desfeito** por uma nova execução.
+
+| Opção | O que faz |
+|---|---|
+| `IMPORT_IMAGES=1 ./scripts/setup.sh` | Baixa as fotos dos produtos do Wix (só para peças novas ou ainda sem foto) |
+| `SITE_IMAGES=1 ./scripts/setup.sh` | Importa as fotos do site de `data/site-images.json` (só os papéis que ainda não têm foto) |
+| `SITE_IMAGES=refresh ./scripts/setup.sh` | Regrava todas as fotos do site com o que está no JSON (desenvolvimento) |
+| `IMPORT_PRODUCTS=refresh ./scripts/setup.sh` | Ressincroniza as peças com o Wix: nome, preço, estoque, peso e variações (**sobrescreve**; só antes da virada) |
 
 | Serviço     | URL                     |
 |-------------|-------------------------|
@@ -147,10 +157,10 @@ O core do WordPress, os plugins de terceiros e os uploads ficam num volume Docke
 Para atualizar produtos e estoque a partir do Wix (antes da virada, por exemplo):
 
 ```bash
-node scripts/export-wix-products.mjs && ./scripts/setup.sh
+node scripts/export-wix-products.mjs && IMPORT_PRODUCTS=refresh ./scripts/setup.sh
 ```
 
-> ⚠️ O import **sobrescreve preço e estoque** com os dados do Wix. Ele serve para a migração. Depois que a loja nova estiver no ar, o estoque passa a ser controlado só no WooCommerce: não rode o import em produção.
+> ⚠️ Sem opção, o import só cria as peças novas do JSON e não mexe nas que já existem. Para puxar preço e estoque atuais do Wix (antes da virada), use `IMPORT_PRODUCTS=refresh`, que **sobrescreve** as peças. Depois que a loja nova estiver no ar, o estoque é controlado só no WooCommerce: nunca use `refresh` em produção.
 
 ## Skills do Claude Code
 

@@ -1,10 +1,15 @@
 <?php
 /**
- * Configuração da loja GILDA; (WooCommerce). Idempotente: pode rodar quantas vezes quiser.
+ * Configuração da loja GILDA; (WooCommerce). Pode rodar quantas vezes quiser.
  * Uso: docker compose run --rm wpcli wp eval-file /scripts/setup-store.php
  *
- * Endereço de origem da loja (usado no cálculo de frete) vem das variáveis
- * STORE_ADDRESS, STORE_CITY, STORE_STATE e STORE_CEP do .env.
+ * Duas regras:
+ * - TÉCNICO (moeda, checkout BR, URLs, frete PAC/SEDEX, atributos…): aplicado em toda execução.
+ * - CONTEÚDO que as donas podem mudar no painel (endereço da loja, remetente dos e-mails, avisos de
+ *   privacidade, cupom, dados do remetente dos Correios, títulos das páginas): só é preenchido quando
+ *   está vazio ou ainda com o padrão do WooCommerce. Depois disso, quem manda é o painel.
+ *
+ * Endereço de origem da loja (frete) vem de STORE_ADDRESS, STORE_CITY, STORE_STATE e STORE_CEP do .env.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -12,17 +17,30 @@ defined( 'ABSPATH' ) || exit;
 $env = static fn( $k, $default = '' ) => getenv( $k ) !== false && getenv( $k ) !== '' ? getenv( $k ) : $default;
 $log = static fn( $msg ) => WP_CLI::log( "  • $msg" );
 
+// Semente: grava só se a opção está vazia ou com um dos valores "de fábrica" informados.
+$seed_option = static function ( string $key, $value, array $factory = array() ): bool {
+	$current = get_option( $key, null );
+	$empty   = null === $current || false === $current || '' === $current || array() === $current;
+	if ( $empty || in_array( $current, $factory, true ) ) {
+		update_option( $key, $value );
+		return true;
+	}
+	return false;
+};
+
 WP_CLI::log( 'Loja:' );
 
 /* ---------------------------------------------------------------------------
  * Geral: Brasil, Real, formato de preço brasileiro
  * ------------------------------------------------------------------------ */
-$state = strtoupper( $env( 'STORE_STATE', 'SP' ) );
+$state = strtoupper( $env( 'STORE_STATE', 'PR' ) );
+// Endereço da loja (requisito 10.1: Curitiba/PR, CEP 82015-384): conteúdo, só na primeira vez.
+// Os valores antigos de fallback (São Paulo) contam como "de fábrica" e são corrigidos.
+$seed_option( 'woocommerce_store_address', $env( 'STORE_ADDRESS', 'Endereço a definir' ) );
+$seed_option( 'woocommerce_store_city', $env( 'STORE_CITY', 'Curitiba' ), array( 'São Paulo' ) );
+$seed_option( 'woocommerce_store_postcode', $env( 'STORE_CEP', '82015-384' ), array( '01001-000' ) );
+$seed_option( 'woocommerce_default_country', "BR:$state", array( 'US:CA', 'BR:SP' ) );
 $options = array(
-	'woocommerce_store_address'           => $env( 'STORE_ADDRESS', 'Endereço a definir' ),
-	'woocommerce_store_city'              => $env( 'STORE_CITY', 'São Paulo' ),
-	'woocommerce_default_country'         => "BR:$state",
-	'woocommerce_store_postcode'          => $env( 'STORE_CEP', '01001-000' ),
 	'woocommerce_allowed_countries'       => 'specific',
 	'woocommerce_specific_allowed_countries' => array( 'BR' ),
 	'woocommerce_ship_to_countries'       => 'specific',
@@ -60,16 +78,8 @@ $options = array(
 	'woocommerce_enable_myaccount_registration'       => 'yes',
 	'woocommerce_registration_generate_username'      => 'yes',
 	'woocommerce_registration_generate_password'      => 'no', // cliente escolhe a própria senha
-	// Avisos de privacidade do cadastro e do checkout. O WooCommerce salva o padrão em inglês
-	// quando é instalado antes da tradução; [privacy_policy] vira o link da política.
-	'woocommerce_registration_privacy_policy_text'    => 'Seus dados pessoais serão usados para melhorar a sua experiência no site, gerenciar o acesso à sua conta e para outros fins descritos na nossa [privacy_policy].',
-	'woocommerce_checkout_privacy_policy_text'        => 'Seus dados pessoais serão usados para processar o seu pedido, melhorar a sua experiência no site e para outros fins descritos na nossa [privacy_policy].',
 	'woocommerce_erasure_request_removes_order_data'  => 'no',
 	'woocommerce_allow_bulk_remove_personal_data'     => 'no',
-
-	// E-mails
-	'woocommerce_email_from_name'         => 'GILDA;',
-	'woocommerce_email_from_address'      => $env( 'MAIL_FROM', get_option( 'admin_email' ) ),
 
 	// Sem assistente de configuração / marketplace / rastreamento
 	'woocommerce_onboarding_profile'      => array( 'skipped' => true ),
@@ -83,6 +93,20 @@ $options = array(
 foreach ( $options as $key => $value ) {
 	update_option( $key, $value );
 }
+
+// Avisos de privacidade do cadastro e do checkout (conteúdo). O WooCommerce salva o padrão em inglês
+// quando é instalado antes da tradução: esse padrão conta como "de fábrica". [privacy_policy] vira o link.
+$wc_default_privacy = array(
+	'Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our [privacy_policy].',
+	'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our [privacy_policy].',
+);
+$seed_option( 'woocommerce_registration_privacy_policy_text', 'Seus dados pessoais serão usados para melhorar a sua experiência no site, gerenciar o acesso à sua conta e para outros fins descritos na nossa [privacy_policy].', $wc_default_privacy );
+$seed_option( 'woocommerce_checkout_privacy_policy_text', 'Seus dados pessoais serão usados para processar o seu pedido, melhorar a sua experiência no site e para outros fins descritos na nossa [privacy_policy].', $wc_default_privacy );
+
+// Remetente dos e-mails (conteúdo): o padrão do WooCommerce é o nome do site e o e-mail do admin.
+$seed_option( 'woocommerce_email_from_name', 'GILDA;', array( get_option( 'blogname' ) ) );
+$seed_option( 'woocommerce_email_from_address', $env( 'MAIL_FROM', get_option( 'admin_email' ) ), array( get_option( 'admin_email' ) ) );
+
 $log( 'Brasil / R$ / kg-cm / sem impostos / estoque ativo' );
 $log( 'Contas: cadastro em Minha Conta e no checkout, compra como visitante liberada' );
 
@@ -138,9 +162,14 @@ $pt_pages = array(
 	'wp_page_for_privacy_policy'    => array( 'Política de privacidade', 'politica-de-privacidade' ),
 );
 foreach ( $pt_pages as $opt => [ $title, $slug ] ) {
-	$id = (int) get_option( $opt );
-	if ( $id && get_post( $id ) ) {
+	$id   = (int) get_option( $opt );
+	$page = $id ? get_post( $id ) : null;
+	// Só traduz título/URL na primeira vez (enquanto a página ainda tem o slug em inglês do WooCommerce).
+	if ( $page && $page->post_name !== $slug && ! get_post_meta( $id, '_gilda_seeded_title', true ) ) {
 		wp_update_post( array( 'ID' => $id, 'post_title' => $title, 'post_name' => $slug ) );
+	}
+	if ( $page ) {
+		update_post_meta( $id, '_gilda_seeded_title', 1 );
 	}
 }
 // Conteúdo de exemplo do WordPress (página, post "Olá, mundo!" e comentário).
@@ -248,14 +277,28 @@ if ( $correios_active ) {
 	$cfg::update( 'general.mask_postcode', 'yes' );
 	$cfg::update( 'general.simple_cart_shipping_calculator', 'yes' );
 	$cfg::update( 'general.show_order_tracking_form', 'yes' );
-	// Remetente (dados públicos do rodapé do site atual; rua/número a confirmar).
-	$cfg::update( 'sender.legal_name', 'GILDA ALFAIATARIA LTDA' );
-	$cfg::update( 'sender.name', 'GILDA;' );
-	$cfg::update( 'sender.document', '45822638000109' );
-	$cfg::update( 'sender.person_type', 'company' );
-	$cfg::update( 'sender.address_postalcode', $origin );
-	$cfg::update( 'sender.address_city', $env( 'STORE_CITY', 'Curitiba' ) );
-	$cfg::update( 'sender.address_state', $state );
+	// Remetente (dados públicos do rodapé do site atual; rua/número a confirmar). Conteúdo: só preenche
+	// o que estiver vazio, para não desfazer o que for ajustado no painel do plugin.
+	$sender = array(
+		'sender.legal_name'         => 'GILDA ALFAIATARIA LTDA',
+		'sender.name'               => 'GILDA;',
+		'sender.document'           => '45822638000109',
+		'sender.person_type'        => 'company',
+		'sender.address_postalcode' => $origin,
+		'sender.address_city'       => $env( 'STORE_CITY', 'Curitiba' ),
+		'sender.address_state'      => $state,
+	);
+	foreach ( $sender as $sender_key => $sender_value ) {
+		$current = null;
+		try {
+			$current = $cfg::get( $sender_key );
+		} catch ( \Throwable $e ) {
+			$current = null;
+		}
+		if ( null === $current || '' === $current ) {
+			$cfg::update( $sender_key, $sender_value );
+		}
+	}
 
 	$log( "Frete: PAC e SEDEX (Correios Automático, sem contrato) saindo do CEP $origin + 2 dias de postagem" );
 } else {
@@ -287,27 +330,36 @@ if ( 'production' !== wp_get_environment_type() ) {
 	);
 	$log( 'Pagamento: gateway de teste ativo (só no ambiente local)' );
 }
+// Transferência e pagamento na entrega: desligados na primeira vez (as donas podem ligar depois).
 foreach ( array( 'bacs', 'cod' ) as $gw ) {
-	$s            = get_option( "woocommerce_{$gw}_settings", array() );
-	$s['enabled'] = 'no';
-	update_option( "woocommerce_{$gw}_settings", $s );
+	$s = get_option( "woocommerce_{$gw}_settings", array() );
+	if ( ! isset( $s['enabled'] ) ) {
+		$s['enabled'] = 'no';
+		update_option( "woocommerce_{$gw}_settings", $s );
+	}
 }
 
 /* ---------------------------------------------------------------------------
  * Cupom de primeira compra (regra "só 1ª compra" no mu-plugin gilda-first-purchase)
  * ------------------------------------------------------------------------ */
-$code      = 'primeiracompra';
-$coupon_id = wc_get_coupon_id_by_code( $code );
-$coupon    = new WC_Coupon( $coupon_id ?: 0 );
-$coupon->set_code( $code );
-$coupon->set_description( '10% off na primeira compra pelo site' );
-$coupon->set_discount_type( 'percent' );
-$coupon->set_amount( 10 );
-$coupon->set_individual_use( true );
-$coupon->set_usage_limit_per_user( 1 );
-$coupon->update_meta_data( '_gilda_first_purchase_only', 'yes' );
-$coupon->save();
-$log( 'Cupom: primeiracompra (10%, 1 uso por cliente, só na primeira compra)' );
+// Semente: cria o cupom uma vez. Se já existe (ou foi criado e as donas apagaram), não mexe:
+// percentual, descrição e regras passam a ser do painel.
+$code = 'primeiracompra';
+if ( wc_get_coupon_id_by_code( $code ) || get_option( 'gilda_seeded_coupon' ) ) {
+	$log( 'Cupom: primeiracompra já existe, mantido como está no painel' );
+} else {
+	$coupon = new WC_Coupon();
+	$coupon->set_code( $code );
+	$coupon->set_description( '10% off na primeira compra pelo site' );
+	$coupon->set_discount_type( 'percent' );
+	$coupon->set_amount( 10 );
+	$coupon->set_individual_use( true );
+	$coupon->set_usage_limit_per_user( 1 );
+	$coupon->update_meta_data( '_gilda_first_purchase_only', 'yes' );
+	$coupon->save();
+	$log( 'Cupom: primeiracompra criado (10%, 1 uso por cliente, só na primeira compra)' );
+}
+update_option( 'gilda_seeded_coupon', 1, false );
 
 /* ---------------------------------------------------------------------------
  * Atributos globais de produto: Cor e Tamanho

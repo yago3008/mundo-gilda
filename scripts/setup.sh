@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
-# Sobe e configura o WordPress/WooCommerce local do zero (ou atualiza um existente).
-# Idempotente. Uso: ./scripts/setup.sh   (rode da raiz do projeto ou de qualquer lugar)
+# Sobe e configura o WordPress/WooCommerce do zero (ou atualiza um existente).
+# Pode rodar quantas vezes quiser. Uso: ./scripts/setup.sh   (rode da raiz do projeto ou de qualquer lugar)
+#
+# Conteúdo é SEMENTE: peças, cupom, endereço da loja, fotos do site e páginas só são criados quando
+# ainda não existem. O que as donas editarem no painel nunca é desfeito por uma nova execução.
+# Parte técnica (plugins, tema, moeda, checkout, frete, URLs) é reaplicada sempre.
+#   IMPORT_IMAGES=1          baixa as fotos dos produtos do Wix (só peças novas ou sem foto)
+#   SITE_IMAGES=1            importa as fotos do site (só papéis sem foto); =refresh regrava do JSON
+#   IMPORT_PRODUCTS=refresh  ressincroniza as peças com o Wix (sobrescreve; só antes da virada)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export MSYS_NO_PATHCONV=1 # Git Bash no Windows: não converter caminhos /scripts, /data
@@ -17,8 +24,8 @@ PLUGINS=(
 # Tema: o da GILDA; (K1venn) assim que existir wp-content/themes/gilda/style.css; senão o padrão.
 if [ -f wp-content/themes/gilda/style.css ]; then THEME="gilda"; else THEME="twentytwentyfive"; fi
 
-# IMPORT_IMAGES precisa chegar ao container: o import-products.php lê a variável lá dentro.
-wp() { docker compose run --rm -T -e IMPORT_IMAGES="${IMPORT_IMAGES:-}" wpcli wp "$@"; }
+# As opções de importação precisam chegar ao container: os scripts PHP leem as variáveis lá dentro.
+wp() { docker compose run --rm -T -e IMPORT_IMAGES="${IMPORT_IMAGES:-}" -e IMPORT_PRODUCTS="${IMPORT_PRODUCTS:-}" -e SITE_IMAGES="${SITE_IMAGES:-}" wpcli wp "$@"; }
 
 echo "==> Subindo containers"
 docker compose up -d --wait
@@ -32,7 +39,10 @@ fi
 wp language core install pt_BR --activate >/dev/null 2>&1 || true
 wp option update timezone_string America/Sao_Paulo >/dev/null
 wp option update date_format 'd/m/Y' >/dev/null
-wp option update blogdescription 'Alfaiataria criativa' >/dev/null
+# Slogan: conteúdo (Configurações → Geral). Só na primeira vez (vazio ou o padrão do WordPress).
+case "$(wp option get blogdescription 2>/dev/null || true)" in
+  ''|'Just another WordPress site'|'Só mais um site WordPress'|'Apenas mais um site WordPress') wp option update blogdescription 'Alfaiataria criativa' >/dev/null ;;
+esac
 wp rewrite structure '/%postname%/' >/dev/null
 [ "$THEME" = "gilda" ] || wp theme is-installed "$THEME" || wp theme install "$THEME"
 wp theme activate "$THEME" >/dev/null
@@ -67,7 +77,7 @@ wp eval-file /scripts/import-legal-pages.php --user="$WP_ADMIN_USER"
 
 # Fotos do site (logo, banners, capítulos, Quem Cria) de data/site-images.json.
 # Baixa só o que ainda não foi importado. Opção separada de IMPORT_IMAGES (que traz as fotos dos produtos).
-if [ "${SITE_IMAGES:-}" = "1" ]; then
+if [ -n "${SITE_IMAGES:-}" ]; then
   echo "==> Fotos do site"
   wp eval-file /scripts/import-site-images.php
 fi

@@ -4,10 +4,12 @@
  * listadas em data/site-images.json para a biblioteca de mídia, e grava os IDs na
  * opção `gilda_site_images`, que o tema usa nos patterns (wp-content/themes/gilda/inc/images.php).
  *
- * Uso: SITE_IMAGES=1 ./scripts/setup.sh
- *      (ou: docker compose run --rm wpcli wp eval-file /scripts/import-site-images.php)
+ * Uso: SITE_IMAGES=1 ./scripts/setup.sh        → SEMENTE: só preenche os papéis que ainda não têm foto
+ *      SITE_IMAGES=refresh ./scripts/setup.sh  → regrava todos os papéis com o que está no JSON
+ *      (ou: docker compose run --rm -e SITE_IMAGES=1 wpcli wp eval-file /scripts/import-site-images.php)
  *
- * Idempotente: cada URL é baixada uma vez (meta _gilda_source_url, igual ao import-products.php).
+ * Semente: papel que já tem foto válida (ex.: trocada pelas donas no painel) não é tocado, nem o texto
+ * alternativo. Cada URL é baixada uma vez (meta _gilda_source_url, igual ao import-products.php).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -17,6 +19,14 @@ if ( ! file_exists( $file ) ) {
 	WP_CLI::error( "Arquivo $file não encontrado." );
 }
 $data = json_decode( file_get_contents( $file ), true );
+
+$refresh = 'refresh' === getenv( 'SITE_IMAGES' );
+// Alt text: só grava se estiver vazio (ou no refresh), para não desfazer o que for editado na mídia.
+$set_alt = static function ( int $id, string $alt ) use ( $refresh ): void {
+	if ( $refresh || '' === (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) ) {
+		update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	}
+};
 
 require_once ABSPATH . 'wp-admin/includes/media.php';
 require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -36,7 +46,7 @@ $find = static function ( string $source ): int {
 	return $ids ? (int) $ids[0] : 0;
 };
 
-$sideload = static function ( string $url, string $alt ) use ( $find ): int {
+$sideload = static function ( string $url, string $alt ) use ( $find, $set_alt ): int {
 	$id = $find( $url );
 	if ( ! $id ) {
 		$id = media_sideload_image( $url, 0, null, 'id' );
@@ -46,13 +56,13 @@ $sideload = static function ( string $url, string $alt ) use ( $find ): int {
 		}
 		update_post_meta( $id, '_gilda_source_url', $url );
 	}
-	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	$set_alt( (int) $id, $alt );
 	return (int) $id;
 };
 
 // Arquivo do próprio repositório (data/<file>), ex.: fotos enviadas pelas donas que não estão no Wix.
 // A chave inclui o hash do arquivo: se a foto for trocada no repo, ela é importada de novo.
-$sideload_file = static function ( string $file, string $alt ) use ( $find ): int {
+$sideload_file = static function ( string $file, string $alt ) use ( $find, $set_alt ): int {
 	$path = '/data/' . ltrim( $file, '/' );
 	if ( ! file_exists( $path ) ) {
 		WP_CLI::warning( "Arquivo $path não encontrado." );
@@ -71,12 +81,12 @@ $sideload_file = static function ( string $file, string $alt ) use ( $find ): in
 		}
 		update_post_meta( $id, '_gilda_source_url', $source );
 	}
-	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	$set_alt( (int) $id, $alt );
 	return (int) $id;
 };
 
 // Recorte (ex.: a folha com 3 versões do logo). crop = [x, y, w, h, largura_final, altura_final].
-$sideload_cropped = static function ( string $url, string $alt, array $crop, string $name ) use ( $find ): int {
+$sideload_cropped = static function ( string $url, string $alt, array $crop, string $name ) use ( $find, $set_alt ): int {
 	$source = $url . '#crop=' . implode( ',', $crop );
 	$id     = $find( $source );
 	if ( ! $id ) {
@@ -111,12 +121,22 @@ $sideload_cropped = static function ( string $url, string $alt, array $crop, str
 		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $saved['path'] ) );
 		update_post_meta( $id, '_gilda_source_url', $source );
 	}
-	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	$set_alt( (int) $id, $alt );
 	return (int) $id;
 };
 
-$map = array();
+$current = (array) get_option( 'gilda_site_images', array() );
+$valid   = static function ( $value ): bool {
+	$ids = array_filter( array_map( 'absint', (array) $value ) );
+	return $ids && count( array_filter( $ids, 'wp_attachment_is_image' ) ) === count( $ids );
+};
+
+$map = $refresh ? array() : $current; // semente: começa do que já existe (inclusive papéis fora do JSON)
 foreach ( $data['images'] as $key => $image ) {
+	if ( ! $refresh && isset( $current[ $key ] ) && $valid( $current[ $key ] ) ) {
+		WP_CLI::log( "  • $key (já tem foto, mantido)" );
+		continue;
+	}
 	$alt = (string) ( $image['alt'] ?? '' );
 	if ( ! empty( $image['urls'] ) ) {
 		// Cada item é uma URL ou "file:images/…" (arquivo do repositório, em data/).
@@ -142,4 +162,4 @@ foreach ( $data['images'] as $key => $image ) {
 }
 
 update_option( 'gilda_site_images', $map, false );
-WP_CLI::success( count( $map ) . ' grupos de imagens do site importados.' );
+WP_CLI::success( count( $map ) . ' grupos de imagens do site conferidos' . ( $refresh ? ' (refresh: regravados do JSON).' : '.' ) );

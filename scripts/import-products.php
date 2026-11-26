@@ -1,11 +1,16 @@
 <?php
 /**
  * Importa os produtos de data/products.json (gerado por export-wix-products.mjs) para o WooCommerce.
- * Idempotente: atualiza pelo slug; recria as variações conforme o JSON.
+ *
+ * SEMENTE: cria só as peças que ainda não foram importadas. Peça que já existe (ou que já foi importada
+ * uma vez e as donas apagaram) NÃO é tocada: preço, estoque, fotos, textos e variações editados no painel
+ * ficam como estão. Os slugs já importados ficam na opção `gilda_seeded_products`.
  *
  * Uso: docker compose run --rm wpcli wp eval-file /scripts/import-products.php
- *      IMPORT_IMAGES=1 → também baixa as fotos do CDN do Wix para a biblioteca de mídia
- *      (IMPORT_IMAGES=1 ./scripts/setup.sh, ou: docker compose run --rm -e IMPORT_IMAGES=1 wpcli wp eval-file …).
+ *      IMPORT_IMAGES=1        → também baixa as fotos do Wix (só para peças novas ou ainda sem foto)
+ *      IMPORT_PRODUCTS=refresh → RESSINCRONIZA tudo com o JSON do Wix (nome, preço, estoque, peso,
+ *                                variações — apaga as que saíram). Só antes da virada; nunca em produção.
+ *      (pelo setup: IMPORT_IMAGES=1 ./scripts/setup.sh, IMPORT_PRODUCTS=refresh ./scripts/setup.sh)
  *
  * Peso e dimensões: o Wix não tem esses dados. Usamos valores PROVISÓRIOS por categoria
  * (necessários para o cálculo de frete) até a GILDA; mandar as medidas reais das embalagens.
@@ -19,6 +24,22 @@ if ( ! file_exists( $file ) ) {
 }
 $data          = json_decode( file_get_contents( $file ), true );
 $import_images = (bool) getenv( 'IMPORT_IMAGES' );
+$refresh       = 'refresh' === getenv( 'IMPORT_PRODUCTS' );
+$seeded        = array_flip( (array) get_option( 'gilda_seeded_products', array() ) );
+// Loja que já passou pelo import antigo (antes desta lista existir): se alguma peça do JSON já está lá,
+// todas foram importadas uma vez. Assim uma peça que as donas apagaram não volta.
+if ( null === get_option( 'gilda_seeded_products', null ) ) {
+	$json_slugs = array_map( static fn( $p ) => sanitize_title( $p['slug'] ), $data['products'] );
+	foreach ( $json_slugs as $json_slug ) {
+		if ( get_page_by_path( $json_slug, OBJECT, 'product' ) ) {
+			$seeded = array_flip( $json_slugs );
+			break;
+		}
+	}
+}
+if ( $refresh ) {
+	WP_CLI::warning( 'IMPORT_PRODUCTS=refresh: sobrescrevendo as peças com os dados do Wix.' );
+}
 
 // Peso (kg) e embalagem (C x L x A cm) provisórios por categoria.
 $shipping_defaults = array(
@@ -75,6 +96,27 @@ foreach ( $data['products'] as $p ) {
 	$existing = get_page_by_path( $slug, OBJECT, 'product' );
 	$variable = ! empty( $p['attributes'] );
 
+	// Semente: peça já importada (mesmo que apagada depois) ou já existente fica como está.
+	if ( ! $refresh && ( $existing || isset( $seeded[ $slug ] ) ) ) {
+		$seeded[ $slug ] = true;
+		if ( $existing && $import_images && ! empty( $p['images'] ) && 'trash' !== $existing->post_status ) {
+			$current = wc_get_product( $existing->ID );
+			if ( $current && ! $current->get_image_id() ) { // só completa quem está sem foto
+				$ids = array_values( array_filter( array_map( static fn( $url ) => $sideload( $url, $existing->ID ), $p['images'] ) ) );
+				if ( $ids ) {
+					$current->set_image_id( array_shift( $ids ) );
+					$current->set_gallery_image_ids( $ids );
+					$current->save();
+					WP_CLI::log( "  • {$p['name']} (#{$existing->ID}): fotos adicionadas" );
+					continue;
+				}
+			}
+		}
+		WP_CLI::log( $existing ? "  • {$p['name']}: já existe, mantida" : "  • {$p['name']}: já foi importada e não está mais na loja (apagada no painel), não recriada" );
+		continue;
+	}
+	$seeded[ $slug ] = true;
+
 	$product = $variable ? new WC_Product_Variable( $existing ? $existing->ID : 0 ) : new WC_Product_Simple( $existing ? $existing->ID : 0 );
 	if ( $existing && $product->get_type() !== ( $variable ? 'variable' : 'simple' ) ) {
 		wp_set_object_terms( $existing->ID, $variable ? 'variable' : 'simple', 'product_type' );
@@ -103,7 +145,9 @@ foreach ( $data['products'] as $p ) {
 				$tid   = $term_id( $taxonomy, 'pa_cor' === $taxonomy ? $normalize( $v['label'] ) : $v['label'] );
 				$ids[] = $tid;
 				// Cor da bolinha (swatch) para o front: term meta "gilda_hex" (ex.: #b4522d).
-				if ( 'pa_cor' === $taxonomy && ! empty( $v['hex'] ) && preg_match( '/^#[0-9a-f]{6}$/i', $v['hex'] ) ) {
+				// Não troca a cor que já estiver gravada (pode ter sido ajustada no painel), salvo no refresh.
+				if ( 'pa_cor' === $taxonomy && ! empty( $v['hex'] ) && preg_match( '/^#[0-9a-f]{6}$/i', $v['hex'] )
+					&& ( $refresh || '' === (string) get_term_meta( $tid, 'gilda_hex', true ) ) ) {
 					update_term_meta( $tid, 'gilda_hex', strtolower( $v['hex'] ) );
 				}
 			}
@@ -181,7 +225,8 @@ foreach ( $data['products'] as $p ) {
 $size_order = array( 'PP', 'P', 'M', 'G', 'GG', '36', '38', '40', '42', '44' );
 foreach ( $size_order as $pos => $name ) {
 	$term = get_term_by( 'name', $name, 'pa_tamanho' );
-	if ( $term ) {
+	if ( $term && ( $refresh || '' === (string) get_term_meta( $term->term_id, 'gilda_seeded_order', true ) ) ) {
+		update_term_meta( $term->term_id, 'gilda_seeded_order', 1 );
 		update_term_meta( $term->term_id, 'order', $pos );
 	}
 }
@@ -194,5 +239,6 @@ foreach ( wc_get_products( array( 'limit' => -1, 'return' => 'ids', 'status' => 
 	$lookup->create_data_for_product( $pid );
 }
 
+update_option( 'gilda_seeded_products', array_keys( $seeded ), false );
 wc_delete_product_transients();
-WP_CLI::success( count( $data['products'] ) . ' produtos importados.' );
+WP_CLI::success( count( $data['products'] ) . ' produtos conferidos.' );
