@@ -54,6 +54,20 @@ function gilda_apply_product_filters( $q ) {
 		$tax_query['relation'] = 'AND';
 	}
 	$q->set( 'tax_query', $tax_query );
+
+	$chapter_params = gilda_filter_param( 'capitulo' );
+	if ( $chapter_params ) {
+		$chapter_products = gilda_chapter_product_slugs();
+		$product_slugs    = $chapter_products[ $chapter_params[0] ] ?? array();
+		$product_ids      = array();
+		foreach ( $product_slugs as $product_slug ) {
+			$product = get_page_by_path( $product_slug, OBJECT, 'product' );
+			if ( $product ) {
+				$product_ids[] = (int) $product->ID;
+			}
+		}
+		$q->set( 'post__in', $product_ids ? $product_ids : array( 0 ) );
+	}
 }
 add_action( 'woocommerce_product_query', 'gilda_apply_product_filters' );
 
@@ -113,6 +127,7 @@ function gilda_shortcode_product_filters() {
 	$tipos    = gilda_filter_param( 'tipo' );
 	$cores    = gilda_filter_param( 'cor' );
 	$tamanhos = gilda_filter_param( 'tamanho' );
+	$capitulo = gilda_filter_param( 'capitulo' );
 	list( $lo, $hi ) = gilda_price_bounds();
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	$min = isset( $_GET['min_price'] ) ? max( $lo, absint( $_GET['min_price'] ) ) : $lo;
@@ -147,6 +162,23 @@ function gilda_shortcode_product_filters() {
 		);
 	}
 	$nav .= '</ul>';
+
+	// Chapter selector.
+	$chapter_html = sprintf(
+		'<label class="screen-reader-text" for="gilda-filter-chapter">%1$s</label><select class="gilda-filter-chapter" id="gilda-filter-chapter" name="capitulo"><option value="">%2$s</option>',
+		esc_html__( 'Capítulo', 'gilda' ),
+		esc_html__( 'Todos os capítulos', 'gilda' )
+	);
+	foreach ( array_keys( gilda_chapter_product_slugs() ) as $chapter_slug ) {
+		$chapter_label = sprintf( __( 'Capítulo %s', 'gilda' ), substr( $chapter_slug, -1 ) );
+		$chapter_html .= sprintf(
+			'<option value="%1$s"%2$s>%3$s</option>',
+			esc_attr( $chapter_slug ),
+			selected( in_array( $chapter_slug, $capitulo, true ), true, false ),
+			esc_html( $chapter_label )
+		);
+	}
+	$chapter_html .= '</select>';
 
 	// 4.2 Tipo de produto.
 	$tipo_html = '';
@@ -206,7 +238,8 @@ function gilda_shortcode_product_filters() {
 		);
 	}
 
-	$sections  = gilda_filter_section( __( 'Tipo de produto', 'gilda' ), $tipo_html, 'gilda-f-tipo' );
+	$sections  = gilda_filter_section( __( 'Capítulo', 'gilda' ), $chapter_html, 'gilda-f-capitulo' );
+	$sections .= gilda_filter_section( __( 'Tipo de produto', 'gilda' ), $tipo_html, 'gilda-f-tipo' );
 	$sections .= gilda_filter_section( __( 'Preço', 'gilda' ), $price_html, 'gilda-f-preco' );
 	if ( $cor_html ) {
 		$sections .= gilda_filter_section( __( 'Cor', 'gilda' ), $cor_html, 'gilda-f-cor' );

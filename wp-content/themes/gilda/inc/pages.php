@@ -96,3 +96,30 @@ function gilda_product_type_url( $slug ) {
 	}
 	return add_query_arg( 'tipo', sanitize_title( $slug ), $shop_url );
 }
+
+/**
+ * Product slugs linked to each chapter in the Livro GILDA page.
+ *
+ * @return array<string,string[]>
+ */
+function gilda_chapter_product_slugs() {
+	return array(
+		'capitulo-1' => array( 'camisa-casulo' ),
+		'capitulo-2' => array( 'bermuda-envolto', 'lenco-manaca' ),
+		'capitulo-3' => array( 'camisa-grao', 'bermuda-envolto', 'camisa-casulo' ),
+	);
+}
+
+/**
+ * URL of the catalog filtered by a chapter.
+ *
+ * @param string $chapter Chapter slug.
+ * @return string
+ */
+function gilda_chapter_shop_url( $chapter ) {
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '';
+	if ( ! $shop_url ) {
+		$shop_url = home_url( '/loja/' );
+	}
+	return add_query_arg( 'capitulo', sanitize_title( $chapter ), $shop_url );
+}

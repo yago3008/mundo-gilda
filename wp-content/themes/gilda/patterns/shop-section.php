@@ -30,7 +30,7 @@ $gilda_featured_chapters = array(
 		return gilda_image_url( $gilda_id, 'large' );
 	}, $gilda_ids ) ) );
 	$gilda_image = $gilda_slides[0] ?? '';
-	$gilda_url   = home_url( '/capitulos/#' . $gilda_featured_chapter['anchor'] );
+	$gilda_url   = gilda_chapter_shop_url( $gilda_featured_chapter['anchor'] );
 	?>
 	<a class="gilda-chapter-card" href="<?php echo esc_url( $gilda_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Ver fotos do %s', 'gilda' ), $gilda_featured_chapter['title'] ) ); ?>"<?php echo $gilda_slides ? ' data-chapter-slides="' . esc_attr( wp_json_encode( $gilda_slides ) ) . '"' : ''; ?>>
 		<?php if ( $gilda_image ) : ?>

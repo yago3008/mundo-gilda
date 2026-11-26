@@ -685,6 +685,16 @@ body.gilda-has-hero .gilda-hero {
 .gilda-filter__title::after { content: "+"; font-size: 16px; }
 .gilda-filter[open] > .gilda-filter__title::after { content: "−"; }
 .gilda-filter__body { display: flex; flex-direction: column; padding-bottom: 14px; }
+.gilda-filter-chapter {
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	color: var(--gilda-ink);
+	font: 400 14px/1.2 var(--gilda-sans);
+	min-height: 44px;
+	padding: 0 12px;
+	width: 100%;
+}
+.gilda-filter-chapter:focus-visible { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
 
 .gilda-check { align-items: center; cursor: pointer; display: flex; font-size: 14px; gap: 10px; min-height: 36px; }
 .gilda-check input { accent-color: var(--gilda-terracotta); height: 18px; margin: 0; width: 18px; }
