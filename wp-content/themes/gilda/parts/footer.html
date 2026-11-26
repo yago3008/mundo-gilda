@@ -1,43 +1,133 @@
-<!-- wp:group {"anchor":"contato","className":"gilda-footer","backgroundColor":"terracotta","textColor":"cream","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0"}},"elements":{"link":{"color":{"text":"var:preset|color|cream"}}}},"layout":{"type":"constrained","contentSize":"1170px"}} -->
-<div id="contato" class="wp-block-group gilda-footer has-cream-color has-terracotta-background-color has-text-color has-background has-link-color" style="margin-top:0;padding-top:var(--wp--preset--spacing--70);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--50)"><!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"var:preset|spacing|70"}}}} -->
-<div class="wp-block-columns"><!-- wp:column {"width":"45%"} -->
-<div class="wp-block-column" style="flex-basis:45%"><!-- wp:heading {"level":2,"style":{"typography":{"letterSpacing":"0.3em","fontSize":"20px"}},"fontFamily":"display"} -->
-<h2 class="wp-block-heading has-display-font-family" style="font-size:20px;letter-spacing:0.3em">CONTATO</h2>
+<!-- wp:html -->
+<style>
+/* Footer GILDA; — estilos embutidos para não depender do theme.css compartilhado. */
+.gilda-footer a { color: var(--wp--preset--color--cream); }
+.gilda-footer__top { display: grid; gap: clamp(32px, 4vw, 80px); grid-template-columns: repeat(3, minmax(140px, max-content)); justify-content: end; }
+.gilda-footer__heading { color: color-mix(in srgb, var(--wp--preset--color--cream) 75%, transparent); font: 500 11px/1 var(--wp--preset--font-family--sans); letter-spacing: 2px; margin: 0 0 22px; text-transform: uppercase; }
+.gilda-footer__links { display: flex; flex-direction: column; gap: 13px; list-style: none; margin: 0; padding: 0; }
+.gilda-footer__links a { font: 400 17px/1.2 var(--wp--preset--font-family--serif); text-decoration: none; }
+.gilda-footer__links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.gilda-footer__brand { align-items: center; display: flex; flex-wrap: wrap; gap: 24px clamp(24px, 4vw, 64px); justify-content: space-between; padding-top: clamp(32px, 4vw, 56px); }
+.gilda-footer__brand .wp-block-site-title { font-size: clamp(30px, 4vw, 44px) !important; margin: 0; }
+.gilda-footer__brand-id { display: flex; flex-direction: column; gap: 14px; }
+.gilda-footer__legal { font: 400 13px/1.7 var(--wp--preset--font-family--sans); letter-spacing: .4px; margin: 0; opacity: .85; }
+.gilda-footer__social .wp-block-social-links { gap: 10px; margin: 0; }
+.gilda-footer__social .wp-block-social-link { background: transparent !important; }
+.gilda-footer__mark { color: var(--wp--preset--color--cream); font: 600 clamp(80px, 9vw, 130px)/.7 var(--wp--preset--font-family--display); margin: 0; }
+.gilda-footer__bar { align-items: center; background: var(--wp--preset--color--terracotta-900, #4e1a08); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+.gilda-footer__bar .gilda-payments { margin: 0; }
+.gilda-footer__bar .gilda-payments p { display: none; }
+.gilda-footer__copyright { font: 400 13px/1.4 var(--wp--preset--font-family--sans); letter-spacing: .4px; margin: 0; }
+@media (max-width: 760px) {
+	.gilda-footer__top { grid-template-columns: 1fr 1fr; justify-content: start; }
+}
+@media (max-width: 480px) {
+	.gilda-footer__top { grid-template-columns: 1fr; justify-content: start; }
+	.gilda-footer__brand { justify-content: center; text-align: center; }
+	.gilda-footer__mark { display: none; }
+	.gilda-footer__bar { flex-direction: column; align-items: flex-start; }
+}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:group {"tagName":"footer","anchor":"contato","className":"gilda-footer","backgroundColor":"terracotta","textColor":"cream","style":{"spacing":{"padding":{"top":"var:preset|spacing|80","bottom":"0","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0"},"blockGap":"var:preset|spacing|70"},"elements":{"link":{"color":{"text":"var:preset|color|cream"}}}},"layout":{"type":"constrained","contentSize":"1280px"}} -->
+<footer id="contato" class="wp-block-group gilda-footer has-cream-color has-terracotta-background-color has-text-color has-background has-link-color" style="margin-top:0;padding-top:var(--wp--preset--spacing--80);padding-right:var(--wp--preset--spacing--50);padding-bottom:0;padding-left:var(--wp--preset--spacing--50)"><!-- wp:group {"className":"gilda-footer__top","layout":{"type":"default"}} -->
+<div class="wp-block-group gilda-footer__top"><!-- wp:group {"layout":{"type":"default"}} -->
+<div class="wp-block-group"><!-- wp:heading {"level":2,"className":"gilda-footer__heading"} -->
+<h2 class="wp-block-heading gilda-footer__heading">Conheça</h2>
 <!-- /wp:heading -->
 
-<!-- wp:paragraph {"style":{"typography":{"fontSize":"22px","letterSpacing":"1px"}}} -->
-<p style="font-size:22px;letter-spacing:1px"><a href="tel:+5541991008303">41.991008303</a></p>
-<!-- /wp:paragraph -->
+<!-- wp:list {"className":"gilda-footer__links"} -->
+<ul class="wp-block-list gilda-footer__links"><!-- wp:list-item -->
+<li><a href="/produtos/">Produtos;</a></li>
+<!-- /wp:list-item -->
 
-<!-- wp:paragraph {"fontFamily":"serif","fontSize":"x-large"} -->
-<p class="has-serif-font-family has-x-large-font-size"><a href="mailto:mundogilda@gmail.com">mundogilda@gmail.com</a></p>
-<!-- /wp:paragraph -->
+<!-- wp:list-item -->
+<li><a href="/quem-cria/">Quem Cria</a></li>
+<!-- /wp:list-item -->
 
-<!-- wp:paragraph {"style":{"typography":{"fontSize":"18px","letterSpacing":"0.03em","textTransform":"uppercase"}},"fontFamily":"headline"} -->
-<p class="has-headline-font-family" style="font-size:18px;letter-spacing:0.03em;text-transform:uppercase"><a href="https://www.instagram.com/gildapontoevirgula/" target="_blank" rel="noreferrer noopener">@gildapontoevirgula</a></p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:column -->
+<!-- wp:list-item -->
+<li><a href="/capitulos/">Livro GILDA;</a></li>
+<!-- /wp:list-item -->
 
-<!-- wp:column {"width":"35%"} -->
-<div class="wp-block-column" style="flex-basis:35%"><!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.7","letterSpacing":"0.4px"}},"fontSize":"small"} -->
-<p class="has-small-font-size" style="line-height:1.7;letter-spacing:0.4px"><strong>GILDA ALFAIATARIA LTDA</strong><br>CNPJ 45.822.638/0001-09<br>Curitiba/PR<br>CEP 82.015-384</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:column -->
-
-<!-- wp:column {"width":"20%"} -->
-<div class="wp-block-column" style="flex-basis:20%"><!-- wp:paragraph {"className":"gilda-footer__mark gilda-decorative"} -->
-<p class="gilda-footer__mark gilda-decorative">;</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns --></div>
+<!-- wp:list-item -->
+<li><a href="/loja/">Loja</a></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
 <!-- /wp:group -->
 
-<!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"blockGap":"var:preset|spacing|40","margin":{"top":"0"}}},"backgroundColor":"cream","fontSize":"x-small","layout":{"type":"constrained","contentSize":"1170px"}} -->
-<div class="wp-block-group has-cream-background-color has-background has-x-small-font-size" style="margin-top:0;padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)"><!-- wp:shortcode -->
-[gilda_payment_methods]
-<!-- /wp:shortcode -->
+<!-- wp:group {"layout":{"type":"default"}} -->
+<div class="wp-block-group"><!-- wp:heading {"level":2,"className":"gilda-footer__heading"} -->
+<h2 class="wp-block-heading gilda-footer__heading">Suporte</h2>
+<!-- /wp:heading -->
 
-<!-- wp:paragraph {"textColor":"ink-soft"} -->
-<p class="has-ink-soft-color has-text-color">© 2006 by GILDA;</p>
+<!-- wp:list {"className":"gilda-footer__links"} -->
+<ul class="wp-block-list gilda-footer__links"><!-- wp:list-item -->
+<li><a href="/cuidados-com-as-pecas/">Cuidados com as peças</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><a href="/trocas-e-devolucoes/">Trocas e Devoluções</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><a href="/politica-de-privacidade/">Política de Privacidade</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><a href="/duvidas-frequentes/">Dúvidas Frequentes</a></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"layout":{"type":"default"}} -->
+<div class="wp-block-group"><!-- wp:heading {"level":2,"className":"gilda-footer__heading"} -->
+<h2 class="wp-block-heading gilda-footer__heading">Contato</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"className":"gilda-footer__links"} -->
+<ul class="wp-block-list gilda-footer__links"><!-- wp:list-item -->
+<li><a href="tel:+5541991008303">41.991008303</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><a href="mailto:mundogilda@gmail.com">mundogilda@gmail.com</a></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><a href="https://www.instagram.com/gildapontoevirgula/" target="_blank" rel="noreferrer noopener">@gildapontoevirgula</a></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"gilda-footer__brand","style":{"spacing":{"padding":{"bottom":"var:preset|spacing|70"}},"border":{"top":{"color":"color-mix(in srgb, var(--wp--preset--color--cream) 30%, transparent)","width":"1px"}}},"layout":{"type":"default"}} -->
+<div class="wp-block-group gilda-footer__brand" style="border-top-color:color-mix(in srgb, var(--wp--preset--color--cream) 30%, transparent);border-top-width:1px;padding-bottom:var(--wp--preset--spacing--70)"><!-- wp:group {"className":"gilda-footer__brand-id","layout":{"type":"default"}} -->
+<div class="wp-block-group gilda-footer__brand-id"><!-- wp:site-title {"level":0,"isLink":true,"className":"gilda-logo is-light"} /-->
+
+<!-- wp:paragraph {"className":"gilda-footer__legal"} -->
+<p class="gilda-footer__legal">GILDA ALFAIATARIA LTDA&nbsp;·&nbsp;CNPJ 45.822.638/0001-09<br>Curitiba/PR&nbsp;·&nbsp;CEP 82.015-384</p>
 <!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:social-links {"iconColor":"cream","iconColorValue":"#f7f5e9","className":"gilda-footer__social is-style-logos-only","layout":{"type":"flex"}} -->
+<ul class="wp-block-social-links has-icon-color gilda-footer__social is-style-logos-only"><!-- wp:social-link {"url":"https://www.instagram.com/gildapontoevirgula/","service":"instagram"} /-->
+
+<!-- wp:social-link {"url":"https://wa.me/5541991008303","service":"whatsapp"} /--></ul>
+<!-- /wp:social-links -->
+
+<!-- wp:paragraph {"className":"gilda-footer__mark gilda-decorative"} -->
+<p class="gilda-footer__mark gilda-decorative">;</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></footer>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"gilda-footer__bar","backgroundColor":"terracotta-900","textColor":"cream","style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0"}}},"layout":{"type":"constrained","contentSize":"1280px"}} -->
+<div class="wp-block-group gilda-footer__bar has-cream-color has-terracotta-900-background-color has-text-color has-background" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--50)"><!-- wp:paragraph {"className":"gilda-footer__copyright"} -->
+<p class="gilda-footer__copyright">© 2006 by GILDA;&nbsp;·&nbsp;Todos os direitos reservados.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:shortcode -->
+[gilda_payment_methods]
+<!-- /wp:shortcode --></div>
 <!-- /wp:group -->
