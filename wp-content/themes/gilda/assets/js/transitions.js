@@ -109,7 +109,7 @@
 		});
 	});
 
-	/* Quem Cria: os nomes das criadoras vão sendo pintados de marrom, de baixo pra cima, com o scroll.
+	/* Quem Cria: os nomes das criadoras começam marrons e vão ficando creme, de baixo pra cima, com o scroll.
 	   Começa quando o nome entra pela base da tela e termina quando ele chega perto do meio. */
 	document.querySelectorAll('.gilda-founder__signature').forEach((name) => {
 		name.classList.add('is-paintable');
