@@ -1,6 +1,6 @@
-# Textos legais (RASCUNHOS)
+# Textos legais
 
-Rascunhos das páginas exigidas pela LGPD e pelo Código de Defesa do Consumidor (item 7 de [requisitos-cliente.md](../requisitos-cliente.md)). **Nenhum deles está pronto para publicar**: são modelos para as donas da GILDA; e o contador/advogado revisarem.
+Rascunhos das páginas exigidas pela LGPD e pelo Código de Defesa do Consumidor (item 7 de [requisitos-cliente.md](../requisitos-cliente.md)). A **política de privacidade está publicada** (`status: publicar`), com os dados que já temos e texto neutro onde o fornecedor ainda não foi escolhido. Trocas e termos continuam **rascunhos** para as donas da GILDA; e o contador/advogado revisarem.
 
 | Arquivo | Página no site | Observação |
 |---|---|---|
@@ -10,7 +10,7 @@ Rascunhos das páginas exigidas pela LGPD e pelo Código de Defesa do Consumidor
 
 ## O que as donas precisam decidir ou informar
 
-Tudo o que está marcado com **[PREENCHER]** nos arquivos. Os principais:
+Tudo o que está marcado com **[PREENCHER]** nos arquivos. Na política de privacidade, ainda vale confirmar: rua e número da sede, e-mail e WhatsApp oficiais, e citar pelo nome o gateway, a hospedagem e o serviço de e-mail quando forem escolhidos (hoje o texto fala de "empresa de pagamentos parceira", "empresa que hospeda o site" etc.). Os principais:
 
 - Endereço completo (rua e número) e os contatos oficiais (e-mail e WhatsApp).
 - Gateway de pagamento e formas de pagamento/parcelamento.
@@ -35,4 +35,4 @@ Tudo o que está marcado com **[PREENCHER]** nos arquivos. Os principais:
 docker compose run --rm wpcli wp eval-file /scripts/import-legal-pages.php --user=admin
 ```
 
-Cria ou atualiza as três páginas **como rascunho** (nunca publica e nunca mexe numa página que já esteja publicada). Depois é revisar no painel, apagar o aviso de RASCUNHO, preencher e publicar. Ao publicar os termos, ligue a página em WooCommerce → Configurações → Avançado → "Termos e condições" (o script não faz isso para o checkout não linkar um rascunho).
+Roda sozinho no `./scripts/setup.sh`. Páginas com `status: publicar` no cabeçalho do .md são publicadas e atualizadas a cada execução (o .md é a fonte: edite aqui, não no painel). As outras ficam **como rascunho** e uma página já publicada sem `status: publicar` não é tocada. Para publicar uma nova: preencher os [PREENCHER], apagar o aviso de RASCUNHO e acrescentar `status: publicar`. Ao publicar os termos, ligue a página em WooCommerce → Configurações → Avançado → "Termos e condições" (o script não faz isso para o checkout não linkar um rascunho).

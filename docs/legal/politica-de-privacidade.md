@@ -2,26 +2,25 @@
 titulo: Política de privacidade
 slug: politica-de-privacidade
 opcao_wp: wp_page_for_privacy_policy
+status: publicar
 ---
-
-> **RASCUNHO: não publicar sem revisão.** Modelo preparado pela equipe do site para as donas da GILDA; e o contador/advogado revisarem. Os trechos marcados com **[PREENCHER]** dependem de informações ou decisões delas. Este texto não substitui orientação jurídica. Apague este aviso antes de publicar.
 
 # Política de privacidade
 
-Última atualização: [PREENCHER: data da publicação]
+Última atualização: 26 de novembro de 2026
 
 Esta política explica quais dados pessoais a **GILDA;** coleta quando você visita o site **mundogilda.com.br** ou compra com a gente, para que usamos, com quem compartilhamos e como você pode exercer seus direitos. Ela segue a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018), o Marco Civil da Internet (Lei nº 12.965/2014) e o Código de Defesa do Consumidor.
 
 ## 1. Quem é responsável pelos seus dados
 
-A controladora dos dados é a **GILDA ALFAIATARIA LTDA**, CNPJ 45.822.638/0001-09, com sede em [PREENCHER: rua e número], Curitiba/PR, CEP 82015-384.
+A controladora dos dados é a **GILDA ALFAIATARIA LTDA**, CNPJ 45.822.638/0001-09, com sede em Curitiba/PR, CEP 82015-384.
 
 Para qualquer assunto sobre privacidade, fale com a gente:
 
-- E-mail: [PREENCHER: confirmar; hoje o site mostra mundogilda@gmail.com]
-- WhatsApp: [PREENCHER: confirmar; hoje o site mostra (41) 99100-8303]
+- E-mail: mundogilda@gmail.com
+- WhatsApp: (41) 99100-8303
 
-[PREENCHER: se a GILDA; se enquadra como agente de tratamento de pequeno porte (Resolução CD/ANPD nº 2/2022), ela não é obrigada a indicar um encarregado (DPO), mas precisa manter um canal de atendimento, que são os contatos acima. Se indicarem um encarregado, colocar aqui o nome e o contato.]
+Esses contatos são o nosso canal de atendimento para qualquer pedido ou dúvida sobre os seus dados.
 
 ## 2. Quais dados coletamos
 
@@ -29,13 +28,13 @@ Para qualquer assunto sobre privacidade, fale com a gente:
 
 **Quando você compra:** nome completo, CPF, endereço de entrega e de cobrança (com CEP, número, complemento e bairro), telefone celular e e-mail, além dos produtos comprados, valores, cupom usado e forma de entrega.
 
-**Pagamento:** os dados do cartão são digitados e processados diretamente pela empresa de pagamentos [PREENCHER: nome do gateway, ex.: Mercado Pago, Pagar.me, PagBank]. A GILDA; não recebe nem guarda o número completo do cartão. Recebemos só a confirmação do pagamento e informações como a bandeira, os últimos dígitos e o número de parcelas.
+**Pagamento:** os dados do cartão são digitados e processados diretamente pela empresa de pagamentos parceira da loja. A GILDA; não recebe nem guarda o número completo do cartão. Recebemos só a confirmação do pagamento e informações como a bandeira, os últimos dígitos e o número de parcelas.
 
 **Quando você navega no site:** endereço IP, data e hora de acesso, tipo de navegador e dispositivo, páginas visitadas e os cookies descritos na seção 5.
 
 **Quando você fala com a gente:** o que você nos enviar por e-mail, WhatsApp ou Instagram (por exemplo, para trocas ou dúvidas).
 
-Não coletamos dados sensíveis (como saúde, religião ou biometria). As medidas que você eventualmente nos informar para ajustes de peças são usadas só para esse fim. [PREENCHER: confirmar se recebem medidas corporais de clientes.]
+Não coletamos dados sensíveis (como saúde, religião ou biometria). As medidas que você eventualmente nos informar para ajustes de peças são usadas só para esse fim.
 
 ## 3. Para que usamos seus dados e com qual base legal
 
@@ -46,7 +45,7 @@ Não coletamos dados sensíveis (como saúde, religião ou biometria). As medida
 - **Validar o cupom de primeira compra** (e-mail e histórico de pedidos): para cumprir as condições da promoção que você escolheu usar (art. 7º, V).
 - **Segurança do site e prevenção de fraudes** (IP, registros de acesso, bloqueio após tentativas de login erradas): por legítimo interesse e para guardar os registros de acesso exigidos pelo Marco Civil da Internet (art. 7º, IX e II).
 - **Medir anúncios e mostrar anúncios mais relevantes** (cookies de marketing, Meta Pixel): só com o seu consentimento (art. 7º, I), que você pode retirar a qualquer momento.
-- **Enviar novidades e promoções por e-mail:** [PREENCHER: hoje o site não tem newsletter. Se for criada, só com consentimento e com link para sair em todo e-mail.]
+- **Enviar novidades e promoções por e-mail:** hoje não enviamos newsletter. Se um dia enviarmos, será só com o seu consentimento (art. 7º, I) e com um link para sair em todo e-mail.
 
 ## 4. Com quem compartilhamos
 
@@ -54,11 +53,11 @@ Compartilhamos apenas o necessário com empresas que nos ajudam a operar a loja:
 
 - **Correios:** para calcular o frete enviamos o CEP de destino e o peso e as medidas do pacote; para entregar, o nome, o endereço e o telefone vão na etiqueta e no sistema de rastreio. O cálculo e o rastreio usam o plugin "Correios Automático" (Infixs), que se comunica com os Correios.
 - **Consulta de CEP:** quando você digita o CEP, o site consulta um serviço público de endereços (como ViaCEP ou Correios) para preencher rua, bairro e cidade. Só o CEP é enviado.
-- **Pagamento:** [PREENCHER: nome do gateway] recebe os dados necessários para processar o pagamento e prevenir fraudes.
+- **Pagamento:** a empresa de pagamentos parceira recebe os dados necessários para processar o pagamento e prevenir fraudes.
 - **Meta Platforms (Facebook e Instagram):** somente se você aceitar os cookies de marketing. O Meta Pixel envia à Meta informações como as páginas vistas, produtos adicionados ao carrinho e compras (valor e produtos), associadas aos cookies da Meta no seu navegador. A Meta trata esses dados conforme a política de privacidade dela.
-- **Hospedagem do site:** [PREENCHER: nome da empresa de hospedagem e país dos servidores].
-- **Envio de e-mails:** os e-mails automáticos da loja saem por um serviço de envio (SMTP) [PREENCHER: provedor, ex.: Brevo, Amazon SES, Google Workspace].
-- **Contabilidade e nota fiscal:** [PREENCHER: escritório de contabilidade e/ou sistema emissor de nota fiscal], e a Secretaria da Fazenda, por obrigação legal.
+- **Hospedagem do site:** a empresa que hospeda o site e o banco de dados da loja.
+- **Envio de e-mails:** os e-mails automáticos da loja saem por um serviço de envio de e-mails (SMTP).
+- **Contabilidade e nota fiscal:** o escritório de contabilidade e o sistema emissor de nota fiscal, além da Secretaria da Fazenda, por obrigação legal.
 - **Autoridades:** quando houver obrigação legal ou ordem judicial.
 
 Não vendemos nem alugamos seus dados.
@@ -77,15 +76,15 @@ Você também pode apagar ou bloquear cookies nas configurações do navegador, 
 
 ## 6. Transferência internacional
 
-Alguns fornecedores podem guardar dados fora do Brasil, como a Meta (Estados Unidos) e [PREENCHER: outros fornecedores com servidores no exterior, ex.: hospedagem ou e-mail]. Nesses casos, a transferência é feita com as garantias previstas na LGPD (art. 33), como cláusulas contratuais padrão adotadas por esses fornecedores, ou com base no seu consentimento, no caso dos cookies de marketing.
+Alguns fornecedores podem guardar dados fora do Brasil, como a Meta (Estados Unidos) e, eventualmente, os serviços de hospedagem e de envio de e-mails. Nesses casos, a transferência é feita com as garantias previstas na LGPD (art. 33), como cláusulas contratuais padrão adotadas por esses fornecedores, ou com base no seu consentimento, no caso dos cookies de marketing.
 
 ## 7. Por quanto tempo guardamos
 
-- **Pedidos, notas fiscais e dados de compra:** por 5 anos após a compra, prazo das obrigações fiscais e do Código de Defesa do Consumidor. [PREENCHER: confirmar com o contador.]
+- **Pedidos, notas fiscais e dados de compra:** por 5 anos após a compra, prazo das obrigações fiscais e do Código de Defesa do Consumidor.
 - **Conta de cliente:** enquanto a conta existir. Você pode pedir a exclusão a qualquer momento (pedidos já feitos continuam guardados pelo prazo acima).
 - **Registros de acesso ao site (IP, data e hora):** 6 meses, como exige o Marco Civil da Internet.
 - **Escolha sobre cookies:** 6 meses; depois perguntamos de novo.
-- **Conversas de atendimento:** [PREENCHER: prazo, ex.: 2 anos ou enquanto houver troca/garantia pendente].
+- **Conversas de atendimento:** pelo tempo necessário para resolver o atendimento e cumprir os prazos legais, como os de troca e garantia.
 
 Depois desses prazos, os dados são apagados ou anonimizados.
 
@@ -106,7 +105,7 @@ Pela LGPD (art. 18) você pode, a qualquer momento e de graça:
 - retirar o consentimento (por exemplo, dos cookies de marketing);
 - se opor a um tratamento feito com base em legítimo interesse.
 
-Para exercer esses direitos, escreva para [PREENCHER: e-mail de contato]. Podemos pedir uma confirmação de identidade para proteger seus dados. Respondemos em até 15 dias. Alguns dados precisam ser mantidos mesmo após o pedido de exclusão, quando a lei obriga (por exemplo, notas fiscais).
+Para exercer esses direitos, escreva para mundogilda@gmail.com. Podemos pedir uma confirmação de identidade para proteger seus dados. Respondemos em até 15 dias. Alguns dados precisam ser mantidos mesmo após o pedido de exclusão, quando a lei obriga (por exemplo, notas fiscais).
 
 Se achar que seus direitos não foram respeitados, você também pode reclamar à ANPD (www.gov.br/anpd).
 

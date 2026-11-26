@@ -110,7 +110,7 @@ scripts/
   setup.sh                  # sobe e configura tudo (rodar sempre que precisar)
   setup-store.php           # configurações do WooCommerce (moeda, contas, checkout BR, frete, cupom...)
   import-products.php       # importa data/products.json para o WooCommerce
-  import-legal-pages.php    # cria/atualiza as páginas legais (rascunho) a partir de docs/legal/
+  import-legal-pages.php    # páginas legais de docs/legal/ (privacidade publicada, resto em rascunho); roda no setup.sh
   export-wix-products.mjs   # lê a loja Wix e gera data/products.json
 data/products.json          # produtos exportados do Wix
 wp-content/mu-plugins/      # nosso código que roda sempre
