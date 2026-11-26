@@ -46,7 +46,7 @@ Hoje existem **três listas de capítulos separadas**, que não conversam entre 
 
 ### Ao adicionar um capítulo, ele precisa aparecer em
 1. Página **Capítulos**: abertura (colagem de até 7 fotos que dá zoom na principal + "CAPÍTULO N;" + nome), narrativa (um parágrafo por passo, fotos trocando), leitura automática.
-2. **Livro GILDA;** (mesma página, abaixo): título vertical, galeria, botões das peças, textos, lookbook (hoje só o capítulo 3 tem, fixo em `book.php:64`).
+2. **Livro GILDA;** (mesma página, abaixo): título vertical, galeria, botões das peças, textos (o lookbook do capítulo 3 foi removido, decisão §16).
 3. **Home**: card do capítulo com fotos trocando (os **5 mais recentes**, decisão §16).
 4. **Loja**: opção no filtro "Capítulo" com as peças do capítulo.
 5. **Página da peça** (novo, sugestão): "Esta peça é do Capítulo 3 — Ritual Brasileiro".
@@ -63,7 +63,6 @@ Hoje existem **três listas de capítulos separadas**, que não conversam entre 
 | Fotos da abertura | **exatamente 6** (+ a principal = 7, decisão §16) | colagem do zoom | Desenho fixo de 7 posições (`transitions.css:11-16`, `transitions.php:53,58`). O formulário exige as 7. ≥ 1536 px. |
 | Fotos da narrativa | lista | narrativa | Útil ter ≤ número de parágrafos; fotos a mais nunca aparecem (`transitions.js:34-59`). |
 | Galeria | lista | Livro GILDA; (recorte 3:4) e card da home | ≥ 768 px, retrato funciona melhor. |
-| Lookbook (opcional) | lista | Livro GILDA; e card da home | Generalizar o que hoje é só do capítulo 3. |
 | Texto alternativo | por foto | acessibilidade | Hoje é um por grupo. |
 
 **Animações:** o JavaScript já é genérico (qualquer quantidade de capítulos e de parágrafos). O que precisa mudar é a **origem dos dados** (as três listas viram uma só, no banco) e os limites acima (7 posições da colagem, grade de 3 cards, rótulo de 1 dígito, número digitado, lookbook fixo, cache). As fotos passam a ser guardadas por **ID**, não por posição (`chapter_3:7` muda de sentido quando uma foto some, `T/inc/images.php:21-32`).
@@ -278,9 +277,9 @@ Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 7. **"Cuidados com as peças" e "Dúvidas frequentes" são criadas**, simples, no padrão das outras páginas, e editáveis no painel (semente uma vez, como os textos legais).
 8. **O painel é só das donas.** O perfil "Dona da loja" vê pedidos e clientes; não há perfil restrito.
 
-### Em aberto
+9. **Sem lookbook.** A galeria extra de looks do capítulo 3 foi removida e o formulário do capítulo não terá esse campo. (As fotos `chapter_3_lookbook` continuam importadas porque a abertura e a narrativa do capítulo 2 usam três delas; na migração elas viram fotos do capítulo 2.)
 
-9. **Lookbook:** hoje só o capítulo 3 tem, além da galeria normal, uma segunda galeria de 8 fotos de looks completos (`chapter_3_lookbook`), que aparece no "LIVRO GILDA;" e também roda no card do capítulo 3 na home. Todo capítulo pode ter essa galeria extra (opcional), ou ela some e vira parte da galeria normal?
+Todas as decisões do levantamento estão tomadas.
 
 ## 17. Achados no caminho (fora do painel)
 
