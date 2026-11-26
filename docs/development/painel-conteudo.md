@@ -22,7 +22,7 @@ Hoje o `./scripts/setup.sh` (rodado "sempre que quiser", inclusive depois de `gi
 | `scripts/import-site-images.php` | Regrava a opção `gilda_site_images` inteira (144) e os textos alternativos das fotos (49, 74). |
 | `scripts/import-legal-pages.php` | Regrava a página da política de privacidade (`status: publicar`) a cada execução. |
 
-**Regra proposta:** o git guarda **código e a carga inicial**; o banco guarda **o conteúdo**. Os scripts de carga só preenchem o que está vazio ("semente uma vez") e nunca rodam em produção depois da virada. Sem isso, qualquer painel perde o que as donas fizerem no próximo setup. Esta é a primeira coisa a mudar.
+**Feito (26/11/2026):** os scripts viraram semente (ver README, "Rodando localmente"). **Regra:** o git guarda **código e a carga inicial**; o banco guarda **o conteúdo**. Os scripts de carga só preenchem o que está vazio ("semente uma vez") e nunca rodam em produção depois da virada. Sem isso, qualquer painel perde o que as donas fizerem no próximo setup. Esta é a primeira coisa a mudar.
 
 ---
 
