@@ -20,7 +20,7 @@ add_action(
 		$map = array(
 			'/category/all-products' => '/loja/',
 			'/cart-page'             => '/carrinho/',
-			'/contact-1'             => '/loja/',  // "PRODUTOS"
+			'/contact-1'             => '/produtos/',  // "PRODUTOS;" (carrossel; o catálogo com filtros fica em /loja/)
 			'/contact'               => '/quem-cria/',
 			'/contact-2'             => '/capitulos/',
 		);

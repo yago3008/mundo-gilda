@@ -1,0 +1,102 @@
+{
+  "source": "https://www.mundogilda.com.br (imagens da página inicial, Quem Cria e Livro GILDA;)",
+  "exported_at": "2026-11-26",
+  "images": {
+    "logo": {
+      "url": "https://static.wixstatic.com/media/ff503a_001532c805994bd9a668428276cfb3a7~mv2.png",
+      "alt": "GILDA;",
+      "crop": [
+        344,
+        4036,
+        3812,
+        960,
+        1200,
+        302
+      ],
+      "note": "folha com 3 versões do logo; recorta a versão terracota"
+    },
+    "hero": {
+      "url": "https://static.wixstatic.com/media/ff503a_0a0f6a78b0d84475b043823880080ed1~mv2.png",
+      "alt": "Modelo vestindo peças GILDA; sentada em uma cadeira"
+    },
+    "hero_mark": {
+      "url": "https://static.wixstatic.com/media/ff503a_559f35dc8a1e45a2a18a3b3337c5638f~mv2.png",
+      "alt": ""
+    },
+    "butterfly": {
+      "url": "https://static.wixstatic.com/media/ff503a_91eeef8fa33d4db797bf79856557dc24~mv2.png",
+      "alt": "Borboleta 88 — ver produtos"
+    },
+    "category_camisas": {
+      "url": "https://static.wixstatic.com/media/ff503a_575ffd954e314a669e9e36803ae867e8~mv2.png",
+      "alt": ""
+    },
+    "category_calcas": {
+      "url": "https://static.wixstatic.com/media/ff503a_6abd1d997c984258bfdc1026169f2a12~mv2.jpg",
+      "alt": ""
+    },
+    "category_bermudas": {
+      "url": "https://static.wixstatic.com/media/ff503a_b06c4fc9492142d8a01c3c7c230837ff~mv2.png",
+      "alt": ""
+    },
+    "category_lencos": {
+      "url": "https://static.wixstatic.com/media/ff503a_6694b4422c594947a67a098851dce3fa~mv2.jpg",
+      "alt": ""
+    },
+    "about_giulia": {
+      "url": "https://static.wixstatic.com/media/ff503a_57d04b090d844bee8e347ba23c9e0f47~mv2.jpg",
+      "alt": "Giulia, criadora da GILDA;"
+    },
+    "about_maria_clara": {
+      "url": "https://static.wixstatic.com/media/ff503a_df32d2f7ea3a4baa8ee5a4192d1587bf~mv2.jpg",
+      "alt": "Maria Clara, criadora da GILDA;"
+    },
+    "chapter_1": {
+      "alt": "Capítulo 1 — Borboleta 88",
+      "urls": [
+        "https://static.wixstatic.com/media/ff503a_2fb43fc5a8a14df7ba983345081297ec~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_77ec0b57b3d940c79d947713e056ae0c~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_6fd34874b93b4941a2c22ca416c664ca~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_924794d0ecaa4d32a1da7ed6e477dde6~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_9ca5bf6b66f34ca78465a2af2d90e48e~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c056bc9d1a774b7dbbd1f80aa91d3971~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_18cb20afb0814a69a013de604db73fd5~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_5bd2c829e0e143bfb4125f4398ee79b8~mv2.jpg"
+      ]
+    },
+    "chapter_2": {
+      "alt": "Capítulo 2 — filetes da borboleta",
+      "urls": [
+        "https://static.wixstatic.com/media/ff503a_d826800020be4a038afebc6dbab9a52f~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_eaaf85e2e5e54b96838a897f2b6b4f07~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_b06c4fc9492142d8a01c3c7c230837ff~mv2.png"
+      ]
+    },
+    "chapter_3": {
+      "alt": "Capítulo 3 — Ritual brasileiro",
+      "urls": [
+        "https://static.wixstatic.com/media/ff503a_4bb43149e768434897f6576913cb3810~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_a521eb8bab1e4f708707f56e36cb068f~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_c1d4c6c3b1fe45d5af369f218c1086fd~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_0aa514a757c44c4ebd096021336132c4~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_9bf249d6b2f94de38dc0742103191468~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_23da737a22704c619fa9ae164c35ee97~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_e1f4a290a58346d5a7ff1978ec346929~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_3b90f9012f704bde99e8b7af3bb83f7b~mv2.png"
+      ]
+    },
+    "chapter_3_lookbook": {
+      "alt": "Lookbook GILDA;",
+      "urls": [
+        "https://static.wixstatic.com/media/ff503a_c4ad66cdad1a4c3a9bd323a8381dddd4~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_e40af413506b42939dc4104d9e107127~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_648e53479c2947be953df254d9e736ec~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_6f01a48764264c3b92627768c4ff6af8~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_e4b5ce081dce405386c4ed73cbd890ce~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_a2794d338f62466c8deddbf8e0e1beec~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_6c5f31b304a0428a8bf9b56ed3990a4d~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_f6f0ac6922f04e8eb7c7a5a0a80d957f~mv2.jpg"
+      ]
+    }
+  }
+}

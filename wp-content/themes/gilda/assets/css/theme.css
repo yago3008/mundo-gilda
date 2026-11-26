@@ -1,0 +1,1181 @@
+/**
+ * GILDA; — component styles that theme.json can't express.
+ * Tokens: docs/design (colors, typography, grid). Use the presets, never hex.
+ */
+
+:root {
+	--gilda-terracotta: var(--wp--preset--color--terracotta);
+	--gilda-terracotta-900: var(--wp--preset--color--terracotta-900);
+	--gilda-cream: var(--wp--preset--color--cream);
+	--gilda-linen: var(--wp--preset--color--linen);
+	--gilda-sand: var(--wp--preset--color--sand);
+	--gilda-taupe: var(--wp--preset--color--taupe);
+	--gilda-graphite: var(--wp--preset--color--graphite);
+	--gilda-ink: var(--wp--preset--color--ink);
+	--gilda-ink-soft: var(--wp--preset--color--ink-soft);
+	--gilda-white: var(--wp--preset--color--white);
+	--gilda-error: var(--wp--preset--color--error);
+	--gilda-error-bg: var(--wp--preset--color--error-bg);
+	--gilda-success: var(--wp--preset--color--success);
+	--gilda-success-bg: var(--wp--preset--color--success-bg);
+	--gilda-display: var(--wp--preset--font-family--display);
+	--gilda-serif: var(--wp--preset--font-family--serif);
+	--gilda-sans: var(--wp--preset--font-family--sans);
+	--gilda-headline: var(--wp--preset--font-family--headline);
+	--gilda-touch: 44px;
+	--gilda-header-h: 72px;
+	--gilda-topbar-h: 40px;
+	--gilda-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+@media (max-width: 1023px) {
+	:root { --gilda-header-h: 56px; --gilda-topbar-h: 36px; }
+}
+
+/* ---------- Base & accessibility (11.4) ---------- */
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+	outline: 2px solid var(--gilda-terracotta);
+	outline-offset: 2px;
+}
+
+.screen-reader-text:not(:focus) {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.skip-link.screen-reader-text:focus {
+	background: var(--gilda-cream);
+	color: var(--gilda-terracotta);
+	font: 500 14px/1 var(--gilda-sans);
+	padding: 14px 18px;
+	outline: 2px solid var(--gilda-terracotta);
+	z-index: 100000;
+}
+
+.gilda-label {
+	font: 500 11px/1.4 var(--gilda-sans);
+	letter-spacing: 2px;
+	text-transform: uppercase;
+}
+
+.gilda-icon { display: block; flex: none; }
+
+img { height: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- Buttons (05-commerce › Buttons) ---------- */
+
+.gilda-btn,
+.wp-block-button__link,
+.woocommerce .button,
+.wc-block-components-button:not(.is-link) {
+	align-items: center;
+	border-radius: 0;
+	display: inline-flex;
+	font-family: var(--gilda-sans);
+	font-size: 14px;
+	font-weight: 500;
+	justify-content: center;
+	letter-spacing: 1.5px;
+	min-height: 52px;
+	text-transform: uppercase;
+	transition: background-color .2s, color .2s, border-color .2s;
+}
+
+.gilda-btn { cursor: pointer; padding: 0 28px; text-decoration: none; }
+
+.gilda-btn--primary,
+.woocommerce .button.alt,
+.wc-block-components-button:not(.is-link):not(.outlined) {
+	background: var(--gilda-terracotta);
+	border: 0;
+	color: var(--gilda-cream);
+}
+.gilda-btn--primary:hover,
+.woocommerce .button.alt:hover,
+.wc-block-components-button:not(.is-link):not(.outlined):hover {
+	background: var(--gilda-terracotta-900);
+	color: var(--gilda-cream);
+}
+
+.gilda-btn--secondary,
+.woocommerce .button:not(.alt),
+.wp-block-button.is-style-outline > .wp-block-button__link {
+	background: transparent;
+	border: 1.5px solid var(--gilda-terracotta);
+	color: var(--gilda-terracotta);
+}
+.gilda-btn--secondary:hover,
+.woocommerce .button:not(.alt):hover,
+.wp-block-button.is-style-outline > .wp-block-button__link:hover {
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+}
+
+.gilda-btn--disabled,
+.gilda-btn[disabled],
+.woocommerce .button.disabled,
+.woocommerce .button:disabled {
+	background: var(--gilda-linen) !important;
+	border: 0 !important;
+	color: #555 !important;
+	cursor: not-allowed;
+	opacity: 1 !important;
+}
+
+/* "disponível" — pill CTA */
+.wp-block-button.is-style-pill > .wp-block-button__link {
+	background: color-mix(in srgb, var(--gilda-cream) 88%, transparent);
+	border: 1.5px solid var(--gilda-terracotta);
+	border-radius: 999px;
+	color: var(--gilda-terracotta);
+	font: italic 400 22px/1 var(--gilda-serif);
+	letter-spacing: 0;
+	min-height: 48px;
+	padding: 0 56px;
+	text-transform: none;
+}
+.wp-block-button.is-style-pill > .wp-block-button__link:hover {
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+}
+
+/* "peças disponíveis" — editorial link */
+.wp-block-button.is-style-editorial-link > .wp-block-button__link {
+	background: none;
+	color: var(--gilda-terracotta);
+	font: italic 400 20px/1.2 var(--gilda-serif);
+	letter-spacing: 0;
+	min-height: var(--gilda-touch);
+	padding: 0;
+	text-decoration: underline;
+	text-transform: none;
+	text-underline-offset: 5px;
+}
+
+/* ---------- Typography styles ---------- */
+
+.is-style-editorial {
+	font-family: var(--gilda-display) !important;
+	font-style: italic;
+	font-weight: 300 !important;
+	text-transform: lowercase;
+}
+
+.is-style-headline {
+	color: var(--gilda-terracotta);
+	font-family: var(--gilda-headline) !important;
+	font-weight: 400 !important;
+	letter-spacing: .03em;
+	text-transform: uppercase;
+}
+
+.wp-block-separator.is-style-semicolon {
+	align-items: center;
+	background: none !important;
+	border: 0 !important;
+	display: flex;
+	gap: 16px;
+	height: auto;
+	opacity: 1;
+}
+.wp-block-separator.is-style-semicolon::before,
+.wp-block-separator.is-style-semicolon::after {
+	background: var(--gilda-sand);
+	content: "";
+	flex: 1;
+	height: 1px;
+}
+.wp-block-separator.is-style-semicolon {
+	color: var(--gilda-terracotta);
+	font: 600 40px/1 var(--gilda-display);
+}
+.wp-block-separator.is-style-semicolon::before { order: 0; }
+.wp-block-separator.is-style-semicolon::after { order: 2; }
+.wp-block-separator.is-style-semicolon { --semicolon: ";"; }
+.wp-block-separator.is-style-semicolon { position: relative; }
+.wp-block-separator.is-style-semicolon::after { margin-left: 40px; }
+.wp-block-separator.is-style-semicolon::before { margin-right: 40px; }
+.wp-block-separator.is-style-semicolon { background-image: none; }
+.wp-block-separator.is-style-semicolon + * { margin-top: var(--wp--preset--spacing--50); }
+
+.gilda-semicolon-mark {
+	color: var(--gilda-terracotta);
+	font-family: var(--gilda-display);
+	font-weight: 600;
+	line-height: .8;
+}
+
+.gilda-vertical-heading {
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	white-space: nowrap;
+}
+@media (max-width: 767px) {
+	.gilda-vertical-heading { writing-mode: horizontal-tb; transform: none; }
+}
+
+/* ---------- Announcement marquee ---------- */
+
+.gilda-marquee {
+	background: rgba(36, 26, 22, 0.16);
+	color: var(--gilda-cream);
+	min-height: var(--gilda-topbar-h);
+	overflow: hidden;
+}
+.gilda-marquee__viewport { display: flex; }
+.gilda-marquee__track {
+	animation: gilda-marquee 38s linear infinite;
+	display: inline-flex;
+	flex: none;
+	min-height: var(--gilda-topbar-h);
+	white-space: nowrap;
+	will-change: transform;
+}
+.gilda-marquee__group { display: inline-flex; }
+.gilda-marquee:hover .gilda-marquee__track { animation-play-state: paused; }
+.gilda-marquee__item {
+	align-items: center;
+	display: inline-flex;
+	font: 500 13px/1 var(--gilda-sans);
+	letter-spacing: 1.5px;
+	padding: 0 28px;
+	text-transform: uppercase;
+}
+.gilda-marquee__item::after {
+	color: var(--gilda-cream);
+	content: "\00b7";
+	margin-left: 28px;
+	opacity: 0.7;
+}
+@keyframes gilda-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+	.gilda-marquee__track { animation: none; }
+}
+
+/* ---------- Header (1.1, 1.3, 1.4, 1.5) ---------- */
+
+.wp-site-blocks > header {
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+	position: sticky;
+	top: var(--wp-admin--admin-bar--height, 0px);
+	transition: background-color 0.3s ease;
+	z-index: 100;
+}
+
+/* Front page: transparent over the hero, solid once scrolled. */
+body.gilda-has-hero .wp-site-blocks > header {
+	background: transparent;
+	margin-bottom: calc(-1 * (var(--gilda-topbar-h) + var(--gilda-header-h)));
+}
+body.gilda-has-hero .wp-site-blocks > header.is-stuck {
+	background: var(--gilda-terracotta);
+}
+/* Dark scrim keeps the cream text legible over a light hero photo. */
+body.gilda-has-hero .wp-site-blocks > header::before {
+	background: linear-gradient(rgba(36, 26, 22, 0.5), rgba(36, 26, 22, 0));
+	content: "";
+	height: 220px;
+	left: 0;
+	opacity: 1;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: opacity 0.3s ease;
+	z-index: -1;
+}
+body.gilda-has-hero .wp-site-blocks > header.is-stuck::before { opacity: 0; }
+
+body.gilda-has-hero .gilda-hero {
+	padding-top: calc(var(--gilda-topbar-h) + var(--gilda-header-h) + var(--wp--preset--spacing--40)) !important;
+}
+
+.gilda-header {
+	align-items: center;
+	display: grid;
+	gap: 12px;
+	grid-template-columns: 1fr auto 1fr;
+	min-height: var(--gilda-header-h);
+}
+.gilda-header > * { align-self: center; }
+
+.gilda-header .wp-block-site-title { margin: 0; text-align: center; }
+.gilda-header .wp-block-site-title a { color: inherit; }
+@media (max-width: 767px) {
+	.gilda-header .wp-block-site-title { font-size: 24px !important; }
+}
+
+.gilda-header__actions {
+	align-items: center;
+	display: flex;
+	gap: 4px;
+	justify-content: flex-end;
+}
+.gilda-header__actions .wp-block-shortcode,
+.gilda-header__actions p { margin: 0; }
+
+.gilda-nav-desktop { font-size: 13px; }
+.gilda-nav-desktop .wp-block-navigation__container {
+	flex-wrap: nowrap !important;
+	gap: clamp(14px, 1.8vw, 26px) !important;
+}
+.gilda-nav-desktop .wp-block-navigation-item__content {
+	border-bottom: 2px solid transparent;
+	padding-block: 10px;
+	white-space: nowrap;
+}
+.gilda-nav-desktop .wp-block-navigation-item__content:hover {
+	text-decoration: underline;
+	text-underline-offset: 6px;
+}
+.gilda-nav-desktop .current-menu-item > .wp-block-navigation-item__content,
+.gilda-nav-desktop [aria-current="page"] {
+	border-bottom-color: currentColor;
+	text-decoration: none;
+}
+
+.gilda-nav-mobile { display: none !important; }
+
+@media (max-width: 1023px) {
+	.gilda-nav-desktop { display: none !important; }
+	.gilda-nav-mobile { display: flex !important; }
+}
+
+/* Account + cart */
+.gilda-account-link,
+.gilda-cart-link {
+	align-items: center;
+	color: inherit;
+	display: inline-flex;
+	gap: 8px;
+	min-height: var(--gilda-touch);
+	min-width: var(--gilda-touch);
+	justify-content: center;
+	padding: 0 8px;
+	position: relative;
+	text-decoration: none;
+}
+.gilda-account-link { font: 400 13px/1 var(--gilda-sans); letter-spacing: 1px; }
+.gilda-account-link:hover .gilda-account-text { text-decoration: underline; }
+.gilda-account-initial {
+	align-items: center;
+	background: var(--gilda-cream);
+	border-radius: 50%;
+	color: var(--gilda-terracotta);
+	display: inline-flex;
+	font: 600 14px/1 var(--gilda-display);
+	height: 28px;
+	justify-content: center;
+	width: 28px;
+}
+@media (max-width: 1023px) {
+	.gilda-account-text { display: none; }
+}
+
+.gilda-cart-count {
+	align-items: center;
+	background: var(--gilda-cream);
+	border-radius: 9px;
+	color: var(--gilda-terracotta);
+	display: inline-flex;
+	font: 600 11px/1 var(--gilda-sans);
+	height: 18px;
+	justify-content: center;
+	min-width: 18px;
+	padding: 0 4px;
+	position: absolute;
+	right: 2px;
+	top: 4px;
+}
+.gilda-cart-count[hidden] { display: none; }
+.gilda-cart-count.is-bumping { animation: gilda-pulse .3s var(--gilda-ease); }
+@keyframes gilda-pulse { 50% { transform: scale(1.35); } }
+
+/* ---------- Mobile drawer (1.2) — core/navigation overlay ---------- */
+
+.gilda-nav-mobile .wp-block-navigation__responsive-container-open {
+	height: var(--gilda-touch);
+	justify-content: center;
+	width: var(--gilda-touch);
+}
+
+.gilda-nav-mobile .wp-block-navigation__responsive-container.is-menu-open {
+	background: rgba(36, 26, 22, .55) !important;
+	padding: 0 !important;
+	z-index: 300;
+	animation: gilda-fade .25s ease-out;
+}
+.gilda-nav-mobile .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-close {
+	background: var(--gilda-cream);
+	box-shadow: 8px 0 24px rgba(36, 26, 22, .25);
+	color: var(--gilda-ink);
+	height: 100%;
+	margin: 0;
+	max-width: 85vw;
+	padding: 8px 24px 24px;
+	width: 300px;
+	animation: gilda-slide-in .25s var(--gilda-ease);
+}
+.gilda-nav-mobile .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-close {
+	align-items: center;
+	display: flex;
+	height: var(--gilda-touch);
+	justify-content: center;
+	right: 12px;
+	top: 8px;
+	width: var(--gilda-touch);
+}
+.gilda-nav-mobile .wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation__responsive-container-content {
+	align-items: stretch !important;
+	padding-top: 64px !important;
+}
+.gilda-nav-mobile .is-menu-open .wp-block-navigation__container {
+	align-items: stretch !important;
+	gap: 0 !important;
+	width: 100%;
+}
+.gilda-nav-mobile .is-menu-open .wp-block-navigation-item { border-bottom: 1px solid var(--gilda-sand); width: 100%; }
+.gilda-nav-mobile .is-menu-open .wp-block-navigation-item__content {
+	color: var(--gilda-ink) !important;
+	display: flex !important;
+	font: 400 24px/1.2 var(--gilda-serif) !important;
+	letter-spacing: .06em !important;
+	min-height: 56px;
+	align-items: center;
+	text-transform: none !important;
+}
+.gilda-nav-mobile .is-menu-open .current-menu-item > .wp-block-navigation-item__content { color: var(--gilda-terracotta) !important; }
+
+@keyframes gilda-slide-in { from { transform: translateX(-100%); } }
+@keyframes gilda-fade { from { opacity: 0; } }
+
+/* ---------- Footer (Epic 10) ---------- */
+
+.gilda-footer a { color: inherit; }
+.gilda-footer__mark {
+	font: 600 120px/.75 var(--gilda-display);
+	text-align: right;
+}
+.gilda-payments { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; }
+.gilda-payments p { margin: 0; }
+.gilda-payments__list { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.gilda-pay {
+	align-items: center;
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	display: inline-flex;
+	font: 600 13px/1 var(--gilda-sans);
+	height: 28px;
+	padding: 0 10px;
+}
+.gilda-pay--visa { color: #1a1f71; font-style: italic; }
+.gilda-pay--mastercard { color: #241a16; }
+.gilda-pay--pix { color: #227a72; }
+
+/* ---------- Carousel (3.1, 5.12, 2.2 mobile) ---------- */
+
+.gilda-carousel { position: relative; }
+.gilda-carousel .wc-block-product-template,
+.gilda-carousel .wp-block-post-template {
+	display: flex !important;
+	gap: var(--wp--preset--spacing--60) !important;
+	grid-template-columns: none !important;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-behavior: smooth;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+}
+.gilda-carousel .wc-block-product-template::-webkit-scrollbar { display: none; }
+.gilda-carousel .wc-block-product-template > li,
+.gilda-carousel .wp-block-post-template > li {
+	flex: 0 0 calc((100% - 3 * var(--wp--preset--spacing--60)) / 4);
+	margin: 0 !important;
+	scroll-snap-align: start;
+}
+@media (max-width: 1023px) {
+	.gilda-carousel .wc-block-product-template > li { flex-basis: calc((100% - var(--wp--preset--spacing--60)) / 2); }
+}
+@media (max-width: 767px) {
+	.gilda-carousel .wc-block-product-template > li { flex-basis: 82%; }
+}
+.gilda-carousel--3 .wc-block-product-template > li { flex-basis: calc((100% - 2 * var(--wp--preset--spacing--60)) / 3); }
+
+.gilda-carousel__controls { display: flex; gap: 8px; justify-content: flex-end; margin-top: var(--wp--preset--spacing--40); }
+.gilda-arrow {
+	align-items: center;
+	background: transparent;
+	border: 1.5px solid var(--gilda-terracotta);
+	border-radius: 50%;
+	color: var(--gilda-terracotta);
+	cursor: pointer;
+	display: inline-flex;
+	height: var(--gilda-touch);
+	justify-content: center;
+	width: var(--gilda-touch);
+}
+.gilda-arrow--next { background: var(--gilda-terracotta); color: var(--gilda-cream); }
+.gilda-arrow:hover { background: var(--gilda-terracotta-900); border-color: var(--gilda-terracotta-900); color: var(--gilda-cream); }
+
+/* Featured on home: grid on desktop, carousel below 768 */
+@media (min-width: 768px) {
+	.gilda-featured.gilda-carousel .wc-block-product-template { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; overflow: visible; }
+	.gilda-featured .gilda-carousel__controls { display: none; }
+}
+
+/* ---------- Product card (3.2, 4.6, 11.2) ---------- */
+
+.wc-block-product-template > li.wc-block-product,
+.gilda-cards > li {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	text-align: left;
+}
+
+.gilda-card-media { display: grid; position: relative; }
+.gilda-card-media > *,
+.gilda-card-media + .gilda-card-action { grid-area: 1 / 1; }
+.gilda-card-media .wc-block-components-product-image { margin: 0 !important; overflow: hidden; }
+.gilda-card-media img {
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	transition: transform .4s var(--gilda-ease);
+	width: 100%;
+}
+.wc-block-product:hover .gilda-card-media img { transform: scale(1.03); }
+
+.wc-block-components-product-image.is-soldout::after {
+	background: rgba(247, 245, 233, .35);
+	content: "";
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+}
+
+.gilda-badge {
+	align-self: start;
+	background: var(--gilda-cream);
+	color: var(--gilda-ink);
+	font: 500 11px/1 var(--gilda-sans);
+	justify-self: start;
+	letter-spacing: 2px;
+	margin: 12px;
+	padding: 7px 10px;
+	text-transform: uppercase;
+	z-index: 2;
+}
+
+.gilda-quickview-btn {
+	align-items: center;
+	align-self: start;
+	background: var(--gilda-cream);
+	border: 0;
+	border-radius: 50%;
+	color: var(--gilda-ink);
+	cursor: pointer;
+	display: inline-flex;
+	height: var(--gilda-touch);
+	justify-content: center;
+	justify-self: end;
+	margin: 10px;
+	opacity: 0;
+	transition: opacity .2s;
+	width: var(--gilda-touch);
+	z-index: 2;
+}
+
+/* The add-to-cart button sits over the bottom of the image and is revealed on hover/focus. */
+.wc-block-product { position: relative; }
+.wc-block-product .gilda-card-action {
+	margin: 0 !important;
+	order: -1;
+	position: relative;
+}
+@supports selector(:has(*)) {
+	.wc-block-product:has(.gilda-card-media) { display: grid !important; grid-template-columns: 1fr; }
+	.wc-block-product:has(.gilda-card-media) > .gilda-card-media { grid-row: 1; grid-column: 1; }
+	.wc-block-product:has(.gilda-card-media) > .gilda-card-action { align-self: end; grid-row: 1; grid-column: 1; z-index: 3; }
+}
+.wc-block-product .gilda-card-action .wp-block-button__link,
+.wc-block-product .gilda-card-action button {
+	min-height: 48px;
+	width: 100%;
+}
+@media (hover: hover) {
+	.wc-block-product .gilda-card-action,
+	.wc-block-product .gilda-quickview-btn { opacity: 0; transition: opacity .2s; }
+	.wc-block-product:hover .gilda-card-action,
+	.wc-block-product:focus-within .gilda-card-action,
+	.wc-block-product:hover .gilda-quickview-btn,
+	.wc-block-product:focus-within .gilda-quickview-btn { opacity: 1; }
+}
+@media (hover: none) {
+	.gilda-quickview-btn { opacity: 1; }
+}
+.wc-block-product .gilda-card-action .wc-block-components-product-button__button { margin: 0; }
+.wc-block-product .added_to_cart { display: none !important; }
+
+.wc-block-product .wp-block-post-title {
+	font-family: var(--gilda-display) !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	letter-spacing: 2px;
+	line-height: 1.3 !important;
+	margin: 0 !important;
+	text-transform: uppercase;
+}
+.wc-block-product .wp-block-post-title a { color: var(--gilda-ink); text-decoration: none; }
+.wc-block-product .wc-block-components-product-price {
+	color: var(--gilda-ink-soft);
+	font: 400 14px/1.3 var(--gilda-sans) !important;
+	letter-spacing: 1px;
+	margin: 0 !important;
+	text-align: left !important;
+}
+.wc-block-product:has(.is-soldout) .wp-block-post-title a,
+.wc-block-product:has(.is-soldout) .wc-block-components-product-price { color: var(--gilda-graphite); }
+
+/* ---------- Catalog layout & filters (Epic 4) ---------- */
+
+.gilda-shop { align-items: start; display: grid; gap: var(--wp--preset--spacing--70); grid-template-columns: 280px minmax(0, 1fr); }
+@media (max-width: 1023px) { .gilda-shop { grid-template-columns: minmax(0, 1fr); } }
+
+.gilda-shop-results.is-loading { opacity: .45; pointer-events: none; transition: opacity .2s; }
+.gilda-result-count { color: var(--gilda-ink-soft); font-size: 13px; margin: 0; }
+
+.gilda-filters { background: var(--gilda-white); padding: 24px; }
+.gilda-filters__head { display: none; }
+.gilda-filters__by { font: 400 20px/1.2 var(--gilda-display); margin: 0 0 8px; }
+.gilda-filter-cats { list-style: none; margin: 0 0 16px; padding: 0 0 16px; border-bottom: 1px solid var(--gilda-sand); }
+.gilda-filter-cats a {
+	color: var(--gilda-ink);
+	display: flex;
+	align-items: center;
+	font-size: 15px;
+	font-weight: 300;
+	min-height: 36px;
+	text-decoration: none;
+}
+.gilda-filter-cats a:hover { text-decoration: underline; }
+.gilda-filter-cats a[aria-current="page"] { color: var(--gilda-terracotta); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+
+.gilda-filter { border-bottom: 1px solid var(--gilda-sand); }
+.gilda-filter__title {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	font: 500 11px/1 var(--gilda-sans);
+	justify-content: space-between;
+	letter-spacing: 2px;
+	list-style: none;
+	min-height: var(--gilda-touch);
+	text-transform: uppercase;
+}
+.gilda-filter__title::-webkit-details-marker { display: none; }
+.gilda-filter__title::after { content: "+"; font-size: 16px; }
+.gilda-filter[open] > .gilda-filter__title::after { content: "−"; }
+.gilda-filter__body { display: flex; flex-direction: column; padding-bottom: 14px; }
+
+.gilda-check { align-items: center; cursor: pointer; display: flex; font-size: 14px; gap: 10px; min-height: 36px; }
+.gilda-check input { accent-color: var(--gilda-terracotta); height: 18px; margin: 0; width: 18px; }
+.gilda-check:has(input:disabled) { color: var(--gilda-graphite); cursor: not-allowed; }
+.gilda-swatch {
+	background: var(--swatch, var(--gilda-sand));
+	border: 1px solid var(--gilda-taupe);
+	border-radius: 50%;
+	display: inline-block;
+	flex: none;
+	height: 18px;
+	width: 18px;
+}
+
+.gilda-sizes { display: grid; gap: 6px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.gilda-size { position: relative; }
+.gilda-size input { inset: 0; margin: 0; opacity: 0; position: absolute; cursor: pointer; }
+.gilda-size span {
+	align-items: center;
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	display: flex;
+	font-size: 13px;
+	height: var(--gilda-touch);
+	justify-content: center;
+}
+.gilda-size input:checked + span { background: var(--gilda-terracotta); border-color: var(--gilda-terracotta); color: var(--gilda-cream); }
+.gilda-size input:focus-visible + span { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
+.gilda-size input:disabled { cursor: not-allowed; }
+.gilda-size input:disabled + span { background: transparent; border-style: dashed; color: var(--gilda-taupe); text-decoration: line-through; }
+
+.gilda-range { height: 28px; margin: 6px 9px 0; position: relative; }
+.gilda-range__track { background: var(--gilda-sand); height: 2px; left: 0; position: absolute; right: 0; top: 13px; }
+.gilda-range__fill { background: var(--gilda-terracotta); bottom: 0; left: var(--from, 0%); position: absolute; right: calc(100% - var(--to, 100%)); top: 0; }
+.gilda-range input[type="range"] {
+	appearance: none;
+	background: none;
+	height: 28px;
+	left: -9px;
+	margin: 0;
+	pointer-events: none;
+	position: absolute;
+	width: calc(100% + 18px);
+}
+.gilda-range input[type="range"]::-webkit-slider-thumb {
+	appearance: none;
+	background: var(--gilda-white);
+	border: 2px solid var(--gilda-terracotta);
+	border-radius: 50%;
+	cursor: grab;
+	height: 22px;
+	pointer-events: auto;
+	width: 22px;
+}
+.gilda-range input[type="range"]::-moz-range-thumb {
+	background: var(--gilda-white);
+	border: 2px solid var(--gilda-terracotta);
+	border-radius: 50%;
+	cursor: grab;
+	height: 18px;
+	pointer-events: auto;
+	width: 18px;
+}
+.gilda-range__values { display: flex; font-size: 13px; justify-content: space-between; margin: 8px 0 0; color: var(--gilda-ink-soft); }
+
+.gilda-filters__actions { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; padding-top: 18px; }
+.gilda-filters__actions .gilda-btn { min-height: 44px; }
+.js .gilda-filters__actions .gilda-btn--primary { display: none; }
+.gilda-filters__clear { font-size: 13px; }
+
+.gilda-filter-toggle { display: none; }
+
+@media (max-width: 1023px) {
+	.gilda-filter-toggle {
+		align-items: center;
+		background: transparent;
+		border: 1.5px solid var(--gilda-terracotta);
+		color: var(--gilda-terracotta);
+		cursor: pointer;
+		display: inline-flex;
+		font: 500 13px/1 var(--gilda-sans);
+		gap: 8px;
+		letter-spacing: 1.5px;
+		min-height: var(--gilda-touch);
+		padding: 0 18px;
+		text-transform: uppercase;
+	}
+	.js .gilda-filters {
+		background: var(--gilda-white);
+		bottom: 0;
+		left: 0;
+		max-height: 85vh;
+		overflow-y: auto;
+		padding: 8px 20px 20px;
+		position: fixed;
+		right: 0;
+		transform: translateY(105%);
+		transition: transform .25s var(--gilda-ease);
+		z-index: 300;
+	}
+	.js .gilda-filters.is-open { transform: none; }
+	.js .gilda-filters__head { align-items: center; display: flex; justify-content: space-between; min-height: 52px; }
+	.gilda-filters__heading { font: 400 20px/1 var(--gilda-display); margin: 0; }
+	.gilda-filters__close { background: none; border: 0; color: var(--gilda-ink); height: var(--gilda-touch); width: var(--gilda-touch); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+	.js .gilda-filters__actions .gilda-btn--primary { display: inline-flex; flex: 1; }
+	.gilda-sizes { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+	.gilda-check--color .gilda-swatch { height: 28px; width: 28px; }
+}
+
+.gilda-backdrop {
+	background: rgba(36, 26, 22, .45);
+	inset: 0;
+	position: fixed;
+	z-index: 299;
+}
+
+.gilda-empty {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding-block: var(--wp--preset--spacing--80);
+	text-align: center;
+}
+
+/* ---------- Single product (Epic 5) ---------- */
+
+.gilda-pdp-summary { display: flex; flex-direction: column; gap: 20px; }
+.gilda-pdp-summary .wp-block-post-title { margin: 0; }
+.gilda-pdp-summary .wc-block-components-product-price,
+.gilda-pdp-summary .wp-block-woocommerce-product-price { font: 400 20px/1.2 var(--gilda-sans) !important; letter-spacing: 1px; }
+.gilda-pdp-description { font-family: var(--gilda-serif); font-size: 18px; line-height: 1.55; }
+.gilda-pdp-description p { margin: 0 0 1em; }
+
+.gilda-composition {
+	align-self: flex-start;
+	background: var(--gilda-linen);
+	display: inline-block;
+	font: 500 13px/1.4 var(--gilda-sans);
+	letter-spacing: 1px;
+	padding: 10px 14px;
+}
+
+.gilda-size-guide table { border-collapse: collapse; font: 400 14px/1.4 var(--gilda-sans); width: 100%; }
+.gilda-size-guide th,
+.gilda-size-guide td { border: 0; border-bottom: 1px solid var(--gilda-sand); padding: 8px 4px; text-align: left; }
+.gilda-size-guide th { font-weight: 500; }
+.gilda-size-guide figcaption { color: var(--gilda-graphite); font-size: 13px; text-align: left; }
+
+/* Gallery */
+.woocommerce-product-gallery .flex-control-thumbs { display: flex; gap: 10px; margin-top: 10px !important; }
+.woocommerce-product-gallery .flex-control-thumbs li { width: 72px !important; }
+.woocommerce-product-gallery .flex-control-thumbs img { aspect-ratio: 4 / 5; object-fit: cover; opacity: .7; border: 2px solid transparent; }
+.woocommerce-product-gallery .flex-control-thumbs img.flex-active { border-color: var(--gilda-terracotta); opacity: 1; }
+.woocommerce-product-gallery__trigger {
+	background: var(--gilda-cream) !important;
+	border-radius: 50%;
+	height: var(--gilda-touch) !important;
+	width: var(--gilda-touch) !important;
+}
+.woocommerce-product-gallery .flex-direction-nav a {
+	align-items: center;
+	background: var(--gilda-terracotta);
+	border-radius: 50%;
+	color: var(--gilda-cream);
+	display: flex;
+	height: var(--gilda-touch);
+	justify-content: center;
+	width: var(--gilda-touch);
+}
+
+/* Add to cart form */
+.gilda-pdp-summary form.cart { display: flex; flex-direction: column; gap: 16px; }
+.gilda-pdp-summary form.cart:not(.variations_form),
+.gilda-pdp-summary .woocommerce-variation-add-to-cart { display: grid !important; gap: 12px; grid-template-columns: auto 1fr; }
+.gilda-pdp-summary .gilda-buy-now { grid-column: 1 / -1; }
+.gilda-pdp-summary .single_add_to_cart_button { margin: 0 !important; }
+.gilda-pdp-summary .single_add_to_cart_button.wc-variation-selection-needed { opacity: 1 !important; }
+
+.gilda-pdp-summary table.variations { border: 0; margin: 0; width: 100%; }
+.gilda-pdp-summary table.variations tr { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.gilda-pdp-summary table.variations th,
+.gilda-pdp-summary table.variations td { border: 0; padding: 0; text-align: left; }
+.gilda-pdp-summary table.variations th label {
+	font: 500 11px/1.4 var(--gilda-sans);
+	letter-spacing: 2px;
+	text-transform: uppercase;
+}
+.gilda-pdp-summary .reset_variations { font-size: 13px; margin-top: 6px; display: inline-block; }
+
+.gilda-select,
+.gilda-input,
+.woocommerce form .input-text,
+.woocommerce form select {
+	appearance: none;
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	border-radius: 0;
+	color: var(--gilda-ink);
+	font: 400 16px/1.2 var(--gilda-sans);
+	min-height: 48px;
+	padding: 0 14px;
+	width: 100%;
+}
+select.gilda-select,
+.woocommerce form select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23241A16' stroke-width='1.5'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+	background-position: right 14px center;
+	background-repeat: no-repeat;
+	padding-right: 40px;
+}
+.gilda-input:focus,
+.gilda-select:focus,
+.woocommerce form .input-text:focus { border: 1.5px solid var(--gilda-terracotta); outline: none; }
+.gilda-select.has-error,
+.gilda-input.has-error,
+.woocommerce form .woocommerce-invalid .input-text { border: 1.5px solid var(--gilda-error); }
+
+/* Colour swatches (5.5) */
+.gilda-swatches { border: 0; display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; }
+.gilda-swatch-option {
+	align-items: center;
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	cursor: pointer;
+	display: inline-flex;
+	font: 400 14px/1 var(--gilda-sans);
+	gap: 8px;
+	min-height: var(--gilda-touch);
+	padding: 0 14px;
+	position: relative;
+}
+.gilda-swatch-option input { inset: 0; margin: 0; opacity: 0; position: absolute; cursor: pointer; }
+.gilda-swatch-option:has(input:checked) { border: 2px solid var(--gilda-terracotta); }
+.gilda-swatch-option:has(input:focus-visible) { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
+.gilda-swatch-option:has(input:disabled) { border-style: dashed; color: var(--gilda-graphite); cursor: not-allowed; text-decoration: line-through; }
+.gilda-swatch-option.has-error { border-color: var(--gilda-error); }
+.gilda-hidden-select { display: none !important; }
+
+/* Quantity stepper (5.7) */
+.quantity.gilda-stepper {
+	border: 1.5px solid var(--gilda-sand);
+	display: inline-flex;
+	height: 52px;
+}
+.gilda-stepper button {
+	background: transparent;
+	border: 0;
+	color: var(--gilda-ink);
+	cursor: pointer;
+	font-size: 20px;
+	width: var(--gilda-touch);
+}
+.gilda-stepper button:disabled { color: var(--gilda-taupe); cursor: not-allowed; }
+.gilda-stepper .qty {
+	-moz-appearance: textfield;
+	background: transparent;
+	border: 0 !important;
+	font: 400 16px/1 var(--gilda-sans);
+	text-align: center;
+	width: 44px !important;
+}
+.gilda-stepper .qty::-webkit-inner-spin-button,
+.gilda-stepper .qty::-webkit-outer-spin-button { appearance: none; margin: 0; }
+
+/* Inline validation + toast */
+.gilda-form-error {
+	align-items: center;
+	color: var(--gilda-error);
+	display: flex;
+	font-size: 14px;
+	gap: 8px;
+	grid-column: 1 / -1;
+}
+.gilda-form-error::before {
+	align-items: center;
+	background: var(--gilda-error);
+	border-radius: 50%;
+	color: #fff;
+	content: "!";
+	display: inline-flex;
+	flex: none;
+	font-size: 12px;
+	font-weight: 600;
+	height: 18px;
+	justify-content: center;
+	width: 18px;
+}
+.gilda-form-error[hidden] { display: none; }
+
+.gilda-toast {
+	align-items: center;
+	background: var(--gilda-ink);
+	bottom: 24px;
+	color: var(--gilda-cream);
+	display: flex;
+	font-size: 14px;
+	gap: 20px;
+	justify-content: space-between;
+	left: 50%;
+	max-width: calc(100vw - 32px);
+	padding: 14px 18px;
+	position: fixed;
+	transform: translateX(-50%);
+	width: 440px;
+	z-index: 500;
+	animation: gilda-rise .25s var(--gilda-ease);
+}
+.gilda-toast a { color: var(--gilda-cream); }
+@keyframes gilda-rise { from { opacity: 0; transform: translate(-50%, 12px); } }
+
+/* Shipping calculator (5.10) */
+.gilda-shipping { border-top: 1px solid var(--gilda-sand); display: flex; flex-direction: column; gap: 10px; padding-top: 20px; }
+.gilda-shipping__title { font: 400 18px/1.2 var(--gilda-display); margin: 0; }
+.gilda-shipping__row { display: flex; gap: 10px; align-items: stretch; }
+.gilda-shipping__row .gilda-input { flex: 1 1 auto; min-width: 0; width: auto; }
+.gilda-shipping__row .gilda-btn { flex: 0 0 auto; min-height: 50px; padding: 0 22px; white-space: nowrap; }
+.gilda-shipping__help { font-size: 13px; align-self: flex-start; }
+.gilda-shipping__feedback:empty { display: none; }
+.gilda-shipping__error { color: var(--gilda-error); font-size: 13px; margin: 0; }
+.gilda-shipping__rates { background: var(--gilda-white); border: 1px solid var(--gilda-sand); list-style: none; margin: 0; padding: 0; }
+.gilda-shipping__rates li { display: flex; font-size: 14px; gap: 12px; justify-content: space-between; padding: 12px 14px; }
+.gilda-shipping__rates li + li { border-top: 1px solid var(--gilda-sand); }
+.gilda-shipping__rates small { color: var(--gilda-graphite); display: block; }
+.gilda-shipping.is-loading button { cursor: progress; opacity: .7; }
+
+/* Share (5.11) */
+.gilda-share { align-items: center; border-top: 1px solid var(--gilda-sand); display: flex; gap: 6px; padding-top: 16px; }
+.gilda-share ul { display: flex; list-style: none; margin: 0 0 0 8px; padding: 0; }
+.gilda-share__link { align-items: center; color: var(--gilda-terracotta); display: inline-flex; height: var(--gilda-touch); justify-content: center; width: var(--gilda-touch); }
+
+.gilda-breadcrumb { color: var(--gilda-graphite); display: flex; flex-wrap: wrap; font-size: 13px; gap: 10px; letter-spacing: .5px; }
+.gilda-breadcrumb a { text-underline-offset: 3px; }
+.gilda-crumb-sep { color: var(--gilda-taupe); }
+@media (max-width: 767px) {
+	.gilda-breadcrumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-wrap: nowrap; }
+}
+
+/* ---------- Quick view dialog (3.2) ---------- */
+
+.gilda-dialog {
+	background: var(--gilda-cream);
+	border: 0;
+	color: var(--gilda-ink);
+	max-height: 90vh;
+	max-width: min(880px, 94vw);
+	padding: 0;
+	width: 100%;
+}
+.gilda-dialog::backdrop { background: rgba(36, 26, 22, .6); }
+.gilda-dialog__close {
+	background: var(--gilda-cream);
+	border: 0;
+	cursor: pointer;
+	height: var(--gilda-touch);
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	width: var(--gilda-touch);
+	z-index: 1;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.gilda-quickview { display: grid; gap: 28px; grid-template-columns: 1fr 1fr; padding: 28px; }
+.gilda-quickview img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
+.gilda-quickview__info { display: flex; flex-direction: column; gap: 14px; }
+.gilda-quickview__name { font: 400 28px/1.2 var(--gilda-display); margin: 0; }
+.gilda-quickview__price { font-size: 18px; letter-spacing: 1px; }
+.gilda-quickview__desc { font: 400 17px/1.5 var(--gilda-serif); }
+@media (max-width: 767px) { .gilda-quickview { grid-template-columns: 1fr; padding: 56px 16px 20px; } }
+
+/* ---------- Editorial (Epics 2, 8, 9) ---------- */
+
+.gilda-hero { position: relative; }
+.gilda-hero__ribbon {
+	clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 50%, 100% 100%, 0 100%);
+	padding-right: 64px !important;
+}
+@media (max-width: 767px) {
+	.gilda-hero__ribbon { clip-path: none; padding-right: var(--wp--preset--spacing--40) !important; }
+	.gilda-hero__mark { display: none !important; }
+}
+
+.gilda-category .wp-block-cover__image-background { transition: transform .4s var(--gilda-ease); }
+.gilda-category:hover .wp-block-cover__image-background,
+.gilda-category:focus-within .wp-block-cover__image-background { transform: scale(1.03); }
+.gilda-category .wp-block-cover__background { transition: opacity .3s; }
+.gilda-category:hover .wp-block-cover__background { opacity: .65 !important; }
+.gilda-category a { color: inherit; text-decoration: none; }
+.gilda-category a::after { content: ""; inset: 0; position: absolute; z-index: 1; }
+.gilda-category:hover a,
+.gilda-category a:focus-visible { text-decoration: underline; text-underline-offset: 8px; }
+
+.gilda-decorative { pointer-events: none; user-select: none; }
+
+.gilda-chapter-gallery.wp-block-gallery img { aspect-ratio: 3 / 4; object-fit: cover; }
+
+.wp-lightbox-overlay .scrim { background-color: rgba(36, 26, 22, .92) !important; }
+.wp-lightbox-overlay .close-button { color: var(--gilda-cream); }
+
+/* ---------- Cart & checkout blocks (Epic 6) ---------- */
+
+.wp-block-woocommerce-cart .wc-block-cart-items th,
+.wp-block-woocommerce-cart .wc-block-components-totals-item__label { font-family: var(--gilda-sans); }
+.wp-block-woocommerce-cart .wc-block-components-product-name {
+	color: var(--gilda-ink);
+	font: 600 14px/1.3 var(--gilda-display);
+	letter-spacing: 2px;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+.wp-block-woocommerce-cart-totals-block,
+.wc-block-cart__sidebar .wp-block-woocommerce-cart-totals-block { background: var(--gilda-white); padding: 28px; }
+.wc-block-cart__totals-title,
+.wp-block-woocommerce-cart-order-summary-heading-block { font: 400 24px/1.2 var(--gilda-display) !important; text-transform: none !important; }
+.wc-block-components-quantity-selector { border-radius: 0 !important; border-color: var(--gilda-sand) !important; }
+.wc-block-components-quantity-selector__button { min-width: var(--gilda-touch) !important; }
+.wc-block-components-totals-footer-item .wc-block-components-totals-item__value { font: 400 28px/1 var(--gilda-display); }
+.wc-block-components-text-input input,
+.wc-block-components-combobox input { border-radius: 0 !important; }
+.wc-block-components-notice-banner.is-success { background: var(--gilda-success-bg); border-color: var(--gilda-success); color: var(--gilda-success); }
+.wc-block-components-notice-banner.is-error { background: var(--gilda-error-bg); border-color: var(--gilda-error); color: var(--gilda-error); }
+
+.gilda-empty-cart__text {
+	font-family: var(--gilda-display) !important;
+	letter-spacing: .08em;
+	margin-inline: auto !important;
+	max-width: 620px;
+}
+
+/* ---------- Account (Epic 7) & notices ---------- */
+
+.woocommerce-account .woocommerce,
+.woocommerce-checkout .woocommerce { font-family: var(--gilda-sans); }
+.woocommerce-account .u-columns.col2-set { display: grid; gap: var(--wp--preset--spacing--60); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.woocommerce-account .u-column1,
+.woocommerce-account .u-column2,
+.woocommerce form.lost_reset_password,
+.woocommerce-checkout #customer_details,
+.woocommerce-checkout #order_review { background: var(--gilda-white); float: none !important; padding: 32px !important; width: auto !important; }
+.woocommerce-account h2,
+.woocommerce-checkout h3 { font: 400 26px/1.2 var(--gilda-display); }
+.woocommerce form .form-row label { font-size: 13px; }
+.woocommerce form.login,
+.woocommerce form.register { border: 0 !important; margin: 0 !important; padding: 0 !important; }
+.woocommerce .woocommerce-form-login__submit,
+.woocommerce .woocommerce-form-register__submit,
+.woocommerce .woocommerce-Button { background: var(--gilda-terracotta) !important; color: var(--gilda-cream) !important; border: 0 !important; width: 100%; }
+.woocommerce-password-strength.strong { background: var(--gilda-success-bg); color: var(--gilda-success); }
+.woocommerce-password-strength.short,
+.woocommerce-password-strength.bad { background: var(--gilda-error-bg); color: var(--gilda-error); }
+
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error { background: var(--gilda-white); border-top-color: var(--gilda-terracotta) !important; font-size: 14px; }
+.woocommerce-message { background: var(--gilda-success-bg); border-top-color: var(--gilda-success) !important; color: var(--gilda-success); }
+.woocommerce-error { background: var(--gilda-error-bg); border-top-color: var(--gilda-error) !important; color: var(--gilda-error); }
+.woocommerce-message::before,
+.woocommerce-info::before,
+.woocommerce-error::before { color: currentColor !important; }
+
+.woocommerce-checkout #payment { background: var(--gilda-white) !important; border-radius: 0 !important; }
+.woocommerce-checkout #payment ul.payment_methods li { border: 1px solid var(--gilda-sand); margin-bottom: 8px; padding: 14px 16px !important; }
+.woocommerce-checkout #payment ul.payment_methods li:has(input:checked) { border: 2px solid var(--gilda-terracotta); }
+.woocommerce-order .woocommerce-thankyou-order-received {
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+	font: italic 300 28px/1.3 var(--gilda-display);
+	padding: 32px;
+}
+
+/* ---------- Imported imagery ---------- */
+
+.wp-block-site-title.has-logo { line-height: 0; margin: 0; }
+.wp-block-site-title.has-logo a { display: inline-block; }
+.gilda-logo__img { display: block; height: auto; margin-inline: auto; max-width: 100%; width: clamp(150px, 16vw, 220px); }
+.gilda-header .gilda-logo__img { width: clamp(120px, 14vw, 190px); }
+.gilda-logo.is-light .gilda-logo__img { filter: brightness(0) invert(96%) sepia(8%) saturate(250%); } /* terracota → creme */
+
+.gilda-hero__mark.wp-block-image { margin: var(--wp--preset--spacing--50) 0 0 var(--wp--preset--spacing--50); }
+.gilda-hero__mark.wp-block-image img { width: clamp(70px, 9vw, 130px); }
+.gilda-hero .wp-block-cover__image-background { object-position: 60% center; }
+
+.gilda-butterfly.wp-block-image { margin-inline: auto; }
+.gilda-butterfly.wp-block-image img { width: 200px; }
+
+.gilda-portrait img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
+
+.gilda-lookbook .wp-block-image { margin: 0; }
+.gilda-lookbook img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }

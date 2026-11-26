@@ -1,0 +1,59 @@
+<!-- wp:template-part {"slug":"header","tagName":"header","area":"header"} /-->
+
+<!-- wp:group {"tagName":"main","anchor":"conteudo","style":{"spacing":{"margin":{"top":"0"},"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|80"}}},"layout":{"type":"constrained","contentSize":"1440px"}} -->
+<main id="conteudo" class="wp-block-group" style="margin-top:0;padding-top:var(--wp--preset--spacing--70);padding-bottom:var(--wp--preset--spacing--80)">
+<!-- wp:query-title {"type":"archive","showPrefix":false,"className":"is-style-editorial","fontSize":"editorial"} /-->
+
+<!-- wp:woocommerce/store-notices /-->
+
+<!-- wp:group {"className":"gilda-shop","layout":{"type":"default"}} -->
+<div class="wp-block-group gilda-shop"><!-- wp:shortcode -->
+[gilda_product_filters]
+<!-- /wp:shortcode -->
+
+<!-- wp:group {"className":"gilda-shop-results","style":{"spacing":{"blockGap":"var:preset|spacing|50"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group gilda-shop-results"><!-- wp:shortcode -->
+[gilda_result_count]
+<!-- /wp:shortcode -->
+
+<!-- wp:woocommerce/product-collection {"queryId":21,"query":{"perPage":12,"pages":0,"offset":0,"postType":"product","order":"asc","orderBy":"menu_order","search":"","exclude":[],"inherit":true,"taxQuery":[],"isProductCollectionBlock":true,"featured":false,"woocommerceOnSale":false,"woocommerceStockStatus":["instock","outofstock","onbackorder"],"woocommerceAttributes":[],"woocommerceHandPickedProducts":[]},"tagName":"div","displayLayout":{"type":"flex","columns":4,"shrinkColumns":true},"collection":"woocommerce/product-collection/product-catalog","hideControls":["inherit"]} -->
+<div class="wp-block-woocommerce-product-collection"><!-- wp:woocommerce/product-template -->
+<!-- wp:woocommerce/product-image {"showSaleBadge":false,"isDescendentOfQueryLoop":true,"aspectRatio":"3/4","scale":"cover"} /-->
+
+<!-- wp:post-title {"level":3,"isLink":true,"__woocommerceNamespace":"woocommerce/product-collection/product-title"} /-->
+
+<!-- wp:woocommerce/product-price {"isDescendentOfQueryLoop":true} /-->
+
+<!-- wp:woocommerce/product-button {"isDescendentOfQueryLoop":true} /-->
+<!-- /wp:woocommerce/product-template -->
+
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+<!-- wp:query-pagination-previous /-->
+
+<!-- wp:query-pagination-numbers /-->
+
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination -->
+
+<!-- wp:woocommerce/product-collection-no-results -->
+<!-- wp:group {"className":"gilda-empty","layout":{"type":"flex","orientation":"vertical","justifyContent":"center"}} -->
+<div class="wp-block-group gilda-empty"><!-- wp:paragraph {"className":"gilda-semicolon-mark gilda-decorative","style":{"typography":{"fontSize":"72px"}}} -->
+<p class="gilda-semicolon-mark gilda-decorative" style="font-size:72px">;</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"textAlign":"center","level":2,"fontSize":"x-large"} -->
+<h2 class="wp-block-heading has-text-align-center has-x-large-font-size">Nenhum produto encontrado</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"align":"center","fontFamily":"serif","fontSize":"large","textColor":"ink-soft"} -->
+<p class="has-text-align-center has-ink-soft-color has-text-color has-serif-font-family has-large-font-size">Essa história ainda não foi escrita. Tente outros filtros.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- /wp:woocommerce/product-collection-no-results --></div>
+<!-- /wp:woocommerce/product-collection --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer","area":"footer"} /-->
