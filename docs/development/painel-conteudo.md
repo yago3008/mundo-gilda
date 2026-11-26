@@ -268,20 +268,18 @@ Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 
    | Capítulo | Peças | Origem |
    |---|---|---|
-   | 1 — Borboleta 88 | Camisa Casulo, Lenço oitenta-e-oito | Casulo: decisão. Lenço: inferido do texto do capítulo ("lenço com estampa exclusiva em aquarela… borboleta 88"), **confirmar** |
+   | 1 — Borboleta 88 | Camisa Casulo, Calça Asas, Lenço oitenta-e-oito | Casulo e Asas: decisão. Lenço: inferido do texto do capítulo ("lenço com estampa exclusiva em aquarela… borboleta 88") |
    | 2 — Os filetes da borboleta | Bermuda Envolto, Lenço Manacá | decisão |
-   | 3 — Ritual Brasileiro | Camisa Grão, Calça Torra, Camisa Café | decisão. **Não existe produto "Camisa Café" na loja** (veio do Wix só a Camisa Grão, em Off White e Marrom): confirmar se a Café é a Grão marrom ou uma peça a cadastrar |
-   | — | Calça Asas | sem capítulo hoje, **confirmar** |
+   | 3 — Ritual Brasileiro | Camisa Grão, Calça Torra | decisão. A "camisa Café" do texto é a **Camisa Grão na cor Marrom** (não é outra peça) |
 
 5. **Textos legais editáveis no painel.** Política de privacidade, trocas e termos passam a ser editados pelas donas no painel. O `scripts/import-legal-pages.php` vira "semente uma vez": cria a página se ela não existir e nunca mais sobrescreve (entra na fase 1, junto com os outros scripts do §0).
 
 ### Em aberto
 
-6. **Camisa Café:** é a Camisa Grão na cor Marrom ou uma peça nova a cadastrar? E o capítulo do Lenço oitenta-e-oito (proposto: 1) e da Calça Asas (proposto: nenhum).
-7. **Lookbook:** todo capítulo pode ter, ou é algo especial?
-8. **Cor oficial** de Marrom e Off White (tema × Wix).
-9. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
-10. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
+6. **Lookbook:** todo capítulo pode ter, ou é algo especial?
+7. **Cor oficial** de Marrom e Off White (tema × Wix).
+8. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
+9. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
 
 ## 17. Achados no caminho (fora do painel)
 
