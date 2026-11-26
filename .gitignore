@@ -1,0 +1,10 @@
+.env
+wp-content/uploads/
+*.log
+.DS_Store
+Thumbs.db
+
+# Itens padrão que a imagem do WordPress copia (não versionar)
+wp-content/themes/twenty*/
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
