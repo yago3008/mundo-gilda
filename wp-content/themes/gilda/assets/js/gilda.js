@@ -678,20 +678,28 @@
 	/* ------------------------------------------------------------------ */
 
 	/* ------------------------------------------------------------------ */
-	/* Transparent header over the hero → solid on scroll                  */
+	/* Direction-aware sticky header with a smooth reveal.                 */
 	/* ------------------------------------------------------------------ */
 
 	function initStickyHeader() {
-		if ( ! document.body.classList.contains( 'gilda-has-hero' ) ) {
-			return;
-		}
 		const header = $( '.wp-site-blocks > header' );
 		if ( ! header ) {
 			return;
 		}
+		const hasHero = document.body.classList.contains( 'gilda-has-hero' );
+		let previousY = window.scrollY;
 		let ticking = false;
 		const sync = () => {
-			header.classList.toggle( 'is-stuck', window.scrollY > 40 );
+			const currentY = Math.max( 0, window.scrollY );
+			if ( hasHero ) {
+				header.classList.toggle( 'is-stuck', currentY > 40 );
+			}
+			if ( currentY <= 40 || currentY < previousY - 3 ) {
+				header.classList.remove( 'is-scroll-hidden' );
+			} else if ( currentY > previousY + 3 ) {
+				header.classList.add( 'is-scroll-hidden' );
+			}
+			previousY = currentY;
 			ticking = false;
 		};
 		sync();
@@ -705,6 +713,46 @@
 			},
 			{ passive: true }
 		);
+	}
+
+	function initChapterShowcase() {
+		if ( reduceMotion ) {
+			return;
+		}
+		$$( '[data-chapter-slides]' ).forEach( ( card ) => {
+			let slides;
+			try {
+				slides = JSON.parse( card.dataset.chapterSlides );
+			} catch ( e ) {
+				return;
+			}
+			const image = $( '.gilda-chapter-card__image', card );
+			if ( ! image || ! Array.isArray( slides ) || slides.length < 2 ) {
+				return;
+			}
+			const preloaded = slides.map( ( src ) => {
+				const photo = new Image();
+				photo.src = src;
+				return photo;
+			} );
+			let index = 0;
+			window.setInterval( () => {
+				const next = ( index + 1 ) % slides.length;
+				image.classList.add( 'is-changing' );
+				window.setTimeout( () => {
+					const showNext = () => {
+						image.src = slides[next];
+						image.classList.remove( 'is-changing' );
+						index = next;
+					};
+					if ( preloaded[next].complete ) {
+						showNext();
+					} else {
+						preloaded[next].addEventListener( 'load', showNext, { once: true } );
+					}
+				}, 350 );
+			}, 4500 );
+		} );
 	}
 
 	function initProductDescriptionToggle() {
@@ -732,6 +780,7 @@
 	}
 	function boot() {
 		initStickyHeader();
+		initChapterShowcase();
 		initProductDescriptionToggle();
 		$$( '.gilda-carousel' ).forEach( initCarousel );
 		$$( 'form.cart .quantity' ).forEach( initStepper );

@@ -42,6 +42,20 @@ function gilda_ensure_pages() {
 }
 add_action( 'after_switch_theme', 'gilda_ensure_pages' );
 add_action( 'init', 'gilda_ensure_pages', 20 );
+
+/**
+ * Render the Quem Cria page directly when a database template cannot resolve
+ * the theme pattern reference.
+ *
+ * @return string
+ */
+function gilda_about_page_shortcode() {
+	ob_start();
+	include GILDA_DIR . '/patterns/about.php';
+	return (string) ob_get_clean();
+}
+add_shortcode( 'gilda_about_page', 'gilda_about_page_shortcode' );
+
 /**
  * Send the old editorial /produtos/ landing page to the actual WooCommerce catalog.
  */
@@ -67,4 +81,18 @@ add_action( 'template_redirect', 'gilda_redirect_products_landing_to_catalog', 1
 function gilda_product_url( $slug ) {
 	$post = get_page_by_path( $slug, OBJECT, 'product' );
 	return $post ? get_permalink( $post ) : home_url( '/product-page/' . $slug . '/' );
+}
+
+/**
+ * URL of the product catalog filtered by a product category.
+ *
+ * @param string $slug Product category slug.
+ * @return string
+ */
+function gilda_product_type_url( $slug ) {
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '';
+	if ( ! $shop_url ) {
+		$shop_url = home_url( '/produtos/' );
+	}
+	return add_query_arg( 'tipo', sanitize_title( $slug ), $shop_url );
 }

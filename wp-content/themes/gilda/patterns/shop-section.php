@@ -1,34 +1,43 @@
 <?php
 /**
- * Title: Seção Loja + Instagram
+ * Title: Capítulos em destaque
  * Slug: gilda/shop-section
  * Categories: gilda
- * Keywords: loja, borboleta, instagram
- * Description: "LOJA" com ícone da borboleta 88 levando para Produtos; logo e @gildapontoevirgula (tasks 2.4 e 2.5).
+ * Keywords: capítulos, fotos, livro GILDA
+ * Description: Três cards com uma foto rotativa para cada capítulo.
  * Viewport Width: 1440
  *
  * @package gilda
  */
 
-$gilda_products  = home_url( '/produtos/' );
-$gilda_butterfly = gilda_image( 'butterfly' );
+$gilda_featured_chapters = array(
+	array( 'title' => __( 'CAPÍTULO 1', 'gilda' ), 'key' => 'chapter_1', 'anchor' => 'capitulo-1' ),
+	array( 'title' => __( 'CAPÍTULO 2', 'gilda' ), 'key' => 'chapter_2', 'anchor' => 'capitulo-2' ),
+	array( 'title' => __( 'CAPÍTULO 3', 'gilda' ), 'key' => 'chapter_3', 'extra_key' => 'chapter_3_lookbook', 'anchor' => 'capitulo-3' ),
+);
 ?>
-<!-- wp:group {"align":"full","backgroundColor":"white","style":{"spacing":{"padding":{"top":"var:preset|spacing|80","bottom":"var:preset|spacing|80"},"blockGap":"var:preset|spacing|50","margin":{"top":"0"}}},"layout":{"type":"flex","orientation":"vertical","justifyContent":"center"}} -->
-<div class="wp-block-group alignfull has-white-background-color has-background" style="margin-top:0;padding-top:var(--wp--preset--spacing--80);padding-bottom:var(--wp--preset--spacing--80)"><!-- wp:heading {"textAlign":"center","className":"is-style-headline","style":{"typography":{"fontSize":"36px","letterSpacing":"0.3em"}}} -->
-<h2 class="wp-block-heading has-text-align-center is-style-headline" style="font-size:36px;letter-spacing:0.3em"><?php echo esc_html__( 'LOJA', 'gilda' ); ?></h2>
+<!-- wp:group {"align":"full","className":"gilda-chapter-showcase","backgroundColor":"white","layout":{"type":"constrained","contentSize":"1170px"}} -->
+<div class="wp-block-group alignfull gilda-chapter-showcase has-white-background-color has-background"><!-- wp:heading {"textAlign":"center","className":"is-style-headline"} -->
+<h2 class="wp-block-heading has-text-align-center is-style-headline"><?php echo esc_html__( 'CAPÍTULOS', 'gilda' ); ?></h2>
 <!-- /wp:heading -->
-
-<?php if ( $gilda_butterfly ) : ?>
-<?php echo gilda_image_block( $gilda_butterfly, 'medium', array( 'className' => 'gilda-butterfly', 'href' => $gilda_products ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-<?php else : ?>
-<!-- wp:image {"width":"140px","height":"140px","sizeSlug":"full","linkDestination":"custom","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full is-resized"><a href="<?php echo esc_url( $gilda_products ); ?>"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/borboleta-88.svg' ) ); ?>" alt="<?php echo esc_attr__( 'Borboleta 88 — ver produtos', 'gilda' ); ?>" style="width:140px;height:140px"/></a></figure>
-<!-- /wp:image -->
-<?php endif; ?>
-
-<!-- wp:site-title {"level":0,"textAlign":"center","isLink":false,"className":"gilda-logo","style":{"typography":{"fontSize":"28px"}}} /-->
-
-<!-- wp:paragraph {"align":"center","fontFamily":"headline","style":{"typography":{"fontSize":"18px","letterSpacing":"0.03em"}}} -->
-<p class="has-text-align-center has-headline-font-family" style="font-size:18px;letter-spacing:0.03em"><a href="https://www.instagram.com/gildapontoevirgula/" target="_blank" rel="noreferrer noopener">@gildapontoevirgula</a></p>
-<!-- /wp:paragraph --></div>
+<div class="gilda-chapter-showcase__grid">
+<?php foreach ( $gilda_featured_chapters as $gilda_featured_chapter ) :
+	$gilda_ids = (array) gilda_image( $gilda_featured_chapter['key'] );
+	if ( ! empty( $gilda_featured_chapter['extra_key'] ) ) {
+		$gilda_ids = array_merge( $gilda_ids, (array) gilda_image( $gilda_featured_chapter['extra_key'] ) );
+	}
+	$gilda_slides = array_values( array_filter( array_map( static function ( $gilda_id ) {
+		return gilda_image_url( $gilda_id, 'large' );
+	}, $gilda_ids ) ) );
+	$gilda_image = $gilda_slides[0] ?? '';
+	$gilda_url   = home_url( '/capitulos/#' . $gilda_featured_chapter['anchor'] );
+	?>
+	<a class="gilda-chapter-card" href="<?php echo esc_url( $gilda_url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Ver fotos do %s', 'gilda' ), $gilda_featured_chapter['title'] ) ); ?>"<?php echo $gilda_slides ? ' data-chapter-slides="' . esc_attr( wp_json_encode( $gilda_slides ) ) . '"' : ''; ?>>
+		<?php if ( $gilda_image ) : ?>
+		<img class="gilda-chapter-card__image" src="<?php echo esc_url( $gilda_image ); ?>" alt="" />
+		<?php endif; ?>
+		<span class="gilda-chapter-card__title"><?php echo esc_html( $gilda_featured_chapter['title'] ); ?></span>
+	</a>
+<?php endforeach; ?>
+</div></div>
 <!-- /wp:group -->

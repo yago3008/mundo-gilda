@@ -14,6 +14,7 @@ $gilda_chapters = array(
 	array(
 		'title' => __( 'CAPÍTULO 1', 'gilda' ),
 		'key'   => 'chapter_1',
+		'anchor' => 'capitulo-1',
 		'text'  => array(
 			'A GILDA; apresenta seu primeiro capítulo, inspirado na borboleta 88.',
 			'Símbolo de transformação e movimento, a borboleta conduz este capítulo a partir de suas formas, cores e delicadezas. Seu desenho singular se desdobra em peças que traduzem a leveza sem abrir mão da estrutura característica da alfaiataria.',
@@ -28,6 +29,7 @@ $gilda_chapters = array(
 	array(
 		'title' => __( 'CAPÍTULO 2', 'gilda' ),
 		'key'   => 'chapter_2',
+		'anchor' => 'capitulo-2',
 		'text'  => array(
 			'No segundo capítulo, a GILDA; continua a observar a borboleta, agora mais de perto.',
 			'A inspiração parte dos filetes que percorrem suas asas: linhas delicadas que sustentam, delimitam e conduzem o movimento. Essa construção se traduz na bermuda ENVOLTO, com pregas frontais e passantes integrados, e no lenço MANACÁ, cuja estampa em aquarela reinterpreta os traços das asas.',
@@ -42,6 +44,7 @@ $gilda_chapters = array(
 	array(
 		'title' => __( 'CAPÍTULO 3', 'gilda' ),
 		'key'   => 'chapter_3',
+		'anchor' => 'capitulo-3',
 		'text'  => array(
 			'Agora, a GILDA; apresenta um novo capítulo: RITUAL BRASILEIRO.',
 			'Inspirado no café, mas, sobretudo, no tempo que se cria ao redor dele, o capítulo parte de um gesto cotidiano profundamente presente na cultura brasileira: fazer uma pausa. Na companhia de alguém ou de si mesma, esse é o momento de observar, conversar, descansar, respirar ou simplesmente passar um café.',
@@ -79,8 +82,8 @@ $gilda_gallery = static function ( $ids ) {
 <!-- /wp:group -->
 
 <?php foreach ( $gilda_chapters as $gilda_chapter ) : ?>
-<!-- wp:group {"align":"full","backgroundColor":"linen","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"4px"}}},"layout":{"type":"constrained","contentSize":"1170px"}} -->
-<div class="wp-block-group alignfull has-linen-background-color has-background" style="margin-top:4px;padding-top:var(--wp--preset--spacing--70);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--50)"><!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"var:preset|spacing|60","top":"var:preset|spacing|50"}}}} -->
+<!-- wp:group {"align":"full","anchor":"<?php echo esc_attr( $gilda_chapter['anchor'] ); ?>","backgroundColor":"linen","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"4px"}}},"layout":{"type":"constrained","contentSize":"1170px"}} -->
+<div id="<?php echo esc_attr( $gilda_chapter['anchor'] ); ?>" class="wp-block-group alignfull has-linen-background-color has-background" style="margin-top:4px;padding-top:var(--wp--preset--spacing--70);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--50)"><!-- wp:columns {"style":{"spacing":{"blockGap":{"left":"var:preset|spacing|60","top":"var:preset|spacing|50"}}}} -->
 <div class="wp-block-columns"><!-- wp:column {"width":"64px"} -->
 <div class="wp-block-column" style="flex-basis:64px"><!-- wp:heading {"className":"gilda-vertical-heading","style":{"typography":{"fontSize":"34px","fontWeight":"300","letterSpacing":"0.15em"}}} -->
 <h2 class="wp-block-heading gilda-vertical-heading" style="font-size:34px;font-weight:300;letter-spacing:0.15em"><?php echo esc_html( $gilda_chapter['title'] ); ?></h2>

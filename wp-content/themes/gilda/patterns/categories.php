@@ -4,18 +4,18 @@
  * Slug: gilda/categories
  * Categories: gilda
  * Keywords: categorias, camisas, calças, bermudas, lenços
- * Description: 4 categorias com foto e link para um produto representativo + "ALFAIATARIA CRIATIVA" (task 2.3). Grade 4 → 2 → 1 colunas.
+ * Description: 4 categorias com links para o catálogo já filtrado + "ALFAIATARIA CRIATIVA" (task 2.3). Grade 4 → 2 → 1 colunas.
  * Viewport Width: 1440
  *
  * @package gilda
  */
 
-// Mesma relação categoria → produto do site atual.
+// Cada card abre o catálogo filtrado pelo tipo de produto.
 $gilda_categories = array(
-	array( 'category_camisas', __( 'CAMISAS', 'gilda' ), gilda_product_url( 'camisa-casulo' ), '#8a5a3c' ),
-	array( 'category_calcas', __( 'CALÇAS', 'gilda' ), gilda_product_url( 'calca-asas' ), '#a08a6e' ),
-	array( 'category_bermudas', __( 'BERMUDAS', 'gilda' ), gilda_product_url( 'bermuda-envolto' ), '#6b4a33' ),
-	array( 'category_lencos', __( 'LENÇOS', 'gilda' ), gilda_product_url( 'lenco-manaca' ), '#4e1a08' ),
+	array( 'category_camisas', __( 'CAMISAS', 'gilda' ), gilda_product_type_url( 'camisas' ), '#8a5a3c' ),
+	array( 'category_calcas', __( 'CALÇAS', 'gilda' ), gilda_product_type_url( 'calcas' ), '#a08a6e' ),
+	array( 'category_bermudas', __( 'BERMUDAS', 'gilda' ), gilda_product_type_url( 'bermudas' ), '#6b4a33' ),
+	array( 'category_lencos', __( 'LENÇOS', 'gilda' ), gilda_product_type_url( 'lencos' ), '#4e1a08' ),
 );
 ?>
 <!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"bottom":"var:preset|spacing|80"},"blockGap":"var:preset|spacing|60"}},"layout":{"type":"constrained","contentSize":"1170px"}} -->
