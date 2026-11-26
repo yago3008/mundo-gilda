@@ -111,3 +111,14 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 - Clientes de teste: credenciais `TEST_CUSTOMER_*` no `.env`.
 - Pra testar o checkout: CEP `01310-100`, CPF de teste `529.982.247-25` e o "Pagamento de teste".
 - Pra recomeçar do zero: `docker compose down -v && ./scripts/setup.sh`.
+
+## 9. Protótipo de transições (referência de front)
+
+Em `prototypes/zoom-mask/` tem um protótipo, feito a pedido do Yago, de duas transições de scroll com as fotos do Capítulo 3 e as fontes e cores do tema:
+
+1. **Zoom Parallax:** colagem de 7 fotos; a do centro cresce até ocupar a tela e aparece "RITUAL BRASILEIRO".
+2. **Mask Section Transition:** "GILDA;" vazado em creme sobre a foto dos livros (`story_banner`). A câmera mergulha no ponto e vírgula e termina no banner "DEPOIS DO PONTO E VÍRGULA, VOCÊ CONTA A HISTÓRIA".
+
+Sem bibliotecas: CSS `position: sticky` mais um `requestAnimationFrame`. Respeita `prefers-reduced-motion` e não dá rolagem lateral no celular. Para ver: `node prototypes/serve.mjs` e abrir http://localhost:5500 (precisa do Docker no ar e das imagens importadas).
+
+**Não está no tema.** Se for usar, o código está separado em blocos `[ZOOM]` e `[MASK]` (HTML, CSS e JS) pra você adaptar aos patterns. As URLs das fotos viram `gilda_image(...)`.
