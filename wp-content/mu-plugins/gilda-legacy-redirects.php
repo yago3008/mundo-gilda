@@ -19,6 +19,7 @@ add_action(
 		// Páginas fixas do Wix → páginas novas (ajustar quando as páginas institucionais existirem).
 		$map = array(
 			'/category/all-products' => '/loja/',
+			'/cart-page'             => '/carrinho/',
 			'/contact-1'             => '/loja/',  // "PRODUTOS"
 			'/contact'               => '/quem-cria/',
 			'/contact-2'             => '/capitulos/',
@@ -28,7 +29,7 @@ add_action(
 			exit;
 		}
 
-		// /product-page/<slug> → página do produto com o mesmo slug.
+		// /product-page/<slug-com-acento> (ex.: camisa-grão) → slug normalizado (camisa-grao).
 		if ( preg_match( '#^/product-page/([^/]+)$#', $path, $m ) ) {
 			$product = get_page_by_path( sanitize_title( $m[1] ), OBJECT, 'product' );
 			wp_safe_redirect( $product ? get_permalink( $product ) : wc_get_page_permalink( 'shop' ), 301 );

@@ -37,20 +37,20 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 
 ## O que já funciona
 
-- **Contas de cliente:** cadastro em "Minha conta" e no checkout, login, recuperação de senha, histórico de pedidos e endereços. Compra sem cadastro também é liberada.
+- **Contas de cliente:** cadastro com nome, e-mail, senha (com medidor de força) e confirmação de senha; login, recuperação de senha por e-mail, histórico de pedidos e endereços. Também dá pra criar a conta no checkout ou comprar sem cadastro.
 - **Checkout brasileiro:** CPF validado, CEP primeiro com autopreenchimento de rua/bairro/cidade/UF, número (com opção S/N), bairro e celular com DDD.
 - **Produtos:** os 7 produtos do Wix, com variações de cor e tamanho, estoque por variação e "Esgotado".
 - **Cupom `primeiracompra`:** 10% e só na primeira compra. A regra confere a conta e também o e-mail, então não dá pra reusar sem login.
 - **E-mails transacionais:** conta criada, pedido recebido, novo pedido para a loja e redefinição de senha.
-- **Redirecionamentos 301** das URLs antigas do Wix (`/product-page/...`, `/category/all-products`, etc.).
+- **URLs:** produtos continuam em `/product-page/<slug>`, como no Wix (requisito 11.3). As outras URLs antigas (`/category/all-products`, `/cart-page`, slugs com acento, etc.) têm redirecionamento 301.
 
 ## Pendências que dependem da GILDA;
 
 | Item | Situação atual | O que falta |
 |---|---|---|
-| **Frete** | Frete fixo provisório de R$ 25 | Escolher a transportadora/integração (ex.: Melhor Envio) e criar a conta |
-| **Pagamento** | Gateway de teste (só no ambiente local) | Escolher o gateway (ex.: Mercado Pago, Pagar.me, PagBank) e passar as credenciais |
-| **Endereço de origem** | CEP de exemplo no `.env` | CEP real de onde saem os envios |
+| **Frete (11.6, 5.10)** | Frete fixo provisório de R$ 25 | Escolher a integração de PAC/SEDEX (contrato Correios ou Melhor Envio) e criar a conta |
+| **Pagamento (11.5)** | Gateway de teste (só no ambiente local) | Escolher o gateway com Visa/Master/Pix (ex.: Mercado Pago, Pagar.me, PagBank) e passar as credenciais |
+| **Endereço de origem** | Curitiba/PR, CEP 82015-384 (requisito 10.1) | Rua e número de onde saem os envios |
 | **Peso/medidas** | Valores provisórios por categoria | Peso e embalagem reais de cada peça (o frete é calculado com isso) |
 | **Fotos dos produtos** | Não importadas | Autorizar a importação do Wix (`IMPORT_IMAGES=1`) ou mandar as fotos originais |
 | **Política de privacidade / trocas** | Páginas em rascunho | Textos da GILDA; (exigência da LGPD/CDC) |
@@ -69,6 +69,8 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-smtp.php                  # envio de e-mail via SMTP (local: Mailpit)
   gilda-first-purchase-coupon.php # regra "só na primeira compra"
   gilda-legacy-redirects.php      # 301 das URLs do Wix
+  gilda-account-fields.php        # nome + confirmar senha no cadastro (7.2)
+docs/                       # requisitos e design system (K1venn)
 ```
 
 O core do WordPress, os plugins de terceiros e os uploads ficam num volume Docker, não no git. Os plugins são instalados pelo `setup.sh` com versão fixa. Para atualizar um plugin, mude a versão lá e teste.

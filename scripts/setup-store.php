@@ -125,8 +125,9 @@ if ( $sample ) {
 	wp_delete_post( $sample->ID, true );
 }
 
-// URLs em português: /produto/<slug>, /categoria/<slug> e endpoints de "Minha conta".
-update_option( 'woocommerce_permalinks', array_merge( (array) get_option( 'woocommerce_permalinks', array() ), array( 'product_base' => '/produto', 'category_base' => 'categoria', 'tag_base' => 'tag-produto', 'attribute_base' => '', 'use_verbose_page_rules' => false ) ) );
+// URLs: produtos em /product-page/<slug> (igual ao Wix, requisito 11.3: preserva SEO e links),
+// categorias em /categoria/<slug> e endpoints de "Minha conta" em português.
+update_option( 'woocommerce_permalinks', array_merge( (array) get_option( 'woocommerce_permalinks', array() ), array( 'product_base' => '/product-page', 'category_base' => 'categoria', 'tag_base' => 'tag-produto', 'attribute_base' => '', 'use_verbose_page_rules' => false ) ) );
 $endpoints = array(
 	'woocommerce_myaccount_orders_endpoint'          => 'pedidos',
 	'woocommerce_myaccount_view_order_endpoint'      => 'ver-pedido',
