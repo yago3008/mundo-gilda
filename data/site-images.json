@@ -16,8 +16,9 @@
       "note": "folha com 3 versões do logo; recorta a versão terracota"
     },
     "hero": {
-      "url": "https://static.wixstatic.com/media/ff503a_0a0f6a78b0d84475b043823880080ed1~mv2.png",
-      "alt": "Modelo vestindo peças GILDA; sentada em uma cadeira"
+      "file": "images/hero-camisa-grao-cadeira.webp",
+      "alt": "Modelo vestindo peças GILDA; sentada em uma cadeira",
+      "note": "Versão em melhor qualidade enviada pelo Yago (26/11). Original do Wix: https://static.wixstatic.com/media/ff503a_0a0f6a78b0d84475b043823880080ed1~mv2.png"
     },
     "hero_mark": {
       "url": "https://static.wixstatic.com/media/ff503a_559f35dc8a1e45a2a18a3b3337c5638f~mv2.png",
@@ -28,8 +29,9 @@
       "alt": "Borboleta 88 — ver produtos"
     },
     "category_camisas": {
-      "url": "https://static.wixstatic.com/media/ff503a_575ffd954e314a669e9e36803ae867e8~mv2.png",
-      "alt": ""
+      "file": "images/camisas-punho-bolso.webp",
+      "alt": "",
+      "note": "Versão em melhor qualidade enviada pelo Yago (26/11). Original do Wix: https://static.wixstatic.com/media/ff503a_575ffd954e314a669e9e36803ae867e8~mv2.png"
     },
     "category_calcas": {
       "url": "https://static.wixstatic.com/media/ff503a_6abd1d997c984258bfdc1026169f2a12~mv2.jpg",
@@ -68,23 +70,25 @@
     "chapter_2": {
       "alt": "Capítulo 2 — filetes da borboleta",
       "urls": [
-        "https://static.wixstatic.com/media/ff503a_d826800020be4a038afebc6dbab9a52f~mv2.jpeg",
+        "file:images/lenco-estampa-filetes.webp",
         "https://static.wixstatic.com/media/ff503a_eaaf85e2e5e54b96838a897f2b6b4f07~mv2.png",
         "https://static.wixstatic.com/media/ff503a_b06c4fc9492142d8a01c3c7c230837ff~mv2.png"
-      ]
+      ],
+      "note": "\"file:images/…\" = arquivo do repositório (data/images/). A estampa do lenço era a ff503a_d826800020be4a038afebc6dbab9a52f~mv2.jpeg do Wix (736 px)."
     },
     "chapter_3": {
       "alt": "Capítulo 3 — Ritual brasileiro",
       "urls": [
         "https://static.wixstatic.com/media/ff503a_4bb43149e768434897f6576913cb3810~mv2.jpg",
-        "https://static.wixstatic.com/media/ff503a_a521eb8bab1e4f708707f56e36cb068f~mv2.png",
-        "https://static.wixstatic.com/media/ff503a_c1d4c6c3b1fe45d5af369f218c1086fd~mv2.png",
-        "https://static.wixstatic.com/media/ff503a_0aa514a757c44c4ebd096021336132c4~mv2.png",
+        "file:images/camisa-grao-corpo-inteiro.webp",
+        "file:images/camisa-cafe-punho.webp",
+        "file:images/hero-camisa-grao-cadeira.webp",
         "https://static.wixstatic.com/media/ff503a_9bf249d6b2f94de38dc0742103191468~mv2.png",
-        "https://static.wixstatic.com/media/ff503a_23da737a22704c619fa9ae164c35ee97~mv2.png",
+        "file:images/camisas-punho-bolso.webp",
         "https://static.wixstatic.com/media/ff503a_e1f4a290a58346d5a7ff1978ec346929~mv2.jpeg",
-        "https://static.wixstatic.com/media/ff503a_3b90f9012f704bde99e8b7af3bb83f7b~mv2.png"
-      ]
+        "file:images/camisa-cafe-flor.webp"
+      ],
+      "note": "\"file:images/…\" = versões em melhor qualidade enviadas pelo Yago (26/11) no lugar das do Wix (1023 px)."
     },
     "chapter_3_lookbook": {
       "alt": "Lookbook GILDA;",
