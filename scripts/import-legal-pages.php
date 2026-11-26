@@ -1,12 +1,14 @@
 <?php
 /**
- * Cria/atualiza as páginas legais a partir de docs/legal/*.md, SEMPRE como rascunho.
+ * Cria/atualiza as páginas legais a partir de docs/legal/*.md. Roda no setup.sh.
  *
  *   docker compose run --rm wpcli wp eval-file /scripts/import-legal-pages.php --user=admin
  *
  * - Cada .md tem um cabeçalho com titulo, slug e opcao_wp (a opção do WordPress/WooCommerce que aponta
  *   para a página, ex.: wp_page_for_privacy_policy). A página é achada por essa opção ou pelo slug.
- * - Página já PUBLICADA não é tocada (o texto do git é rascunho com [PREENCHER]): o script avisa e pula.
+ * - Por padrão vira RASCUNHO, e página já PUBLICADA não é tocada (o texto do git ainda tem [PREENCHER]).
+ * - Com `status: publicar` no cabeçalho, o texto já foi revisado: a página é publicada e o git passa a ser
+ *   a fonte (cada execução atualiza a página com o .md; edite o .md, não o painel).
  * - Não define woocommerce_terms_page_id: com a página em rascunho, o checkout linkaria para um 404.
  *   Depois de publicar os termos, ligue em WooCommerce → Configurações → Avançado → Termos e condições.
  * - Converte só o Markdown que esses arquivos usam (títulos, parágrafos, listas, citação, negrito,
@@ -93,7 +95,8 @@ foreach ( $files as $file ) {
 	}
 	$title  = $meta['titulo'] ?? basename( $file, '.md' );
 	$slug   = $meta['slug'] ?? sanitize_title( $title );
-	$option = $meta['opcao_wp'] ?? '';
+	$option  = $meta['opcao_wp'] ?? '';
+	$publish = 'publicar' === ( $meta['status'] ?? '' );
 
 	$page = null;
 	if ( $option && ( $id = (int) get_option( $option ) ) ) {
@@ -103,14 +106,14 @@ foreach ( $files as $file ) {
 		$page = get_page_by_path( $slug );
 	}
 
-	if ( $page && 'publish' === $page->post_status ) {
+	if ( $page && 'publish' === $page->post_status && ! $publish ) {
 		WP_CLI::warning( "\"{$page->post_title}\" (#{$page->ID}) já está publicada; não sobrescrevo com o rascunho. Atualize pelo painel." );
 		continue;
 	}
 
 	$postarr = array(
 		'post_type'    => 'page',
-		'post_status'  => 'draft',
+		'post_status'  => $publish ? 'publish' : 'draft',
 		'post_title'   => $title,
 		'post_name'    => $slug,
 		'post_content' => $to_blocks( $fm[2] ),
@@ -128,6 +131,6 @@ foreach ( $files as $file ) {
 	if ( $option && 'woocommerce_terms_page_id' !== $option && (int) get_option( $option ) !== (int) $id ) {
 		update_option( $option, (int) $id );
 	}
-	WP_CLI::log( sprintf( '%s "%s" (#%d, rascunho): %s', $page ? 'Atualizada' : 'Criada', $title, $id, admin_url( "post.php?post=$id&action=edit" ) ) );
+	WP_CLI::log( sprintf( '%s "%s" (#%d, %s): %s', $page ? 'Atualizada' : 'Criada', $title, $id, $publish ? 'publicada' : 'rascunho', $publish ? get_permalink( $id ) : admin_url( "post.php?post=$id&action=edit" ) ) );
 }
-WP_CLI::success( 'Páginas legais em rascunho. Revise, apague o aviso de RASCUNHO, preencha os [PREENCHER] e publique pelo painel.' );
+WP_CLI::success( 'Páginas legais importadas. As em rascunho: revise, apague o aviso de RASCUNHO, preencha os [PREENCHER] e marque `status: publicar` no .md.' );

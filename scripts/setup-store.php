@@ -60,6 +60,10 @@ $options = array(
 	'woocommerce_enable_myaccount_registration'       => 'yes',
 	'woocommerce_registration_generate_username'      => 'yes',
 	'woocommerce_registration_generate_password'      => 'no', // cliente escolhe a própria senha
+	// Avisos de privacidade do cadastro e do checkout. O WooCommerce salva o padrão em inglês
+	// quando é instalado antes da tradução; [privacy_policy] vira o link da política.
+	'woocommerce_registration_privacy_policy_text'    => 'Seus dados pessoais serão usados para melhorar a sua experiência no site, gerenciar o acesso à sua conta e para outros fins descritos na nossa [privacy_policy].',
+	'woocommerce_checkout_privacy_policy_text'        => 'Seus dados pessoais serão usados para processar o seu pedido, melhorar a sua experiência no site e para outros fins descritos na nossa [privacy_policy].',
 	'woocommerce_erasure_request_removes_order_data'  => 'no',
 	'woocommerce_allow_bulk_remove_personal_data'     => 'no',
 

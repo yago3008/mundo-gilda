@@ -59,7 +59,17 @@ function gilda_enqueue_assets() {
 
 	$wc = function_exists( 'WC' );
 	$account_images = array();
-	if ( $wc && function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'wc_get_products' ) ) {
+	// Fotos do carrossel do login/cadastro: as versões em alta de data/site-images.json (account_carousel).
+	// Sem elas importadas, usa a foto principal dos produtos.
+	if ( function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'gilda_image' ) ) {
+		foreach ( (array) gilda_image( 'account_carousel' ) as $carousel_id ) {
+			$image_url = wp_get_attachment_image_url( $carousel_id, 'full' );
+			if ( $image_url ) {
+				$account_images[] = esc_url_raw( $image_url );
+			}
+		}
+	}
+	if ( ! $account_images && $wc && function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'wc_get_products' ) ) {
 		$account_products = wc_get_products(
 			array(
 				'limit'   => 8,
@@ -121,6 +131,20 @@ function gilda_enqueue_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'gilda_enqueue_assets' );
+
+/**
+ * Segunda metade da transição dos cards de categoria: inline no começo do <body>, para a tela
+ * creme com o nome já sair na primeira pintura da página de destino (assets/js/category-zoom-arrive.js).
+ * Não faz nada se a página não foi aberta por um card.
+ */
+function gilda_category_zoom_arrive() {
+	$file = GILDA_DIR . '/assets/js/category-zoom-arrive.js';
+	if ( is_admin() || ! is_readable( $file ) ) {
+		return;
+	}
+	echo '<script id="gilda-category-zoom-arrive">' . file_get_contents( $file ) . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput, WordPress.WP.AlternativeFunctions
+}
+add_action( 'wp_body_open', 'gilda_category_zoom_arrive', 1 );
 
 /**
  * Product colour swatches (docs/design/01-colors.md → Product colors).

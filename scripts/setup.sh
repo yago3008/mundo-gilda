@@ -61,6 +61,10 @@ else
   echo "  (sem data/products.json — rode: node scripts/export-wix-products.mjs)"
 fi
 
+# Páginas legais de docs/legal/ (política de privacidade publicada; o resto em rascunho).
+echo "==> Páginas legais"
+wp eval-file /scripts/import-legal-pages.php --user="$WP_ADMIN_USER"
+
 # Fotos do site (logo, banners, capítulos, Quem Cria) de data/site-images.json.
 # Baixa só o que ainda não foi importado. Opção separada de IMPORT_IMAGES (que traz as fotos dos produtos).
 if [ "${SITE_IMAGES:-}" = "1" ]; then

@@ -1,11 +1,16 @@
 /*
  * Cards de categoria (pattern gilda/categories): ao clicar, a tela "entra" no nome do card
- * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e depois abre o catálogo.
+ * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai no catálogo.
  *
- * 1. abertura: o card vira creme com o nome vazado (a foto aparece pelas letras), cresce até ocupar
- *    a tela e o nome vai para o centro, grande;
- * 2. mergulho: zoom dentro da parte mais grossa de uma letra até a foto tomar a tela;
- * 3. navega para o link do card.
+ * 1. abertura (aqui): o card vira creme com o nome vazado (a foto aparece pelas letras), cresce até
+ *    ocupar a tela e o nome vai para o centro, grande;
+ * 2. navega para o link do card. Enquanto o catálogo carrega, o navegador segura esse último quadro;
+ * 3. mergulho (no catálogo, assets/js/category-zoom-arrive.js): a mesma tela creme com o nome aparece
+ *    já na primeira pintura e o zoom entra numa letra revelando o próprio catálogo.
+ *    Os dados do quadro passam pelo sessionStorage ('gilda-czoom').
+ *
+ * Login e cadastro (Minha conta): ao enviar, o "GILDA;" do topo cresce até o centro e, já logado, a página
+ * seguinte mergulha no ";", como na abertura do Quem Cria. Se o login falhar, a página volta sem o mergulho.
  *
  * Com "menos movimento" no sistema, ctrl/cmd/shift/clique do meio ou nova aba, o link funciona normal.
  * Sem dependências.
@@ -13,16 +18,16 @@
 (() => {
 	const force = /[?&]anima=1\b/.test(window.location.search);
 	if (!force && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-	if (!document.querySelector('.gilda-category a[href]')) return;
+	const AUTH_FORMS = 'form.woocommerce-form-login, form.woocommerce-form-register';
+	if (!document.querySelector(`.gilda-category a[href], ${AUTH_FORMS}`)) return;
 
 	const NS = 'http://www.w3.org/2000/svg';
-	const OPEN_MS = 600;
-	const DIVE_MS = 1200;
+	const OPEN_MS = 650;
+	const KEY = 'gilda-czoom';
 	const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 	const lerp = (a, b, t) => a + (b - a) * t;
 	const smooth = (t) => t * t * (3 - 2 * t);
 	const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-	const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
 	let overlay = null;
 	const cleanup = () => {
@@ -82,41 +87,50 @@
 		return { dx: bx - penX, dy: by - baseY, r: best / 3 };
 	}
 
-	function play(link) {
-		const card = link.closest('.gilda-category');
-		const img = card && card.querySelector('img');
-		const text = (link.textContent || '').trim();
-		if (!card || !img || !text) return false;
+	/**
+	 * Abertura da transição.
+	 * @param {Element}  label  Elemento com o nome (texto, fonte e posição inicial).
+	 * @param {Object}   opts   card/img: card de origem (a foto aparece pelas letras); sem eles a tela creme
+	 *                          cobre a página inteira. zoomInto: 'middle' (letra mais grossa do meio) ou 'last'
+	 *                          (a última, o ";"). requireLogin: só mergulha se a próxima página estiver logada.
+	 *                          go: o que fazer no fim (navegar, enviar o formulário).
+	 */
+	function play(label, opts) {
+		const { card = null, img = null, zoomInto = 'middle', requireLogin = false, go } = opts;
+		const text = (label.textContent || '').trim();
+		if (!text || (card && !img)) return false;
 
 		const vw = document.documentElement.clientWidth;
 		const vh = window.innerHeight;
-		const cardBox = card.getBoundingClientRect();
+		const cardBox = card ? card.getBoundingClientRect() : { left: 0, top: 0, width: vw, height: vh };
 		const range = document.createRange();
-		range.selectNodeContents(link);
+		range.selectNodeContents(label);
 		const labelBox = range.getBoundingClientRect();
-		const labelStyle = getComputedStyle(link);
+		const labelStyle = getComputedStyle(label);
 		const labelSize = parseFloat(labelStyle.fontSize) || 22;
-		const dim = card.querySelector('.wp-block-cover__background');
+		const dim = card && card.querySelector('.wp-block-cover__background');
 		const dimStyle = dim ? getComputedStyle(dim) : null;
-		const imgStyle = getComputedStyle(img);
 
 		// ---- camadas: foto (no lugar do card) + creme com o nome vazado
 		overlay = document.createElement('div');
 		overlay.className = 'gilda-czoom';
 		overlay.setAttribute('aria-hidden', 'true');
 
+		// Sem card (login), as letras mostram a própria página por baixo.
 		const photo = document.createElement('div');
 		photo.className = 'gilda-czoom__photo';
 		const pic = document.createElement('img');
-		pic.src = img.currentSrc || img.src;
-		pic.alt = '';
-		pic.style.objectPosition = imgStyle.objectPosition;
-		photo.appendChild(pic);
 		const shade = document.createElement('div');
-		shade.className = 'gilda-czoom__shade';
-		if (dimStyle) shade.style.background = dimStyle.backgroundColor;
+		if (img) {
+			pic.src = img.currentSrc || img.src;
+			pic.alt = '';
+			pic.style.objectPosition = getComputedStyle(img).objectPosition;
+			photo.appendChild(pic);
+			shade.className = 'gilda-czoom__shade';
+			if (dimStyle) shade.style.background = dimStyle.backgroundColor;
+			photo.appendChild(shade);
+		}
 		const shadeFrom = dimStyle ? parseFloat(dimStyle.opacity) || 0 : 0;
-		photo.appendChild(shade);
 
 		const svg = document.createElementNS(NS, 'svg');
 		svg.setAttribute('class', 'gilda-czoom__svg');
@@ -135,7 +149,8 @@
 		const spacingEm = (parseFloat(labelStyle.letterSpacing) || 0) / labelSize;
 		word.style.letterSpacing = `${spacingEm}em`;
 
-		overlay.append(photo, svg);
+		if (img) overlay.append(photo);
+		overlay.append(svg);
 		document.body.appendChild(overlay);
 
 		// ---- tamanho final do nome: ~86% da largura, sem passar de ~40% da altura
@@ -146,14 +161,14 @@
 		const center = { x: vw / 2, y: vh / 2 };
 		word.setAttribute('font-size', size);
 		word.setAttribute('x', center.x);
-		word.setAttribute('y', center.y + size * 0.35); // linha de base ≈ centro + metade da altura das maiúsculas
+		word.setAttribute('y', center.y + size * 0.35); // linha de base ≈ centro + metade da altura das maiúsculas (= baseline abaixo)
 
-		// ---- por onde o zoom entra: a letra mais grossa entre as do meio
+		// ---- por onde o zoom entra: a letra mais grossa entre as do meio (ou o ";" do GILDA;)
 		let origin = { x: center.x, y: center.y }, radius = size * 0.08;
 		try {
 			const n = word.getNumberOfChars();
 			const mid = Math.floor(n / 2);
-			const chars = [...new Set([mid, mid - 1, mid + 1].filter((i) => i >= 0 && i < n))];
+			const chars = 'last' === zoomInto ? [n - 1] : [...new Set([mid, mid - 1, mid + 1].filter((i) => i >= 0 && i < n))];
 			const sample = 120;
 			let best = null;
 			for (const i of chars) {
@@ -170,6 +185,7 @@
 			}
 		} catch (e) { /* fica no centro */ }
 		const maxScale = Math.max(8, (Math.hypot(vw, vh) * 0.7) / radius);
+		const baseline = center.y + size * 0.35;
 
 		const labelCenter = { x: labelBox.left + labelBox.width / 2, y: labelBox.top + labelBox.height / 2 };
 		const startScale = labelSize / size;
@@ -197,37 +213,42 @@
 			shade.style.opacity = shadeFrom * (1 - 0.5 * t);
 		};
 
-		const dive = (p) => {
-			const s = Math.pow(maxScale, p * p);
-			const slide = smooth(p);
-			const px = lerp(origin.x, center.x, slide);
-			const py = lerp(origin.y, center.y, slide);
-			zoom.setAttribute('transform', `translate(${px} ${py}) scale(${s}) translate(${-origin.x} ${-origin.y})`);
-			pic.style.transform = `scale(${lerp(1.2, 1, easeOut(p))})`;
-			shade.style.opacity = shadeFrom * 0.5 * (1 - p);
-			svg.style.visibility = p >= 0.999 ? 'hidden' : 'visible';
+		// O catálogo continua daqui: mesmo nome, mesma posição, mesmo ponto de entrada do zoom.
+		const handOff = () => {
+			try {
+				sessionStorage.setItem(KEY, JSON.stringify({
+					t: Date.now(),
+					force,
+					text,
+					font: { family: labelStyle.fontFamily, weight: labelStyle.fontWeight, style: labelStyle.fontStyle, spacingEm },
+					vw, vh, size,
+					x: center.x, y: baseline,
+					origin, maxScale,
+					requireLogin,
+				}));
+			} catch (e) { /* sem sessionStorage: o catálogo abre sem o mergulho */ }
 		};
 
 		open(0);
-		const href = link.href;
-		let started = 0;
+		let started = 0, finished = false;
+		const finish = () => {
+			if (finished || !overlay) return;
+			finished = true;
+			open(1);
+			handOff();
+			go();
+		};
 		const frame = (now) => {
-			if (!overlay) return;
+			if (finished || !overlay) return;
 			if (!started) started = now;
 			const ms = now - started;
-			if (ms < OPEN_MS) {
-				open(ms / OPEN_MS);
-			} else {
-				open(1);
-				dive(clamp((ms - OPEN_MS) / DIVE_MS));
-			}
-			if (ms < OPEN_MS + DIVE_MS) {
-				requestAnimationFrame(frame);
-			} else {
-				window.location.assign(href);
-			}
+			open(clamp(ms / OPEN_MS));
+			if (ms < OPEN_MS) requestAnimationFrame(frame);
+			else finish();
 		};
 		requestAnimationFrame(frame);
+		// Aba em segundo plano não roda requestAnimationFrame: segue mesmo assim.
+		setTimeout(finish, OPEN_MS + 400);
 		return true;
 	}
 
@@ -245,10 +266,42 @@
 		prefetch(link.href);
 		let ok = false;
 		try {
-			ok = play(link);
+			const card = link.closest('.gilda-category');
+			ok = play(link, { card, img: card && card.querySelector('img'), go: () => window.location.assign(link.href) });
 		} catch (err) {
 			cleanup();
 		}
 		if (ok) e.preventDefault();
 	});
+
+	// Login e cadastro: "GILDA;" do topo → centro; depois do envio, mergulho no ";" já logado.
+	let resubmitting = false;
+	document.addEventListener('submit', (e) => {
+		const form = e.target.closest && e.target.closest(AUTH_FORMS);
+		if (!form || resubmitting || e.defaultPrevented) return;
+		if (overlay) { e.preventDefault(); return; }
+		const brand = document.querySelector('.gilda-account-auth__brand');
+		if (!brand || !brand.getClientRects().length) return; // sem a marca visível, envio normal
+		const submitter = e.submitter;
+		let ok = false;
+		try {
+			ok = play(brand, {
+				zoomInto: 'last',
+				requireLogin: true,
+				go: () => {
+					resubmitting = true;
+					// requestSubmit mantém o botão (o WooCommerce precisa do name="login"/"register" no POST)
+					let leaving = false;
+					window.addEventListener('beforeunload', () => { leaving = true; }, { once: true });
+					if (form.requestSubmit) form.requestSubmit(submitter && submitter.form === form ? submitter : undefined);
+					else form.submit();
+					// Se outro script barrou o envio, a página não sai: tira a tela creme.
+					setTimeout(() => { if (!leaving) { cleanup(); resubmitting = false; } }, 1500);
+				},
+			});
+		} catch (err) {
+			cleanup();
+		}
+		if (ok) e.preventDefault();
+	}, true);
 })();
