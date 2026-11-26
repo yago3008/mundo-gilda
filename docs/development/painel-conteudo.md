@@ -245,7 +245,7 @@ Plugins, temas, configurações técnicas e o editor de blocos ficam escondidos 
 
 ## 15. Fases sugeridas
 
-1. **Base:** regra "semente uma vez" nos scripts (§0); perfil "Dona da loja"; tela "Dados da loja" (§10) ligada ao rodapé e aos textos legais.
+1. **Base:** regra "semente uma vez" nos scripts (§0), incluindo os textos legais (decisão §16.5); perfil "Dona da loja"; tela "Dados da loja" (§10) ligada ao rodapé e aos textos legais.
 2. **Capítulos** (§1): tipo de conteúdo, migração dos 3 atuais, página Capítulos/Livro/cards da home/filtro lendo dele, limites removidos (colagem, grade, rótulo, cache), capítulo na página da peça.
 3. **Catálogo:** "Nova peça" (§2), cores com seletor (§4), tamanhos (§5), categorias com card na home (§3).
 4. **Promoção e home:** caixinha "só primeira compra" + promoção em destaque (§6), faixa de avisos (§7), banner (§8).
@@ -262,14 +262,26 @@ Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 2. **Colagem do zoom fixa em 7 fotos** (1 principal + 6). O formulário do capítulo exige as 7 e avisa se faltar, para a colagem nunca ficar com buracos.
 3. **Home com no máximo 5 cards** (os 5 capítulos mais recentes; a mesma regra de 5 vale para os cards de categoria marcados "na home"). A grade da home passa de 3 para até 5 colunas.
 
+### Tomadas depois (26/11/2026)
+
+4. **Peças de cada capítulo** (resolve as peças que hoje estão em dois capítulos e o texto do capítulo 3):
+
+   | Capítulo | Peças | Origem |
+   |---|---|---|
+   | 1 — Borboleta 88 | Camisa Casulo, Lenço oitenta-e-oito | Casulo: decisão. Lenço: inferido do texto do capítulo ("lenço com estampa exclusiva em aquarela… borboleta 88"), **confirmar** |
+   | 2 — Os filetes da borboleta | Bermuda Envolto, Lenço Manacá | decisão |
+   | 3 — Ritual Brasileiro | Camisa Grão, Calça Torra, Camisa Café | decisão. **Não existe produto "Camisa Café" na loja** (veio do Wix só a Camisa Grão, em Off White e Marrom): confirmar se a Café é a Grão marrom ou uma peça a cadastrar |
+   | — | Calça Asas | sem capítulo hoje, **confirmar** |
+
+5. **Textos legais editáveis no painel.** Política de privacidade, trocas e termos passam a ser editados pelas donas no painel. O `scripts/import-legal-pages.php` vira "semente uma vez": cria a página se ela não existir e nunca mais sobrescreve (entra na fase 1, junto com os outros scripts do §0).
+
 ### Em aberto
 
-4. **Peças hoje em dois capítulos:** Camisa Casulo (capítulos 1 e 3) e Bermuda Envolto (capítulos 2 e 3) precisam ficar com um só. Qual de cada? E o texto do capítulo 3 cita a camisa Café e uma calça, que não estão ligadas a ele: elas são do capítulo 3?
-5. **Quem manda nos textos legais depois que a loja for ao ar.** Hoje o texto da política de privacidade fica num arquivo do código (`docs/legal/politica-de-privacidade.md`) e o setup copia esse arquivo para o site, apagando o que tiver sido mudado no painel. Proposta: até a virada, o arquivo manda (fica fácil revisar com advogado/contador); depois da virada, o setup para de copiar e as donas editam política, trocas e termos direto no painel.
-6. **Lookbook:** todo capítulo pode ter, ou é algo especial?
-7. **Cor oficial** de Marrom e Off White (tema × Wix).
-8. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
-9. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
+6. **Camisa Café:** é a Camisa Grão na cor Marrom ou uma peça nova a cadastrar? E o capítulo do Lenço oitenta-e-oito (proposto: 1) e da Calça Asas (proposto: nenhum).
+7. **Lookbook:** todo capítulo pode ter, ou é algo especial?
+8. **Cor oficial** de Marrom e Off White (tema × Wix).
+9. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
+10. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
 
 ## 17. Achados no caminho (fora do painel)
 
