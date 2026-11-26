@@ -58,6 +58,29 @@ function gilda_enqueue_assets() {
 	);
 
 	$wc = function_exists( 'WC' );
+	$account_images = array();
+	if ( $wc && function_exists( 'is_account_page' ) && is_account_page() && function_exists( 'wc_get_products' ) ) {
+		$account_products = wc_get_products(
+			array(
+				'limit'   => 8,
+				'orderby' => 'menu_order',
+				'order'   => 'ASC',
+				'status'  => 'publish',
+			)
+		);
+		foreach ( $account_products as $account_product ) {
+			if ( ! $account_product instanceof WC_Product || ! $account_product->get_image_id() ) {
+				continue;
+			}
+			$image_url = wp_get_attachment_image_url( $account_product->get_image_id(), 'large' );
+			if ( $image_url ) {
+				$account_images[] = esc_url_raw( $image_url );
+			}
+			if ( count( $account_images ) >= 4 ) {
+				break;
+			}
+		}
+	}
 
 	wp_localize_script(
 		'gilda-theme',
@@ -69,6 +92,8 @@ function gilda_enqueue_assets() {
 			'restNonce'   => wp_create_nonce( 'wp_rest' ),
 			'cartUrl'     => $wc ? wc_get_cart_url() : '',
 			'checkoutUrl' => $wc ? wc_get_checkout_url() : '',
+			'homeUrl'     => esc_url_raw( home_url( '/' ) ),
+			'accountImages' => $account_images,
 			'colors'      => gilda_product_colors(),
 			'i18n'        => array(
 				'prev'            => __( 'Produto anterior', 'gilda' ),

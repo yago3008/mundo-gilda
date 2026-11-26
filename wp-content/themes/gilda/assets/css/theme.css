@@ -1234,6 +1234,59 @@ select.gilda-select,
 	width: 100%;
 }
 .woocommerce-account .u-columns.col2-set { display: grid; gap: var(--wp--preset--spacing--60); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.woocommerce-account .gilda-account-tabs__list {
+	border-bottom: 1px solid var(--gilda-sand);
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin: 0 auto;
+	max-width: 560px;
+	width: 100%;
+}
+.woocommerce-account .gilda-account-tabs__list [role="tab"] {
+	background: transparent;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	color: var(--gilda-ink-soft);
+	cursor: pointer;
+	font: 500 14px/1.3 var(--gilda-sans);
+	letter-spacing: .04em;
+	min-height: 48px;
+	padding: 12px 16px;
+	transition: border-color .2s ease, color .2s ease;
+}
+.woocommerce-account .gilda-account-tabs__list [role="tab"][aria-selected="true"] {
+	border-bottom-color: var(--gilda-terracotta);
+	color: var(--gilda-terracotta);
+}
+.woocommerce-account .u-columns.col2-set.gilda-account-tabs {
+	display: block;
+	margin: 0 auto;
+	max-width: 560px;
+	width: 100%;
+}
+.woocommerce-account .gilda-account-tab-panel[hidden] { display: none !important; }
+.woocommerce-account .gilda-account-tab-panel:not([hidden]) {
+	animation: gilda-account-panel-in .22s ease both;
+}
+.woocommerce-account .gilda-account-tab-panel h2 { margin: 0 0 22px; }
+.woocommerce-account .gilda-account-tab-panel .form-row { margin: 0 0 16px; }
+.woocommerce-account .gilda-account-tab-panel .input-text {
+	background: var(--gilda-cream);
+	border: 1px solid var(--gilda-sand);
+	box-sizing: border-box;
+	color: var(--gilda-ink);
+	font: 400 15px/1.4 var(--gilda-sans);
+	min-height: 48px;
+	width: 100%;
+}
+.woocommerce-account .gilda-account-tab-panel .form-row label { margin-bottom: 7px; }
+.woocommerce-account .gilda-account-tab-panel .woocommerce-Button { margin: 8px 0 14px !important; min-height: 48px; }
+.woocommerce-account .gilda-account-tab-panel .woocommerce-LostPassword { margin: 2px 0 0; }
+.woocommerce-account .gilda-account-tab-panel .woocommerce-privacy-policy-text { color: var(--gilda-ink-soft); font-size: 13px; line-height: 1.7; margin: 18px 0; }
+@keyframes gilda-account-panel-in {
+	from { opacity: 0; transform: translateY(5px); }
+	to { opacity: 1; transform: translateY(0); }
+}
 .woocommerce-account .u-column1,
 .woocommerce-account .u-column2,
 .woocommerce form.lost_reset_password,
@@ -1543,6 +1596,127 @@ select.gilda-select,
 	.woocommerce-checkout .gilda-checkout-fields-section .form-row.gilda-checkout-field--half { grid-column: 1; }
 	.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-name { column-gap: 12px; grid-template-columns: 64px minmax(0, 1fr); }
 	.woocommerce-checkout .gilda-checkout-item__image { height: 84px; width: 64px; }
+}
+
+/* Dedicated split-screen login and registration page. */
+body.gilda-account-auth-page {
+	background: var(--gilda-linen);
+	min-height: 100vh;
+	margin: 0;
+}
+body.gilda-account-auth-page .wp-site-blocks > header,
+body.gilda-account-auth-page .wp-site-blocks > footer { display: none !important; }
+body.gilda-account-auth-page .wp-site-blocks { gap: 0; min-height: 100vh; width: 100%; }
+body.gilda-account-auth-page main#conteudo.gilda-account-auth {
+	align-items: stretch;
+	display: grid;
+	gap: 0;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	grid-template-rows: minmax(100vh, auto);
+	margin: 0 !important;
+	max-width: none !important;
+	min-height: 100vh;
+	overflow: hidden;
+	padding: 0 !important;
+	position: relative;
+	width: 100% !important;
+}
+body.gilda-account-auth-page .gilda-account-auth__brand {
+	color: var(--gilda-terracotta);
+	font: 400 clamp(28px, 3vw, 42px)/1 var(--gilda-display);
+	left: clamp(28px, 5vw, 76px);
+	position: absolute;
+	text-decoration: none;
+	top: clamp(28px, 5vh, 56px);
+	z-index: 2;
+}
+body.gilda-account-auth-page .gilda-account-auth > .wp-block-post-content {
+	align-items: center;
+	box-sizing: border-box;
+	display: flex;
+	grid-column: 1;
+	grid-row: 1;
+	justify-content: center;
+	margin: 0 !important;
+	max-width: none !important;
+	min-width: 0;
+	padding: 120px clamp(28px, 5vw, 72px) 64px;
+	width: 100%;
+}
+body.gilda-account-auth-page .gilda-account-auth > .wp-block-post-content > * { box-sizing: border-box; margin-inline: 0 !important; max-width: 520px !important; min-width: 0; width: 100% !important; }
+body.gilda-account-auth-page .gilda-account-auth .gilda-account-tabs__list { margin: 0 auto 30px; max-width: 520px; }
+body.gilda-account-auth-page .gilda-account-auth .u-columns.col2-set.gilda-account-tabs { max-width: 520px; width: 100%; }
+body.gilda-account-auth-page .gilda-account-tabs > .u-column1,
+body.gilda-account-auth-page .gilda-account-tabs > .u-column2 { float: none !important; margin: 0 !important; width: 100% !important; }
+body.gilda-account-auth-page .gilda-account-auth .gilda-account-tab-panel:not([hidden]) {
+	animation: none;
+	background: transparent !important;
+	padding: 0 !important;
+}
+body.gilda-account-auth-page .gilda-account-auth .gilda-account-tab-panel h2 {
+	font: 400 clamp(30px, 3vw, 38px)/1.15 var(--gilda-display);
+	margin: 0 0 28px;
+}
+body.gilda-account-auth-page .gilda-account-tab-panel form.login,
+body.gilda-account-auth-page .gilda-account-tab-panel form.register { box-sizing: border-box; margin: 0 !important; max-width: none; min-width: 0; padding: 0 !important; width: 100%; }
+body.gilda-account-auth-page .gilda-account-tab-panel .form-row { box-sizing: border-box; clear: both; float: none; min-width: 0; width: 100%; }
+body.gilda-account-auth-page .gilda-account-auth__visual {
+	align-items: center;
+	background: transparent;
+	display: flex;
+	grid-column: 2;
+	grid-row: 1;
+	justify-content: center;
+	margin: 0 !important;
+	max-width: none !important;
+	min-height: 100%;
+	overflow: hidden;
+	position: relative;
+	padding: 0;
+}
+body.gilda-account-auth-page .gilda-account-auth__frame {
+	background: transparent;
+	inset: 0;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+body.gilda-account-auth-page .gilda-account-auth__product-image {
+	display: block;
+	height: 100%;
+	inset: 0;
+	min-height: 0;
+	object-fit: cover;
+	opacity: 0;
+	position: absolute;
+	transition: opacity .7s ease;
+	width: 100% !important;
+}
+body.gilda-account-auth-page .gilda-account-auth__product-image.is-active { opacity: 1; }
+body.gilda-account-auth-page .gilda-account-tab-panel .form-row { margin-bottom: 20px; }
+body.gilda-account-auth-page .gilda-account-tab-panel .form-row label { font-size: 14px; line-height: 1.4; }
+body.gilda-account-auth-page .gilda-account-tab-panel .input-text { font-size: 16px; min-height: 46px; padding: 10px 12px; }
+body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-height: 54px; }
+@media (prefers-reduced-motion: reduce) {
+	body.gilda-account-auth-page .gilda-account-auth__product-image { transition: none; }
+}
+@media (max-width: 900px) {
+	body.gilda-account-auth-page main#conteudo.gilda-account-auth {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(320px, 54svh) auto;
+	}
+	body.gilda-account-auth-page .gilda-account-auth__visual { grid-column: 1; grid-row: 1; min-height: 320px; }
+	body.gilda-account-auth-page .gilda-account-auth__frame { height: 100%; width: 100%; }
+	body.gilda-account-auth-page .gilda-account-auth__brand { background: var(--gilda-cream); color: var(--gilda-terracotta); left: 20px; padding: 8px 12px; top: 20px; }
+	body.gilda-account-auth-page .gilda-account-auth > .wp-block-post-content {
+		grid-column: 1;
+		grid-row: 2;
+		padding: 42px 24px 48px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.woocommerce-account .gilda-account-tab-panel:not([hidden]) { animation: none; }
 }
 .woocommerce-account h2,
 .woocommerce-checkout h3 { font: 400 26px/1.2 var(--gilda-display); }

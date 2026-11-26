@@ -715,6 +715,123 @@
 		);
 	}
 
+	function initAccountTabs() {
+		const columns = $( '.woocommerce-account .u-columns.col2-set' );
+		if ( ! columns || columns.dataset.gildaAccountTabs ) {
+			return;
+		}
+		const loginPanel = $( '.u-column1', columns );
+		const registerPanel = $( '.u-column2', columns );
+		if ( ! loginPanel || ! registerPanel || ! $( 'form.login, form.woocommerce-form-login', loginPanel ) || ! $( 'form.register, form.woocommerce-form-register', registerPanel ) ) {
+			return;
+		}
+		columns.dataset.gildaAccountTabs = '1';
+		columns.classList.add( 'gilda-account-tabs' );
+		const main = columns.closest( '#conteudo' ) || columns.closest( 'main' );
+		if ( main ) {
+			main.classList.add( 'gilda-account-auth' );
+			document.body.classList.add( 'gilda-account-auth-page' );
+			const brand = document.createElement( 'a' );
+			brand.className = 'gilda-account-auth__brand';
+			brand.href = S.homeUrl || '/';
+			brand.setAttribute( 'aria-label', 'GILDA; — página inicial' );
+			brand.textContent = 'GILDA;';
+			main.prepend( brand );
+			const visual = document.createElement( 'aside' );
+			visual.className = 'gilda-account-auth__visual';
+			visual.setAttribute( 'aria-hidden', 'true' );
+			const productImages = Array.isArray( S.accountImages ) ? S.accountImages.slice( 0, 4 ) : [];
+			if ( productImages.length ) {
+				const frame = document.createElement( 'div' );
+				frame.className = 'gilda-account-auth__frame';
+				const imageLayers = productImages.length > 1 ? [ document.createElement( 'img' ), document.createElement( 'img' ) ] : [ document.createElement( 'img' ) ];
+				imageLayers.forEach( ( image ) => {
+					image.className = 'gilda-account-auth__product-image';
+					image.alt = '';
+					image.decoding = 'async';
+					frame.append( image );
+				} );
+				visual.append( frame );
+				let activeLayer = 0;
+				let nextImageIndex = 1;
+				const showInitialImage = () => imageLayers[ 0 ].classList.add( 'is-active' );
+				imageLayers[ 0 ].addEventListener( 'load', showInitialImage, { once: true } );
+				imageLayers[ 0 ].addEventListener( 'error', showInitialImage, { once: true } );
+				imageLayers[ 0 ].src = productImages[ 0 ];
+				if ( productImages.length > 1 ) {
+					const cycleImages = () => {
+						const incomingLayer = 1 - activeLayer;
+						const incomingImage = imageLayers[ incomingLayer ];
+						const finishFade = () => {
+							incomingImage.classList.add( 'is-active' );
+							window.setTimeout( () => {
+								imageLayers[ activeLayer ].classList.remove( 'is-active' );
+								activeLayer = incomingLayer;
+								nextImageIndex = ( nextImageIndex + 1 ) % productImages.length;
+							}, 800 );
+						};
+						incomingImage.addEventListener( 'load', finishFade, { once: true } );
+						incomingImage.addEventListener( 'error', finishFade, { once: true } );
+						incomingImage.src = productImages[ nextImageIndex ];
+					};
+					window.setInterval( cycleImages, 3500 );
+				}
+			}
+			main.append( visual );
+			const pageTitle = $( '.wp-block-post-title', main );
+			if ( pageTitle ) {
+				pageTitle.classList.add( 'screen-reader-text' );
+			}
+		}
+		loginPanel.classList.add( 'gilda-account-tab-panel' );
+		registerPanel.classList.add( 'gilda-account-tab-panel' );
+		loginPanel.id = 'gilda-account-login-panel';
+		registerPanel.id = 'gilda-account-register-panel';
+		loginPanel.setAttribute( 'role', 'tabpanel' );
+		registerPanel.setAttribute( 'role', 'tabpanel' );
+		loginPanel.setAttribute( 'aria-labelledby', 'gilda-account-login-tab' );
+		registerPanel.setAttribute( 'aria-labelledby', 'gilda-account-register-tab' );
+
+		const tabs = document.createElement( 'div' );
+		tabs.className = 'gilda-account-tabs__list';
+		tabs.setAttribute( 'role', 'tablist' );
+		tabs.setAttribute( 'aria-label', 'Acesso à conta' );
+		tabs.innerHTML = '<button type="button" id="gilda-account-login-tab" role="tab" aria-controls="gilda-account-login-panel">Entrar</button><button type="button" id="gilda-account-register-tab" role="tab" aria-controls="gilda-account-register-panel">Criar conta</button>';
+		columns.before( tabs );
+		const tabButtons = $$( '[role="tab"]', tabs );
+		const panels = [ loginPanel, registerPanel ];
+		const activate = ( index, moveFocus = false ) => {
+			tabButtons.forEach( ( button, buttonIndex ) => {
+				const selected = buttonIndex === index;
+				button.setAttribute( 'aria-selected', String( selected ) );
+				button.tabIndex = selected ? 0 : -1;
+				panels[ buttonIndex ].hidden = ! selected;
+			} );
+			if ( moveFocus ) {
+				tabButtons[ index ].focus();
+			}
+		};
+		tabButtons.forEach( ( button, index ) => button.addEventListener( 'click', () => activate( index ) ) );
+		tabs.addEventListener( 'keydown', ( event ) => {
+			const selectedIndex = tabButtons.findIndex( ( button ) => 'true' === button.getAttribute( 'aria-selected' ) );
+			let nextIndex = selectedIndex;
+			if ( 'ArrowRight' === event.key ) {
+				nextIndex = ( selectedIndex + 1 ) % tabButtons.length;
+			} else if ( 'ArrowLeft' === event.key ) {
+				nextIndex = ( selectedIndex - 1 + tabButtons.length ) % tabButtons.length;
+			} else if ( 'Home' === event.key ) {
+				nextIndex = 0;
+			} else if ( 'End' === event.key ) {
+				nextIndex = tabButtons.length - 1;
+			} else {
+				return;
+			}
+			event.preventDefault();
+			activate( nextIndex, true );
+		} );
+		activate( 0 );
+	}
+
 	function initCheckoutStepper() {
 		const form = $( 'form.checkout' );
 		if ( ! form ) {
@@ -1161,6 +1278,7 @@
 	}
 	function boot() {
 		initStickyHeader();
+		initAccountTabs();
 		initCheckoutStepper();
 		initChapterShowcase();
 		initProductDescriptionToggle();
