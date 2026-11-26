@@ -153,18 +153,32 @@ add_action( 'wp_body_open', 'gilda_category_zoom_arrive', 1 );
  * @return array<string,string>
  */
 function gilda_product_colors() {
-	return apply_filters(
-		'gilda_product_colors',
-		array(
-			'off-white'   => '#F2EEE3',
-			'marrom'      => '#5C3A21',
-			'azul-claro'  => '#A9C4D6',
-			'branco'      => '#FFFFFF',
-			'laranja'     => '#D9792B',
-			'verde-musgo' => '#4B5320',
-			'preto'       => '#111111',
-		)
+	// Reserva: as cores do site Wix. A cor de verdade vem de cada termo de Cor (term meta
+	// "gilda_hex", gravado pelo import e editável no painel), então cor nova não fica bege.
+	$colors = array(
+		'off-white'   => '#e9e9d4',
+		'marrom'      => '#b4522d',
+		'azul-claro'  => '#d4edff',
+		'branco'      => '#ffffff',
+		'laranja'     => '#eb6d18',
+		'verde-musgo' => '#496148',
+		'preto'       => '#000000',
 	);
+	if ( taxonomy_exists( 'pa_cor' ) ) {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'pa_cor',
+				'hide_empty' => false,
+			)
+		);
+		foreach ( is_array( $terms ) ? $terms : array() as $term ) {
+			$hex = (string) get_term_meta( $term->term_id, 'gilda_hex', true );
+			if ( preg_match( '/^#[0-9a-f]{6}$/i', $hex ) ) {
+				$colors[ $term->slug ] = strtolower( $hex );
+			}
+		}
+	}
+	return apply_filters( 'gilda_product_colors', $colors );
 }
 
 /**
