@@ -274,12 +274,13 @@ Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 
 5. **Textos legais editáveis no painel.** Política de privacidade, trocas e termos passam a ser editados pelas donas no painel. O `scripts/import-legal-pages.php` vira "semente uma vez": cria a página se ela não existir e nunca mais sobrescreve (entra na fase 1, junto com os outros scripts do §0).
 
+6. **Cores das bolinhas = as do Wix** (Marrom `#b4522d`, Off White `#e9e9d4` etc.). O tema passa a ler a cor gravada em cada cor do atributo (`gilda_hex`), que é o que o painel vai editar; o mapa fixo do tema vira só reserva.
+7. **"Cuidados com as peças" e "Dúvidas frequentes" são criadas**, simples, no padrão das outras páginas, e editáveis no painel (semente uma vez, como os textos legais).
+8. **O painel é só das donas.** O perfil "Dona da loja" vê pedidos e clientes; não há perfil restrito.
+
 ### Em aberto
 
-6. **Lookbook:** todo capítulo pode ter, ou é algo especial?
-7. **Cor oficial** de Marrom e Off White (tema × Wix).
-8. **Páginas do rodapé** que não existem ("Cuidados com as peças", "Dúvidas frequentes"): criar ou remover os links?
-9. Quem vai usar o painel: só as donas, ou também alguém que não pode ver pedidos/dados de clientes?
+9. **Lookbook:** hoje só o capítulo 3 tem, além da galeria normal, uma segunda galeria de 8 fotos de looks completos (`chapter_3_lookbook`), que aparece no "LIVRO GILDA;" e também roda no card do capítulo 3 na home. Todo capítulo pode ter essa galeria extra (opcional), ou ela some e vira parte da galeria normal?
 
 ## 17. Achados no caminho (fora do painel)
 
