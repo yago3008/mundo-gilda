@@ -99,7 +99,12 @@ foreach ( $data['products'] as $p ) {
 			$taxonomy = $tax_of[ $a['name'] ];
 			$ids      = array();
 			foreach ( $a['values'] as $v ) {
-				$ids[] = $term_id( $taxonomy, 'pa_cor' === $taxonomy ? $normalize( $v['label'] ) : $v['label'] );
+				$tid   = $term_id( $taxonomy, 'pa_cor' === $taxonomy ? $normalize( $v['label'] ) : $v['label'] );
+				$ids[] = $tid;
+				// Cor da bolinha (swatch) para o front: term meta "gilda_hex" (ex.: #b4522d).
+				if ( 'pa_cor' === $taxonomy && ! empty( $v['hex'] ) && preg_match( '/^#[0-9a-f]{6}$/i', $v['hex'] ) ) {
+					update_term_meta( $tid, 'gilda_hex', strtolower( $v['hex'] ) );
+				}
 			}
 			$attr = new WC_Product_Attribute();
 			$attr->set_id( wc_attribute_taxonomy_id_by_name( $taxonomy ) );
@@ -169,6 +174,23 @@ foreach ( $data['products'] as $p ) {
 
 	$n = $variable ? count( $p['variations'] ) . ' variações' : 'simples';
 	WP_CLI::log( "  • {$p['name']} (#$product_id, $n)" );
+}
+
+// Ordem dos tamanhos nos seletores e filtros (PP→GG, 36→44), em vez de alfabética.
+$size_order = array( 'PP', 'P', 'M', 'G', 'GG', '36', '38', '40', '42', '44' );
+foreach ( $size_order as $pos => $name ) {
+	$term = get_term_by( 'name', $name, 'pa_tamanho' );
+	if ( $term ) {
+		update_term_meta( $term->term_id, 'order', $pos );
+	}
+}
+
+// Tabela de atributos usada pelos filtros (contagens e "só com estoque").
+update_option( 'woocommerce_attribute_lookup_enabled', 'yes' );
+update_option( 'woocommerce_attribute_lookup_direct_updates', 'no' );
+$lookup = wc_get_container()->get( \Automattic\WooCommerce\Internal\ProductAttributesLookup\LookupDataStore::class );
+foreach ( wc_get_products( array( 'limit' => -1, 'return' => 'ids', 'status' => 'publish' ) ) as $pid ) {
+	$lookup->create_data_for_product( $pid );
 }
 
 wc_delete_product_transients();

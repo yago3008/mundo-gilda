@@ -14,7 +14,8 @@ PLUGINS=(
   "woo-better-shipping-calculator-for-brazil:5.2.6"
   "infixs-correios-automatico:1.15.0"
 )
-THEME="twentytwentyfive" # provisório até o tema da GILDA; existir
+# Tema: o da GILDA; (K1venn) assim que existir wp-content/themes/gilda/style.css; senão o padrão.
+if [ -f wp-content/themes/gilda/style.css ]; then THEME="gilda"; else THEME="twentytwentyfive"; fi
 
 wp() { docker compose run --rm -T wpcli wp "$@"; }
 
@@ -32,7 +33,7 @@ wp option update timezone_string America/Sao_Paulo >/dev/null
 wp option update date_format 'd/m/Y' >/dev/null
 wp option update blogdescription 'Alfaiataria criativa' >/dev/null
 wp rewrite structure '/%postname%/' >/dev/null
-wp theme is-installed "$THEME" || wp theme install "$THEME"
+[ "$THEME" = "gilda" ] || wp theme is-installed "$THEME" || wp theme install "$THEME"
 wp theme activate "$THEME" >/dev/null
 
 echo "==> Plugins"

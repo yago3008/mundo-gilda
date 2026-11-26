@@ -44,6 +44,11 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 - **E-mails transacionais:** conta criada, pedido recebido, novo pedido para a loja e redefinição de senha.
 - **URLs:** produtos continuam em `/product-page/<slug>`, como no Wix (requisito 11.3). As outras URLs antigas (`/category/all-products`, `/cart-page`, slugs com acento, etc.) têm redirecionamento 301.
 - **Frete (Correios Automático):** PAC e SEDEX com cotação real a partir de Curitiba (CEP 82015-384), mais 2 dias de postagem. Aparece no simulador da página do produto (com "Não sei meu CEP"), no carrinho e no checkout. Também cria a página "Rastrear encomenda". Funciona sem contrato. Se a GILDA; tiver contrato com os Correios, é só ligar "Contrato próprio" no painel do plugin: os métodos continuam os mesmos.
+- **Botão "Comprar"** na página do produto: adiciona e vai direto pro checkout (5.9).
+- **Filtros da loja** por categoria, cor, tamanho e preço, via URL (`?filter_cor=marrom`, `?min_price=…`). Cada cor tem o código hex salvo para as bolinhas de cor. Detalhes em [backend-para-frontend.md](docs/development/backend-para-frontend.md).
+- **SEO:** meta description (editável por página/produto/categoria), Open Graph para prévia no WhatsApp/Instagram, sitemap sem páginas de sistema nem usuários, schema de Produto. Fora de produção nada é indexado.
+- **Segurança:** bloqueio após 5 logins errados, sem XML-RPC, sem expor usuários, cabeçalhos de segurança, editor de código do painel desligado.
+- **Backup:** `./scripts/backup.sh` e `./scripts/restore.sh` (banco + uploads). Produção: ver [deploy.md](docs/development/deploy.md).
 - **Meta Pixel:** usa o mesmo ID do site atual (`2143468076438110`) e manda PageView, ViewContent, AddToCart, InitiateCheckout e Purchase (sem duplicar se o cliente recarregar a página). **Só envia em produção.** Localmente, com `META_PIXEL_DEBUG=1`, os eventos aparecem no console do navegador.
 
 ## Pendências que dependem da GILDA;
@@ -76,7 +81,18 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-legacy-redirects.php      # 301 das URLs do Wix
   gilda-account-fields.php        # nome + confirmar senha no cadastro (7.2)
   gilda-meta-pixel.php            # Meta Pixel com eventos de e-commerce (só em produção)
-docs/                       # requisitos e design system (K1venn)
+  gilda-buy-now.php               # botão "Comprar" → checkout (5.9)
+  gilda-seo.php                   # meta description, Open Graph, sitemap limpo, noindex fora de produção (11.3)
+  gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
+wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
+scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)
+scripts/restore.sh          # restaura um backup
+docs/
+  requisitos-cliente.md           # o que pedir/conversar com as donas
+  development/tasks.md            # backlog (K1venn)
+  development/backend-para-frontend.md  # o que o backend oferece pro tema
+  development/deploy.md           # roteiro de produção (servidor, wp-config, cron, backup, virada)
+  design/                         # design system (K1venn)
 ```
 
 O core do WordPress, os plugins de terceiros e os uploads ficam num volume Docker, não no git. Os plugins são instalados pelo `setup.sh` com versão fixa. Para atualizar um plugin, mude a versão lá e teste.

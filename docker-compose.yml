@@ -28,6 +28,7 @@ x-wp-env: &wp-env
 x-wp-volumes: &wp-volumes
   - wp_core:/var/www/html
   - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+  - ./wp-content/themes/gilda:/var/www/html/wp-content/themes/gilda # tema do K1venn
 
 services:
   db:
@@ -85,8 +86,10 @@ services:
     volumes:
       - wp_core:/var/www/html
       - ./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ./wp-content/themes/gilda:/var/www/html/wp-content/themes/gilda
       - ./scripts:/scripts:ro
       - ./data:/data:ro
+      - ./backups:/backups
 
 volumes:
   db_data:

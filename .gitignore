@@ -7,7 +7,9 @@ Thumbs.db
 # ficam no volume Docker e são instalados pelo scripts/setup.sh (versões fixas lá).
 wp-content/*
 !wp-content/mu-plugins/
-# quando existirem:
-# !wp-content/themes/
-# wp-content/themes/*
-# !wp-content/themes/gilda/
+!wp-content/themes/
+wp-content/themes/*
+!wp-content/themes/gilda/
+
+# Backups locais (scripts/backup.sh)
+backups/

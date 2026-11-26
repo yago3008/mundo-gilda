@@ -120,10 +120,13 @@ foreach ( $pt_pages as $opt => [ $title, $slug ] ) {
 		wp_update_post( array( 'ID' => $id, 'post_title' => $title, 'post_name' => $slug ) );
 	}
 }
-$sample = get_page_by_path( 'sample-page' );
-if ( $sample ) {
-	wp_delete_post( $sample->ID, true );
+// Conteúdo de exemplo do WordPress (página, post "Olá, mundo!" e comentário).
+foreach ( array( get_page_by_path( 'sample-page' ), get_page_by_path( 'hello-world', OBJECT, 'post' ), get_page_by_path( 'ola-mundo', OBJECT, 'post' ) ) as $sample ) {
+	if ( $sample ) {
+		wp_delete_post( $sample->ID, true );
+	}
 }
+update_option( 'default_comment_status', 'closed' );
 
 // URLs: produtos em /product-page/<slug> (igual ao Wix, requisito 11.3: preserva SEO e links),
 // categorias em /categoria/<slug> e endpoints de "Minha conta" em português.
