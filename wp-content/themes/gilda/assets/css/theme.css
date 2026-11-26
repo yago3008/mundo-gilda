@@ -1213,8 +1213,35 @@ select.gilda-select,
 .wc-block-components-totals-footer-item .wc-block-components-totals-item__value { font: 400 28px/1 var(--gilda-display); }
 .wc-block-components-text-input input,
 .wc-block-components-combobox input { border-radius: 0 !important; }
-.wc-block-components-notice-banner.is-success { background: var(--gilda-success-bg); border-color: var(--gilda-success); color: var(--gilda-success); }
-.wc-block-components-notice-banner.is-error { background: var(--gilda-error-bg); border-color: var(--gilda-error); color: var(--gilda-error); }
+/* Avisos (erro, sucesso, info): creme, cantos retos, barra lateral e o ";" da marca no lugar do ícone. */
+.wc-block-components-notice-banner {
+	align-items: center;
+	background: var(--gilda-cream);
+	border: 0;
+	border-left: 3px solid var(--gilda-terracotta);
+	border-radius: 0;
+	box-shadow: 0 1px 0 rgba(36, 26, 22, .06);
+	color: var(--gilda-ink);
+	font: 400 15px/1.45 var(--gilda-sans);
+	gap: 14px;
+	margin-bottom: 20px;
+	padding: 14px 20px 14px 18px;
+}
+.wc-block-components-notice-banner > svg { display: none; }
+.wc-block-components-notice-banner::before {
+	color: var(--gilda-terracotta);
+	content: ";";
+	flex: none;
+	font: 400 30px/.8 var(--gilda-display);
+	transform: translateY(-2px);
+}
+.wc-block-components-notice-banner__content { color: inherit; }
+.wc-block-components-notice-banner__content a { color: var(--gilda-terracotta); text-underline-offset: 3px; }
+.wc-block-components-notice-banner.is-error { background: var(--gilda-cream); border-left-color: var(--gilda-terracotta); color: var(--gilda-ink); }
+.wc-block-components-notice-banner.is-success { background: var(--gilda-cream); border-left-color: var(--gilda-success); color: var(--gilda-ink); }
+.wc-block-components-notice-banner.is-success::before { color: var(--gilda-success); }
+.wc-block-components-notice-banner.is-info { background: var(--gilda-cream); border-left-color: var(--gilda-taupe); color: var(--gilda-ink); }
+.wc-block-components-notice-banner.is-info::before { color: var(--gilda-taupe); }
 
 .gilda-empty-cart__text {
 	font-family: var(--gilda-display) !important;
@@ -1586,6 +1613,8 @@ select.gilda-select,
 .gilda-checkout-coupon input { background: transparent; border: 0; box-sizing: border-box; color: var(--gilda-ink); font: 400 14px/1.4 var(--gilda-sans); min-width: 0; padding: 10px; width: 100%; }
 .gilda-checkout-coupon__apply { background: var(--gilda-terracotta); border: 0; color: var(--gilda-cream); cursor: pointer; font: 500 11px/1 var(--gilda-sans); letter-spacing: .08em; min-height: 42px; padding: 0 16px; text-transform: uppercase; }
 .gilda-checkout-coupon__feedback { color: var(--gilda-ink-soft); font-size: 12px; margin: 0; }
+.gilda-checkout-coupon__feedback--error { color: var(--gilda-terracotta); font-size: 13px; margin-top: 6px; }
+.gilda-checkout-coupon__feedback--success { color: var(--gilda-success); font-size: 13px; margin-top: 6px; }
 .woocommerce-checkout .gilda-checkout-summary #payment { margin-top: 24px; }
 @media (max-width: 1023px) {
 	.woocommerce-checkout .woocommerce.gilda-checkout-layout { gap: 24px; grid-template-areas: "notices" "login" "fields" "summary"; grid-template-columns: minmax(0, 1fr); }
@@ -1738,14 +1767,31 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 .woocommerce-password-strength.short,
 .woocommerce-password-strength.bad { background: var(--gilda-error-bg); color: var(--gilda-error); }
 
+/* Avisos clássicos (ul.woocommerce-error etc.): mesmo visual dos avisos em bloco. */
 .woocommerce-message,
 .woocommerce-info,
-.woocommerce-error { background: var(--gilda-white); border-top-color: var(--gilda-terracotta) !important; font-size: 14px; }
-.woocommerce-message { background: var(--gilda-success-bg); border-top-color: var(--gilda-success) !important; color: var(--gilda-success); }
-.woocommerce-error { background: var(--gilda-error-bg); border-top-color: var(--gilda-error) !important; color: var(--gilda-error); }
+.woocommerce-error {
+	background: var(--gilda-cream);
+	border: 0 !important;
+	border-left: 3px solid var(--gilda-terracotta) !important;
+	border-radius: 0;
+	color: var(--gilda-ink);
+	font: 400 15px/1.45 var(--gilda-sans);
+	padding: 14px 20px 14px 48px !important;
+}
+.woocommerce-message { border-left-color: var(--gilda-success) !important; }
+.woocommerce-info { border-left-color: var(--gilda-taupe) !important; }
 .woocommerce-message::before,
 .woocommerce-info::before,
-.woocommerce-error::before { color: currentColor !important; }
+.woocommerce-error::before {
+	color: var(--gilda-terracotta) !important;
+	content: ";" !important;
+	font: 400 30px/1 var(--gilda-display) !important;
+	left: 20px !important;
+	top: 10px !important;
+}
+.woocommerce-message::before { color: var(--gilda-success) !important; }
+.woocommerce-info::before { color: var(--gilda-taupe) !important; }
 
 .woocommerce-checkout #payment { background: var(--gilda-white) !important; border-radius: 0 !important; }
 .woocommerce-checkout #payment ul.payment_methods li { border: 1px solid var(--gilda-sand); margin-bottom: 8px; padding: 14px 16px !important; }

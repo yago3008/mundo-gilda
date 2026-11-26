@@ -192,13 +192,15 @@ export async function shippingOptions(page: Page): Promise<{ pac: Locator; sedex
 
 /** Abre o campo de cupom (blocos: "Adicionar cupons"; clássico: "Clique aqui para digitar seu cupom") e aplica. */
 export async function applyCoupon(page: Page, code: string): Promise<void> {
-  const input = page.getByRole('textbox', { name: /digite o c[óo]digo|c[óo]digo do cupom|cupom/i }).first();
+  // Tema: campo "Código promocional" + "Aplicar" no resumo; blocos/clássico: link que abre o campo.
+  // O formulário de cupom original do WooCommerce continua na página, escondido: só os visíveis contam.
+  const input = page.getByRole('textbox', { name: /c[óo]digo promocional|digite o c[óo]digo|c[óo]digo do cupom|cupom/i }).filter({ visible: true }).first();
   if (!(await input.isVisible())) {
-    await page.getByRole('button', { name: /adicionar cupons|c[óo]digo de cupom|digitar seu cupom/i }).first().click();
+    await page.getByRole('button', { name: /adicionar cupons|c[óo]digo de cupom|digitar seu cupom/i }).filter({ visible: true }).first().click();
   }
   await expect(input).toBeVisible();
   await input.fill(code);
-  await page.getByRole('button', { name: /^aplicar/i }).first().click();
+  await page.getByRole('button', { name: /^aplicar/i }).filter({ visible: true }).first().click();
   await waitIdle(page);
 }
 

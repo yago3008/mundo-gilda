@@ -127,9 +127,12 @@ test('cupom de primeira compra é recusado na segunda compra do mesmo e-mail', a
   await fillCheckout(page, email);
   await shippingOptions(page);
 
-  const refusal = page.getByText(/v[áa]lido apenas na primeira compra/i).first();
+  // O WooCommerce também escreve o texto no formulário de cupom original (escondido): só o visível conta.
+  const refusal = page.getByText(/v[áa]lido apenas na primeira compra/i).filter({ visible: true }).first();
   await applyCoupon(page, COUPON);
   // O aviso pode vir ao aplicar (e-mail já conhecido) ou ao finalizar (e-mail só no envio do formulário).
+  // A resposta do "aplicar" chega por AJAX: espera um pouco antes de decidir.
+  await refusal.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {});
   if (!(await refusal.isVisible())) {
     await choosePaymentAndPlaceOrder(page);
   }

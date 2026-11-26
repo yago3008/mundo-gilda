@@ -1165,6 +1165,33 @@
 				couponCode.form.dispatchEvent( new Event( 'submit', { bubbles: true, cancelable: true } ) );
 			} );
 			new MutationObserver( placeCouponRow ).observe( orderReview, { childList: true, subtree: true } );
+			// Resultado do cupom: o WooCommerce escreve a resposta perto do formulário original, que fica
+			// escondido. Sem isto o campo ficava em "Aplicando cupom…" e a recusa (ex.: "válido apenas na
+			// primeira compra") nunca aparecia.
+			if ( window.jQuery ) {
+				let couponErrored = false;
+				const feedback = ( text, isError ) => {
+					const el = $( '.gilda-checkout-coupon__feedback', couponRow );
+					el.textContent = text;
+					el.classList.toggle( 'gilda-checkout-coupon__feedback--error', !! isError ); // não usar is-error: o WooCommerce apaga esses elementos
+					el.classList.toggle( 'gilda-checkout-coupon__feedback--success', ! isError && !! text );
+					el.setAttribute( 'role', isError ? 'alert' : 'status' );
+				};
+				window.jQuery( document.body )
+					.on( 'errored_coupon_in_checkout', ( event, code, response ) => {
+						couponErrored = true;
+						const box = document.createElement( 'div' );
+						box.innerHTML = response || '';
+						feedback( box.textContent.replace( /\s+/g, ' ' ).trim() || 'Não foi possível aplicar este cupom.', true );
+					} )
+					.on( 'applied_coupon_in_checkout', () => {
+						if ( ! couponErrored ) {
+							feedback( 'Cupom aplicado.', false );
+							$( '#gilda-checkout-coupon-code', couponRow ).value = '';
+						}
+						couponErrored = false;
+					} );
+			}
 		} else {
 			couponRow.remove();
 		}
