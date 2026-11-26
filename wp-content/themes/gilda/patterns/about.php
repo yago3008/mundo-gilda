@@ -45,6 +45,23 @@ $gilda_people = array(
 <!-- /wp:heading --></div>
 <!-- /wp:group -->
 
+<?php
+// Abertura: "GILDA;" com máscara (inc/transitions.php) antes de apresentar as criadoras;
+// volta ao banner fixo se a foto não existir.
+if ( function_exists( 'gilda_mask_transition_shortcode' ) && gilda_transition_image_id( 'story_banner' ) ) :
+	echo gilda_mask_transition_shortcode( array() ); // phpcs:ignore WordPress.Security.EscapeOutput
+else :
+	?>
+<!-- wp:group {"align":"full","className":"gilda-about__closing","layout":{"type":"default"}} -->
+<div class="wp-block-group alignfull gilda-about__closing">
+<div class="gilda-about__closing-title"><p>DEPOIS DO PONTO E VÍRGULA,</p></div>
+<div class="gilda-about__closing-image" role="img" aria-label="Livros e histórias que inspiram a criação">
+<h2>VOCÊ CONTA A HISTÓRIA</h2>
+</div>
+</div>
+<!-- /wp:group -->
+<?php endif; ?>
+
 <!-- wp:group {"align":"full","className":"gilda-about__founders has-brown-background-color has-cream-color has-background has-text-color","layout":{"type":"constrained"}} -->
 <div class="wp-block-group alignfull gilda-about__founders has-brown-background-color has-cream-color has-background has-text-color"><!-- wp:heading {"textAlign":"center","level":2} -->
 <h2 class="wp-block-heading has-text-align-center">quem cria</h2>
@@ -84,19 +101,3 @@ if ( $gilda_photo ) {
 </div>
 <!-- /wp:columns --></div>
 <!-- /wp:group -->
-
-<?php
-// Transição com máscara (inc/transitions.php) no lugar do banner fixo; volta ao banner se a foto não existir.
-if ( function_exists( 'gilda_mask_transition_shortcode' ) && gilda_transition_image_id( 'story_banner' ) ) :
-	echo gilda_mask_transition_shortcode( array() ); // phpcs:ignore WordPress.Security.EscapeOutput
-else :
-	?>
-<!-- wp:group {"align":"full","className":"gilda-about__closing","layout":{"type":"default"}} -->
-<div class="wp-block-group alignfull gilda-about__closing">
-<div class="gilda-about__closing-title"><p>DEPOIS DO PONTO E VÍRGULA,</p></div>
-<div class="gilda-about__closing-image" role="img" aria-label="Livros e histórias que inspiram a criação">
-<h2>VOCÊ CONTA A HISTÓRIA</h2>
-</div>
-</div>
-<!-- /wp:group -->
-<?php endif; ?>
