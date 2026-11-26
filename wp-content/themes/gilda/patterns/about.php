@@ -14,6 +14,7 @@ $gilda_people = array(
 	array(
 		'name'  => 'giulia',
 		'image' => 'about_giulia',
+		'focus' => 'gilda-portrait--focus-high', // foto em pé no quadro deitado: mantém rosto, ";" do suéter e livro
 		'tone'  => '#c9b8a0',
 		'text'  => array(
 			'Antes mesmo de entender o que era moda, eu já a vivia.',
@@ -57,7 +58,15 @@ $gilda_people = array(
 <?php
 $gilda_photo = gilda_image( $gilda_person['image'] );
 if ( $gilda_photo ) {
-	echo gilda_image_block( $gilda_photo, 'large', array( 'className' => 'gilda-portrait' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+	// Sem lightbox (clique para ampliar) nas fotos das criadoras.
+	echo gilda_image_block(
+		$gilda_photo,
+		'large',
+		array(
+			'className' => trim( 'gilda-portrait ' . ( $gilda_person['focus'] ?? '' ) ),
+			'lightbox'  => array( 'enabled' => false ),
+		)
+	); // phpcs:ignore WordPress.Security.EscapeOutput
 } else {
 	echo gilda_cover_block( $gilda_person['image'], $gilda_person['tone'], array( 'minHeight' => 360 ), '' ); // phpcs:ignore WordPress.Security.EscapeOutput
 }

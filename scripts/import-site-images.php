@@ -50,6 +50,31 @@ $sideload = static function ( string $url, string $alt ) use ( $find ): int {
 	return (int) $id;
 };
 
+// Arquivo do próprio repositório (data/<file>), ex.: fotos enviadas pelas donas que não estão no Wix.
+// A chave inclui o hash do arquivo: se a foto for trocada no repo, ela é importada de novo.
+$sideload_file = static function ( string $file, string $alt ) use ( $find ): int {
+	$path = '/data/' . ltrim( $file, '/' );
+	if ( ! file_exists( $path ) ) {
+		WP_CLI::warning( "Arquivo $path não encontrado." );
+		return 0;
+	}
+	$source = 'file:' . $file . '#' . md5_file( $path );
+	$id     = $find( $source );
+	if ( ! $id ) {
+		$tmp = wp_tempnam( basename( $path ) );
+		copy( $path, $tmp );
+		$id = media_handle_sideload( array( 'name' => basename( $path ), 'tmp_name' => $tmp ), 0, $alt );
+		if ( is_wp_error( $id ) ) {
+			wp_delete_file( $tmp );
+			WP_CLI::warning( "Arquivo $path: " . $id->get_error_message() );
+			return 0;
+		}
+		update_post_meta( $id, '_gilda_source_url', $source );
+	}
+	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	return (int) $id;
+};
+
 // Recorte (ex.: a folha com 3 versões do logo). crop = [x, y, w, h, largura_final, altura_final].
 $sideload_cropped = static function ( string $url, string $alt, array $crop, string $name ) use ( $find ): int {
 	$source = $url . '#crop=' . implode( ',', $crop );
@@ -96,6 +121,9 @@ foreach ( $data['images'] as $key => $image ) {
 	if ( ! empty( $image['urls'] ) ) {
 		$map[ $key ] = array_values( array_filter( array_map( static fn( $u ) => $sideload( $u, $alt ), $image['urls'] ) ) );
 		WP_CLI::log( sprintf( '  • %s (%d imagens)', $key, count( $map[ $key ] ) ) );
+	} elseif ( ! empty( $image['file'] ) ) {
+		$map[ $key ] = $sideload_file( $image['file'], $alt );
+		WP_CLI::log( "  • $key (arquivo do repositório)" );
 	} elseif ( ! empty( $image['crop'] ) ) {
 		$map[ $key ] = $sideload_cropped( $image['url'], $alt, $image['crop'], 'gilda-' . $key );
 		WP_CLI::log( "  • $key (recortado)" );

@@ -1619,6 +1619,7 @@ select.gilda-select,
 .gilda-founder__photo .wp-block-image { margin: 0; }
 .gilda-founder__photo .wp-block-image img,
 .gilda-founder__photo .wp-block-cover { aspect-ratio: 1.22 / 1; height: auto; object-fit: cover; width: 100%; }
+.gilda-founder__photo .gilda-portrait--focus-high img { object-position: center 38%; }
 .gilda-founder__signature {
 	bottom: -15px;
 	color: var(--gilda-cream);
