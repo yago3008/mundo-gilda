@@ -119,7 +119,7 @@ A loja precisa ter estas páginas no ar. A LGPD e o Código de Defesa do Consumi
 - [ ] **Termos de uso / condições de venda.**
 - [ ] **Política de frete:** prazos, áreas atendidas, o que fazer em caso de extravio.
 
-> Podemos entregar um **rascunho-modelo** para elas (ou o contador/advogado) revisarem.
+> **Rascunhos prontos** em [docs/legal/](legal/) para elas (ou o contador/advogado) revisarem. O que depende delas está marcado com **[PREENCHER]**; o resumo está em [docs/legal/README.md](legal/README.md). O banner de cookies já existe e o Meta Pixel só dispara depois do aceite.
 
 ---
 

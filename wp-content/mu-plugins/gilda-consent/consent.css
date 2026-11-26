@@ -1,0 +1,32 @@
+/* GILDA; consentimento: visual neutro mínimo. O tema pode sobrescrever as variáveis/classes ou desligar este CSS
+   com add_filter( 'gilda_consent_default_css', '__return_false' ). Aceitar e Recusar têm o mesmo peso visual (orientação da ANPD). */
+.gilda-consent,.gilda-consent__prefs{--gilda-consent-bg:#fff;--gilda-consent-fg:#1a1a1a;--gilda-consent-border:rgba(0,0,0,.2);--gilda-consent-font:inherit;box-sizing:border-box;background:var(--gilda-consent-bg);color:var(--gilda-consent-fg);font-family:var(--gilda-consent-font);font-size:.9375rem;line-height:1.5}
+.gilda-consent *,.gilda-consent__prefs *{box-sizing:border-box}
+.gilda-consent{position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:1rem;border-top:1px solid var(--gilda-consent-border);box-shadow:0 -2px 12px rgba(0,0,0,.08);max-height:80vh;overflow:auto}
+.gilda-consent__inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem 1.5rem}
+.gilda-consent__body{flex:1 1 30rem}
+.gilda-consent__title{margin:0 0 .25rem;font-size:1rem;font-weight:600;line-height:1.3;color:inherit}
+.gilda-consent__text{margin:0}
+.gilda-consent__link{color:inherit;text-decoration:underline}
+.gilda-consent__actions{display:flex;flex-wrap:wrap;gap:.5rem}
+.gilda-consent__button{font:inherit;min-height:44px;padding:.5rem 1.1rem;border:1px solid currentColor;border-radius:0;background:transparent;color:inherit;cursor:pointer}
+.gilda-consent__button:hover{background:rgba(0,0,0,.06)}
+.gilda-consent__button:focus-visible,.gilda-consent__close:focus-visible,.gilda-consent__checkbox:focus-visible,.gilda-consent__link:focus-visible,.gilda-consent-open:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.gilda-consent__prefs{width:calc(100% - 2rem);max-width:34rem;max-height:calc(100% - 2rem);overflow:auto;padding:1.25rem;border:1px solid var(--gilda-consent-border)}
+.gilda-consent__prefs::backdrop{background:rgba(0,0,0,.45)}
+.gilda-consent__prefs-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.5rem}
+.gilda-consent__close{font:inherit;font-size:1.5rem;line-height:1;width:44px;height:44px;margin:-.5rem -.5rem 0 0;border:0;background:transparent;color:inherit;cursor:pointer}
+.gilda-consent__categories{margin:1rem 0;padding:0;border:0}
+.gilda-consent__category{display:grid;grid-template-columns:auto 1fr;gap:.25rem .75rem;padding:.75rem 0;border-top:1px solid var(--gilda-consent-border)}
+.gilda-consent__checkbox{width:1.25rem;height:1.25rem;margin:.1rem 0 0;accent-color:var(--gilda-consent-fg)}
+.gilda-consent__label{font-weight:600}
+.gilda-consent__badge{font-weight:400;opacity:.75}
+.gilda-consent__category-desc{grid-column:2;margin:0;font-size:.875em}
+.gilda-consent-open{font:inherit;padding:0;border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer}
+.gilda-consent__reopen{margin:0;padding:.5rem 1rem;text-align:center;font-size:.8125rem}
+@media (max-width:600px){
+	.gilda-consent{padding:.875rem}
+	.gilda-consent__actions{width:100%}
+	.gilda-consent__actions .gilda-consent__button{flex:1 1 auto}
+	.gilda-consent__prefs .gilda-consent__actions{flex-direction:column}
+}

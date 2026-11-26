@@ -10,6 +10,12 @@
  * O pixel só envia eventos de verdade quando WP_ENVIRONMENT_TYPE = production, para que testes
  * locais/staging não sujem os dados de anúncios. Conversions API (servidor) fica para depois:
  * precisa de um token gerado no Gerenciador de Eventos da Meta.
+ *
+ * LGPD: nada é carregado nem enviado à Meta sem consentimento de marketing (gilda-consent.php).
+ * Os eventos da página ficam numa fila local (o "stub" do fbq); o fbevents.js só é baixado quando
+ * gildaConsent libera "marketing" (na hora, se a pessoa aceitar nesta página). Se a pessoa recusar
+ * ou revogar, chamamos fbq('consent','revoke') e apagamos _fbp/_fbc. Sem o mu-plugin de
+ * consentimento, o pixel não carrega (falha fechada).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -29,32 +35,49 @@ final class Gilda_Meta_Pixel {
 			return;
 		}
 
+		if ( ! class_exists( 'Gilda_Consent' ) ) {
+			// Sem banner de consentimento não há base legal para o pixel: não carrega.
+			return;
+		}
+
 		$self = new self( $id, $live );
 		add_action( 'wp_head', array( $self, 'base_code' ), 1 );
 		add_action( 'wp_footer', array( $self, 'page_events' ), 20 );
 		add_action( 'woocommerce_add_to_cart', array( $self, 'queue_add_to_cart' ), 10, 6 );
+		add_action( 'wp_ajax_gilda_pixel_purchase_sent', array( $self, 'ajax_purchase_sent' ) );
+		add_action( 'wp_ajax_nopriv_gilda_pixel_purchase_sent', array( $self, 'ajax_purchase_sent' ) );
 	}
 
 	private function __construct( private string $id, private bool $live ) {}
 
-	/** Código base do pixel (ou um stub que loga no console, em modo debug). */
+	/**
+	 * Código base do pixel, que só carrega depois do consentimento de marketing.
+	 * Até lá, fbq() é o stub oficial da Meta: guarda os comandos numa fila, sem rede e sem cookies.
+	 */
 	public function base_code(): void {
-		if ( $this->live ) {
-			?>
-<!-- Meta Pixel -->
+		$loader = $this->live
+			// Produção: baixa o fbevents.js, que processa a fila (init, PageView e eventos da página).
+			? "fbq('consent','grant');var t=d.createElement('script');t.async=true;t.src='https://connect.facebook.net/en_US/fbevents.js';var s=d.getElementsByTagName('script')[0];s.parentNode.insertBefore(t,s);"
+			// Debug: troca o stub por um que loga no console e despeja a fila.
+			: "var q=w.fbq.queue.slice();w.fbq=function(){console.info('[Meta Pixel debug]',...arguments);(w.__gildaPixel=w.__gildaPixel||[]).push([...arguments]);};q.forEach(function(a){w.fbq.apply(null,a);});";
+		?>
+<!-- Meta Pixel (só com consentimento de marketing) -->
 <script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+!function(f){if(f.fbq)return;var n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);
 fbq('init', <?php echo wp_json_encode( $this->id ); ?>);
 fbq('track', 'PageView');
+(function(w,d){var C=w.gildaConsent;if(!C){return;}var loaded=false;
+function sync(){if(C.has('marketing')){if(!loaded){loaded=true;<?php echo $loader; // phpcs:ignore WordPress.Security.EscapeOutput ?>}else{w.fbq('consent','grant');}}else{if(loaded){w.fbq('consent','revoke');}C.deleteCookies(['_fbp','_fbc']);<?php echo $this->live ? '' : "console.info('[Meta Pixel debug] sem consentimento de marketing: nada é enviado (eventos na fila: '+(w.fbq.queue?w.fbq.queue.length:0)+')');"; // phpcs:ignore WordPress.Security.EscapeOutput ?>}}
+sync();C.onChange(sync);})(window,document);
 </script>
-<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=<?php echo esc_attr( $this->id ); ?>&ev=PageView&noscript=1"/></noscript>
-<!-- /Meta Pixel -->
-			<?php
-		} else {
+		<?php
+		if ( $this->live && Gilda_Consent::has( 'marketing' ) ) {
+			// Sem JavaScript: só com consentimento já salvo (o cookie é lido no servidor).
 			?>
-<script>window.fbq=function(){console.info('[Meta Pixel debug]',...arguments);(window.__gildaPixel=window.__gildaPixel||[]).push([...arguments]);};fbq('init', <?php echo wp_json_encode( $this->id ); ?>);fbq('track','PageView');</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=<?php echo esc_attr( $this->id ); ?>&ev=PageView&noscript=1"/></noscript>
 			<?php
 		}
+		echo "<!-- /Meta Pixel -->\n";
 	}
 
 	/** Eventos da página atual + eventos enfileirados (ex.: AddToCart feito via AJAX/Store API). */
@@ -85,6 +108,7 @@ fbq('track', 'PageView');
 			);
 		}
 
+		$purchase_mark = null;
 		if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) ) {
 			$order_id = absint( get_query_var( 'order-received' ) );
 			$order    = $order_id ? wc_get_order( $order_id ) : null;
@@ -105,8 +129,15 @@ fbq('track', 'PageView');
 					),
 					array( 'eventID' => 'order-' . $order->get_id() ), // deduplicação com a futura Conversions API
 				);
-				$order->update_meta_data( '_gilda_pixel_purchase_sent', time() );
-				$order->save();
+				if ( Gilda_Consent::has( 'marketing' ) ) {
+					// Consentimento já dado: o evento sai agora; marca para não repetir no recarregar.
+					$order->update_meta_data( '_gilda_pixel_purchase_sent', time() );
+					$order->save();
+				} else {
+					// Fica na fila. Se a pessoa aceitar nesta página, o Purchase dispara e o navegador avisa
+					// o servidor (ajax_purchase_sent) para não disparar de novo. Se recusar, nunca dispara.
+					$purchase_mark = array( $order->get_id(), $order->get_order_key() );
+				}
 			}
 		}
 
@@ -128,7 +159,30 @@ fbq('track', 'PageView');
 			}
 			echo 'fbq(' . implode( ',', array_map( 'wp_json_encode', $args ) ) . ");\n";
 		}
+		if ( $purchase_mark ) {
+			printf(
+				"window.gildaConsent&&gildaConsent.whenGranted('marketing',function(){var f=new FormData();f.append('action','gilda_pixel_purchase_sent');f.append('order',%s);f.append('key',%s);var u=%s;if(!(navigator.sendBeacon&&navigator.sendBeacon(u,f))){fetch(u,{method:'POST',body:f,credentials:'same-origin',keepalive:true});}});\n",
+				wp_json_encode( (string) $purchase_mark[0] ),
+				wp_json_encode( $purchase_mark[1] ),
+				wp_json_encode( admin_url( 'admin-ajax.php' ) )
+			);
+		}
 		echo "</script>\n";
+	}
+
+	/** O navegador avisa que o Purchase saiu (consentimento dado na própria página de pedido recebido). */
+	public function ajax_purchase_sent(): void {
+		$order = wc_get_order( absint( $_POST['order'] ?? 0 ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$key   = isset( $_POST['key'] ) ? wc_clean( wp_unslash( $_POST['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		// A chave do pedido (que só quem comprou tem, na URL de pedido recebido) faz o papel do nonce.
+		if ( ! $order || '' === $key || ! hash_equals( $order->get_order_key(), $key ) ) {
+			wp_send_json_error( null, 403 );
+		}
+		if ( ! $order->get_meta( '_gilda_pixel_purchase_sent' ) ) {
+			$order->update_meta_data( '_gilda_pixel_purchase_sent', time() );
+			$order->save();
+		}
+		wp_send_json_success();
 	}
 
 	/** AddToCart: enfileira na sessão e dispara no próximo carregamento de página. */

@@ -49,7 +49,8 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 - **SEO:** meta description (editável por página/produto/categoria), Open Graph para prévia no WhatsApp/Instagram, sitemap sem páginas de sistema nem usuários, schema de Produto. Fora de produção nada é indexado.
 - **Segurança:** bloqueio após 5 logins errados, sem XML-RPC, sem expor usuários (inclusive na recuperação de senha), cabeçalhos de segurança, editor de código do painel desligado. O servidor bloqueia arquivos de versão, logs e backups, e PHP em uploads não executa (`config/apache`, `config/php`). Bateria de testes: `./scripts/security-check.sh [url]`. Resultado atual no local: 78 PASS, 0 FAIL.
 - **Backup:** `./scripts/backup.sh` e `./scripts/restore.sh` (banco + uploads). Produção: ver [deploy.md](docs/development/deploy.md).
-- **Meta Pixel:** usa o mesmo ID do site atual (`2143468076438110`) e manda PageView, ViewContent, AddToCart, InitiateCheckout e Purchase (sem duplicar se o cliente recarregar a página). **Só envia em produção.** Localmente, com `META_PIXEL_DEBUG=1`, os eventos aparecem no console do navegador.
+- **Meta Pixel:** usa o mesmo ID do site atual (`2143468076438110`) e manda PageView, ViewContent, AddToCart, InitiateCheckout e Purchase (sem duplicar se o cliente recarregar a página). **Só envia em produção e só depois do consentimento de marketing.** Localmente, com `META_PIXEL_DEBUG=1`, os eventos aparecem no console do navegador quando você aceita os cookies (antes disso, o console avisa que nada é enviado).
+- **Consentimento de cookies (LGPD):** banner com Aceitar / Recusar / Preferências (necessários sempre ligados, marketing opcional), escolha guardada por 6 meses no cookie `gilda_consent`. Sem aceite, nada da Meta carrega e os cookies de atribuição do WooCommerce (`sbjs_*`) não são gravados. Se a pessoa aceitar na página de pedido recebido, o Purchase ainda dispara (uma vez). Também publica o consent mode do Google (negado por padrão). Para reabrir as preferências: shortcode `[gilda_consent_preferences]`. Pra testar do zero, apague o cookie `gilda_consent` no navegador.
 
 ## Pendências que dependem da GILDA;
 
@@ -63,7 +64,7 @@ A lista completa do que pedir ou conversar com as donas, com prioridade e checkl
 | **Endereço de origem** | Curitiba/PR, CEP 82015-384 (requisito 10.1) | Rua e número de onde saem os envios |
 | **Peso/medidas** | Valores provisórios por categoria | Peso e embalagem reais de cada peça (o frete é calculado com isso) |
 | **Fotos dos produtos** | Não importadas | Autorizar a importação do Wix (`IMPORT_IMAGES=1`) ou mandar as fotos originais |
-| **Política de privacidade / trocas** | Páginas em rascunho | Textos da GILDA; (exigência da LGPD/CDC) |
+| **Textos legais** | Rascunhos em [docs/legal/](docs/legal/) (privacidade, trocas, termos/frete), importados como páginas em rascunho | Revisão das donas/contador e os campos **[PREENCHER]**; depois publicar |
 
 ## Estrutura
 
@@ -73,6 +74,7 @@ scripts/
   setup.sh                  # sobe e configura tudo (rodar sempre que precisar)
   setup-store.php           # configurações do WooCommerce (moeda, contas, checkout BR, frete, cupom...)
   import-products.php       # importa data/products.json para o WooCommerce
+  import-legal-pages.php    # cria/atualiza as páginas legais (rascunho) a partir de docs/legal/
   export-wix-products.mjs   # lê a loja Wix e gera data/products.json
 data/products.json          # produtos exportados do Wix
 wp-content/mu-plugins/      # nosso código que roda sempre
@@ -80,7 +82,8 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-first-purchase-coupon.php # regra "só na primeira compra"
   gilda-legacy-redirects.php      # 301 das URLs do Wix
   gilda-account-fields.php        # nome + confirmar senha no cadastro (7.2)
-  gilda-meta-pixel.php            # Meta Pixel com eventos de e-commerce (só em produção)
+  gilda-meta-pixel.php            # Meta Pixel com eventos de e-commerce (só em produção, só com consentimento)
+  gilda-consent.php (+ gilda-consent/)  # banner de cookies LGPD, cookie gilda_consent, consent mode
   gilda-buy-now.php               # botão "Comprar" → checkout (5.9)
   gilda-seo.php                   # meta description, Open Graph, sitemap limpo, noindex fora de produção (11.3)
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
@@ -89,6 +92,7 @@ scripts/backup.sh           # backup do banco + uploads em backups/ (retenção 
 scripts/restore.sh          # restaura um backup
 docs/
   requisitos-cliente.md           # o que pedir/conversar com as donas
+  legal/                          # rascunhos: privacidade, trocas e devoluções, termos de uso (revisão das donas)
   development/tasks.md            # backlog (K1venn)
   development/backend-para-frontend.md  # o que o backend oferece pro tema
   development/deploy.md           # roteiro de produção (servidor, wp-config, cron, backup, virada)
