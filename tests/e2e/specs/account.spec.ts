@@ -10,7 +10,12 @@ const email = uniqueEmail('conta');
 const name = 'Cliente Teste E2E';
 let password = strongPassword();
 
-function registerForm(page: Page) {
+/** O cadastro fica na aba "Criar conta" (o login abre por padrão); sem as abas, o formulário já está visível. */
+async function openRegisterForm(page: Page) {
+  const tab = page.getByRole('tab', { name: /criar conta|cadastr/i });
+  if (await tab.count()) {
+    await tab.click();
+  }
   return page.locator('form').filter({ has: page.getByRole('button', { name: /cadastr/i }) });
 }
 function loginForm(page: Page) {
@@ -33,7 +38,7 @@ test.afterAll(async () => {
 
 test('cadastro recusa senhas diferentes', async ({ page }) => {
   await page.goto('/minha-conta/');
-  const form = registerForm(page);
+  const form = await openRegisterForm(page);
   await form.getByRole('textbox', { name: /^nome\b/i }).fill(name);
   await form.getByRole('textbox', { name: /e-?mail/i }).fill(email);
   await form.getByRole('textbox', { name: /^senha/i }).fill(password);
@@ -46,7 +51,7 @@ test('cadastro recusa senhas diferentes', async ({ page }) => {
 
 test('cadastro cria a conta, entra e manda o e-mail de boas-vindas', async ({ page }) => {
   await page.goto('/minha-conta/');
-  const form = registerForm(page);
+  const form = await openRegisterForm(page);
   await form.getByRole('textbox', { name: /^nome\b/i }).fill(name);
   await form.getByRole('textbox', { name: /e-?mail/i }).fill(email);
   await form.getByRole('textbox', { name: /^senha/i }).fill(password);

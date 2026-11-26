@@ -43,8 +43,9 @@ export async function selectVariation(page: Page, variation: Variation): Promise
       await select.selectOption(slug);
     }
   }
-  // O WooCommerce só libera os botões depois de achar a variação.
-  await expect(page.locator('input[name="variation_id"]')).toHaveValue(String(variation.variation_id));
+  // O WooCommerce só libera os botões depois de achar a variação. (input.variation_id: o "avise-me"
+  // tem outro campo variation_id na página.)
+  await expect(page.locator('form.variations_form input.variation_id')).toHaveValue(String(variation.variation_id));
   await expect(addToCartButton(page)).not.toHaveClass(/\bdisabled\b/);
 }
 
@@ -114,52 +115,67 @@ export interface AddressCheck {
 }
 
 /**
- * Preenche o checkout. O CEP vem primeiro e deve preencher rua/bairro/cidade sozinho
- * (o plugin "Campos Checkout Brasileiro" oferece "Usar o endereço: …").
+ * Preenche o checkout. O tema divide em etapas ("Cliente" → Continuar → "Entrega"); campos da etapa
+ * escondida somem da árvore de acessibilidade, então cada etapa é preenchida e conferida antes de seguir.
+ * O CEP deve preencher rua/bairro/cidade sozinho: direto (busca de CEP do tema) ou pela sugestão
+ * "Usar o endereço: …" do plugin "Campos Checkout Brasileiro". Sem etapas, tudo fica numa tela só.
  */
 export async function fillCheckout(page: Page, email: string): Promise<AddressCheck> {
-  await field(page, 'Endereço de e-mail').fill(email);
+  const customerFields: [Locator, string, boolean][] = [
+    [field(page, 'Endereço de e-mail'), email, false],
+    [field(page, 'Nome'), checkoutData.firstName, false],
+    [field(page, 'Sobrenome'), checkoutData.lastName, false],
+    [field(page, /^CPF/), checkoutData.cpf, true],
+    [field(page, /celular|telefone/i), checkoutData.phone, true],
+  ];
+  await waitIdle(page);
+  for (const [input, value, masked] of customerFields) {
+    await fillVerified(input, value, { masked });
+  }
+  const next = page.getByRole('button', { name: /^continuar$/i });
+  if (await next.isVisible()) {
+    await next.click();
+  }
 
   const cep = field(page, /^(CEP|Código postal)/);
   // No checkout de blocos, o CEP dispara um update-customer (com atraso). Se a sugestão de endereço
   // for aceita antes da resposta chegar, a resposta apaga rua/cidade. Uma pessoa leva mais de 1 s
-  // para clicar; aqui esperamos a resposta (no clássico ela não existe e o timeout curto basta).
-  const synced = page
-    .waitForResponse((r) => r.url().includes('/wc/store/v1/cart/update-customer'), { timeout: 8_000 })
-    .catch(() => null);
-  await cep.fill(checkoutData.cep);
-  await cep.blur();
-
-  const suggestion = page.getByRole('checkbox', { name: /usar o endere[çc]o/i });
-  await expect(suggestion, 'sugestão de endereço pelo CEP (autopreenchimento)').toBeVisible({ timeout: 20_000 });
-  await synced;
-  await waitIdle(page);
-  await suggestion.check();
+  // para clicar; aqui esperamos a resposta (só existe no checkout de blocos).
+  const synced = (await page.locator('.wc-block-checkout').count())
+    ? page.waitForResponse((r) => r.url().includes('/wc/store/v1/cart/update-customer'), { timeout: 8_000 }).catch(() => null)
+    : Promise.resolve(null);
+  // CEP com máscara: digitado tecla a tecla (o fill direto é apagado pela máscara do tema).
+  await fillVerified(cep, checkoutData.cep, { masked: true });
 
   const street = field(page, 'Endereço');
+  const suggestion = page.getByRole('checkbox', { name: /usar o endere[çc]o/i });
+  await expect
+    .poll(async () => (await suggestion.isVisible()) || /paulista/i.test(await street.inputValue().catch(() => '')), {
+      message: 'endereço preenchido pelo CEP (autopreenchimento)',
+      timeout: 20_000,
+    })
+    .toBe(true);
+  await synced;
+  await waitIdle(page);
+  if (await suggestion.isVisible()) {
+    await suggestion.check();
+  }
+
   await expect(street, 'rua preenchida pelo CEP').toHaveValue(/paulista/i);
   await expect(field(page, 'Cidade'), 'cidade preenchida pelo CEP').toHaveValue(/s[ãa]o paulo/i);
   await expect(field(page, 'Bairro'), 'bairro preenchido pelo CEP').not.toHaveValue('');
 
   await waitIdle(page);
-  const fields: [Locator, string, boolean][] = [
-    [field(page, 'Nome'), checkoutData.firstName, false],
-    [field(page, 'Sobrenome'), checkoutData.lastName, false],
-    [field(page, /^CPF/), checkoutData.cpf, true],
-    [field(page, 'Número'), checkoutData.number, false],
-    [field(page, /celular|telefone/i), checkoutData.phone, true],
-  ];
-  for (const [input, value, masked] of fields) {
-    await fillVerified(input, value, { masked });
-  }
+  const number = field(page, 'Número');
+  await fillVerified(number, checkoutData.number);
   await waitIdle(page);
   // Confere de novo: nada pode ter sido apagado por uma re-renderização (inclusive o CEP).
   await fillVerified(cep, checkoutData.cep, { masked: true });
-  for (const [input, value, masked] of fields) {
-    await fillVerified(input, value, { masked });
-  }
-  await fillVerified(field(page, 'Endereço de e-mail'), email);
+  await fillVerified(number, checkoutData.number);
   await expect(street, 'rua continua preenchida').toHaveValue(/paulista/i);
+  // Campos da etapa "Cliente" (podem estar escondidos): confere pelo name.
+  await expect(page.locator('[name="billing_email"]')).toHaveValue(email);
+  await expect(page.locator('[name="billing_first_name"]')).toHaveValue(checkoutData.firstName);
   await waitIdle(page);
 
   return { street: await street.inputValue(), city: await field(page, 'Cidade').inputValue() };

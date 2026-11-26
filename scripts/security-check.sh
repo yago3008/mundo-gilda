@@ -133,7 +133,13 @@ section "6. Login: força bruta"
 for i in 1 2 3 4 5 6; do c -o /dev/null -d "log=gilda_teste_inexistente&pwd=errada$i&wp-submit=Entrar&testcookie=1" -b "wordpress_test_cookie=WP%20Cookie%20check" "$BASE/wp-login.php"; done
 lp=$(c -d "log=gilda_teste_inexistente&pwd=errada7&wp-submit=Entrar&testcookie=1" -b "wordpress_test_cookie=WP%20Cookie%20check" "$BASE/wp-login.php")
 if echo "$lp" | grep -qi 'Muitas tentativas'; then pass "bloqueio após várias tentativas erradas"; else fail "sem bloqueio após 7 tentativas erradas"; fi
-echo "    (o teste deixou o IP desta máquina bloqueado por alguns minutos — limpe com: docker compose run --rm wpcli wp transient delete --all)"
+# O teste deixa o IP desta máquina bloqueado por 15 min. No ambiente local (e no CI) libera na hora,
+# senão o que vier depois (testes ponta a ponta, login do admin) cai no bloqueio.
+if [[ "$BASE" == *localhost* ]] && (cd "$(dirname "$0")/.." && docker compose run --rm -T wpcli wp transient delete --all >/dev/null 2>&1); then
+  echo "    (bloqueio de login criado pelo teste liberado no ambiente local)"
+else
+  echo "    (o teste deixou o IP desta máquina bloqueado por alguns minutos — limpe com: docker compose run --rm wpcli wp transient delete --all)"
+fi
 
 # ---------------------------------------------------------------------------
 section "7. Cabeçalhos e cookies"

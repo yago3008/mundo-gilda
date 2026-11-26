@@ -956,7 +956,9 @@
 			deliverySection.append( additionalFields );
 		}
 
-		const postcodeInput = $( 'input[name="billing_postcode"]', form );
+		// deliverySection ainda não está no form aqui (entra no replaceChildren mais abaixo): buscar no form
+		// não achava o CEP e a busca de endereço nunca era ligada.
+		const postcodeInput = $( 'input[name="billing_postcode"]', deliverySection );
 		if ( postcodeInput ) {
 			const postcodeRow = postcodeInput.closest( '.form-row' );
 			const addressFeedback = document.createElement( 'p' );
