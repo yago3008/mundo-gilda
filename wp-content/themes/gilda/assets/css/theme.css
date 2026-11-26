@@ -1821,6 +1821,21 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	transform: rotate(-5deg);
 }
 .wp-block-column:nth-child(even) .gilda-founder__signature { left: auto; right: -34px; }
+/* Pintura de baixo pra cima conforme o scroll (assets/js/transitions.js põe .is-paintable e --paint).
+   Sem JS ou com "menos movimento", o nome fica creme. A sombra vira drop-shadow: text-shadow
+   pintaria por cima das letras recortadas. */
+.gilda-founder__signature.is-paintable {
+	-webkit-background-clip: text;
+	background-clip: text;
+	background-image: linear-gradient(to top, var(--wp--preset--color--terracotta-900, #4e1a08) var(--paint, 0%), var(--gilda-cream) var(--paint, 0%));
+	color: transparent;
+	filter: drop-shadow(0 2px 10px rgb(0 0 0 / 16%));
+	/* Com line-height .9 o "g" e o "l" passam da caixa e ficariam sem fundo (invisíveis):
+	   o padding aumenta a área pintada e a margem negativa mantém o nome no mesmo lugar. */
+	margin: -.25em -.2em -.3em;
+	padding: .25em .2em .3em;
+	text-shadow: none;
+}
 .gilda-founder__story {
 	font: 400 17px/1.55 var(--gilda-sans);
 	margin-inline: auto;
