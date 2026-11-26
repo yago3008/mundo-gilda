@@ -116,7 +116,10 @@ st=$(code "$BASE/wp-json/wc/v3/orders"); if [ "$st" = "401" ] || [ "$st" = "403"
 st=$(code "$BASE/wp-json/wc/v3/customers"); if [ "$st" = "401" ] || [ "$st" = "403" ]; then pass "API de clientes exige autenticação ($st)"; else fail "API /wc/v3/customers respondeu $st sem autenticação"; fi
 st=$(code "$BASE/wp-json/wc/store/v1/order/1"); if [ "$st" = "200" ]; then fail "Store API devolve pedido sem chave"; else pass "Store API não devolve pedido sem chave ($st)"; fi
 st=$(code "$BASE/finalizar-compra/pedido-recebido/1/"); body=$(c "$BASE/finalizar-compra/pedido-recebido/1/")
-if echo "$body" | grep -qiE 'CPF|Endereço de cobrança|billing'; then fail "página de pedido recebido abre sem a chave do pedido"; else pass "pedido recebido exige chave ($st)"; fi
+# Procura os blocos que só aparecem com o pedido liberado (resumo/totais da confirmação em blocos,
+# detalhes do checkout clássico ou um CPF preenchido). Não usa palavras soltas: "billing"/"CPF" estão
+# nos parâmetros de JS de qualquer página do WooCommerce, e as classes dos blocos aparecem no CSS.
+if echo "$body" | grep -qiE 'data-block-name="woocommerce/order-confirmation-(summary|totals|billing-address|shipping-address)"|wc-block-order-confirmation-summary-list|woocommerce-order-details|woocommerce-customer-details|[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}'; then fail "página de pedido recebido abre sem a chave do pedido"; else pass "pedido recebido exige chave ($st)"; fi
 st=$(code -X TRACE "$BASE/"); if [ "$st" = "200" ]; then warn "método TRACE habilitado"; else pass "TRACE desabilitado ($st)"; fi
 if c "$BASE/?s=%3Cscript%3Ealert(1)%3C/script%3E" | grep -q '<script>alert(1)</script>'; then fail "busca reflete <script> (XSS)"; else pass "busca não reflete <script>"; fi
 if c "$BASE/loja/?filter_cor=%22%3E%3Cscript%3Ealert(1)%3C/script%3E" | grep -q '"><script>alert(1)'; then fail "filtro reflete <script> (XSS)"; else pass "filtro não reflete <script>"; fi
