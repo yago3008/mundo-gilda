@@ -43,13 +43,16 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 - **Cupom `primeiracompra`:** 10% e só na primeira compra. A regra confere a conta e também o e-mail, então não dá pra reusar sem login.
 - **E-mails transacionais:** conta criada, pedido recebido, novo pedido para a loja e redefinição de senha.
 - **URLs:** produtos continuam em `/product-page/<slug>`, como no Wix (requisito 11.3). As outras URLs antigas (`/category/all-products`, `/cart-page`, slugs com acento, etc.) têm redirecionamento 301.
+- **Frete (Correios Automático):** PAC e SEDEX com cotação real a partir de Curitiba (CEP 82015-384), mais 2 dias de postagem. Aparece no simulador da página do produto (com "Não sei meu CEP"), no carrinho e no checkout. Também cria a página "Rastrear encomenda". Funciona sem contrato. Se a GILDA; tiver contrato com os Correios, é só ligar "Contrato próprio" no painel do plugin: os métodos continuam os mesmos.
+- **Meta Pixel:** usa o mesmo ID do site atual (`2143468076438110`) e manda PageView, ViewContent, AddToCart, InitiateCheckout e Purchase (sem duplicar se o cliente recarregar a página). **Só envia em produção.** Localmente, com `META_PIXEL_DEBUG=1`, os eventos aparecem no console do navegador.
 
 ## Pendências que dependem da GILDA;
 
 | Item | Situação atual | O que falta |
 |---|---|---|
-| **Frete (11.6, 5.10)** | Frete fixo provisório de R$ 25 | Escolher a integração de PAC/SEDEX (contrato Correios ou Melhor Envio) e criar a conta |
 | **Pagamento (11.5)** | Gateway de teste (só no ambiente local) | Escolher o gateway com Visa/Master/Pix (ex.: Mercado Pago, Pagar.me, PagBank) e passar as credenciais |
+| **Contrato Correios** | Tabela pública (sem contrato) | Se tiver contrato (o app Meu Frete do Wix tem plano com contrato), passar usuário do Meu Correios, código de acesso e cartão de postagem. Também falta aceitar os termos de uso do plugin no painel |
+| **Conversions API (Meta)** | Só o pixel no navegador | Token gerado no Gerenciador de Eventos da Meta |
 | **Endereço de origem** | Curitiba/PR, CEP 82015-384 (requisito 10.1) | Rua e número de onde saem os envios |
 | **Peso/medidas** | Valores provisórios por categoria | Peso e embalagem reais de cada peça (o frete é calculado com isso) |
 | **Fotos dos produtos** | Não importadas | Autorizar a importação do Wix (`IMPORT_IMAGES=1`) ou mandar as fotos originais |
@@ -70,6 +73,7 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-first-purchase-coupon.php # regra "só na primeira compra"
   gilda-legacy-redirects.php      # 301 das URLs do Wix
   gilda-account-fields.php        # nome + confirmar senha no cadastro (7.2)
+  gilda-meta-pixel.php            # Meta Pixel com eventos de e-commerce (só em produção)
 docs/                       # requisitos e design system (K1venn)
 ```
 

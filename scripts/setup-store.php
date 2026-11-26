@@ -168,24 +168,83 @@ if ( ! $zone ) {
 	$zone->add_location( 'BR', 'country' );
 	$zone->save();
 }
-$has_flat = false;
-foreach ( $zone->get_shipping_methods() as $method ) {
-	if ( 'flat_rate' === $method->id ) {
-		$has_flat = true;
-	}
-}
-if ( ! $has_flat ) {
-	$instance_id = $zone->add_shipping_method( 'flat_rate' );
-	update_option(
-		"woocommerce_flat_rate_{$instance_id}_settings",
-		array(
-			'title'      => 'Frete fixo (provisório)',
-			'tax_status' => 'none',
-			'cost'       => '25,00',
-		)
+$correios_active = class_exists( '\Infixs\CorreiosAutomatico\Core\Support\Config' );
+
+if ( $correios_active ) {
+	// PAC e SEDEX pelo plugin "Correios Automático" (sem contrato: tabela pública via API da Infixs;
+	// com contrato: basta ligar o "Contrato próprio" no painel, os métodos continuam os mesmos).
+	$origin   = preg_replace( '/\D/', '', $env( 'STORE_CEP', '82015384' ) );
+	$services = array(
+		'pac'   => array( 'title' => 'PAC', 'order' => 1 ),
+		'sedex' => array( 'title' => 'SEDEX', 'order' => 2 ),
 	);
+
+	$existing = array();
+	foreach ( $zone->get_shipping_methods() as $instance_id => $method ) {
+		if ( 'flat_rate' === $method->id ) {
+			$zone->delete_shipping_method( $instance_id ); // remove o frete fixo provisório
+		} elseif ( 'infixs-correios-automatico' === $method->id ) {
+			$existing[ $method->get_option( 'basic_service' ) ] = $instance_id;
+		}
+	}
+
+	foreach ( $services as $code => $svc ) {
+		$instance_id = $existing[ $code ] ?? $zone->add_shipping_method( 'infixs-correios-automatico' );
+		$key         = "woocommerce_infixs-correios-automatico_{$instance_id}_settings";
+		update_option(
+			$key,
+			array_merge(
+				(array) get_option( $key, array() ),
+				array(
+					'enabled'            => 'yes',
+					'title'              => $svc['title'],
+					'advanced_mode'      => 'no',
+					'basic_service'      => $code,
+					'origin_postcode'    => $origin,
+					'estimated_delivery' => 'yes',
+					'delivery_time_mode' => 'add',
+					'additional_days'    => '2', // prazo de separação/postagem somado ao dos Correios
+					'minimum_height'     => '2',
+					'minimum_width'      => '11',
+					'minimum_length'     => '16',
+					'minimum_weight'     => '0.100',
+				)
+			)
+		);
+		global $wpdb;
+		$wpdb->update( "{$wpdb->prefix}woocommerce_shipping_zone_methods", array( 'method_order' => $svc['order'], 'is_enabled' => 1 ), array( 'instance_id' => $instance_id ) );
+	}
+
+	// Configurações gerais do plugin.
+	$cfg = '\Infixs\CorreiosAutomatico\Core\Support\Config';
+	$cfg::update( 'general.autofill_address', 'no' ); // o plugin de campos BR já preenche pelo CEP
+	$cfg::update( 'general.calculate_shipping_product_page', 'yes' ); // simulador na página do produto (5.10)
+	$cfg::update( 'general.mask_postcode', 'yes' );
+	$cfg::update( 'general.simple_cart_shipping_calculator', 'yes' );
+	$cfg::update( 'general.show_order_tracking_form', 'yes' );
+	// Remetente (dados públicos do rodapé do site atual; rua/número a confirmar).
+	$cfg::update( 'sender.legal_name', 'GILDA ALFAIATARIA LTDA' );
+	$cfg::update( 'sender.name', 'GILDA;' );
+	$cfg::update( 'sender.document', '45822638000109' );
+	$cfg::update( 'sender.person_type', 'company' );
+	$cfg::update( 'sender.address_postalcode', $origin );
+	$cfg::update( 'sender.address_city', $env( 'STORE_CITY', 'Curitiba' ) );
+	$cfg::update( 'sender.address_state', $state );
+
+	$log( "Frete: PAC e SEDEX (Correios Automático, sem contrato) saindo do CEP $origin + 2 dias de postagem" );
+} else {
+	$has_flat = false;
+	foreach ( $zone->get_shipping_methods() as $method ) {
+		if ( 'flat_rate' === $method->id ) {
+			$has_flat = true;
+		}
+	}
+	if ( ! $has_flat ) {
+		$instance_id = $zone->add_shipping_method( 'flat_rate' );
+		update_option( "woocommerce_flat_rate_{$instance_id}_settings", array( 'title' => 'Frete fixo (provisório)', 'tax_status' => 'none', 'cost' => '25,00' ) );
+	}
+	$log( 'Frete: plugin dos Correios inativo — usando frete fixo provisório de R$ 25' );
 }
-$log( 'Frete: zona Brasil com frete fixo provisório de R$ 25 (até integrar a transportadora)' );
 
 /* ---------------------------------------------------------------------------
  * Pagamento: só o de teste no ambiente local (o gateway real entra depois)

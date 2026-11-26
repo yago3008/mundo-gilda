@@ -12,6 +12,7 @@ set -a; . ./.env; set +a
 PLUGINS=(
   "woocommerce:11.3.1"
   "woo-better-shipping-calculator-for-brazil:5.2.6"
+  "infixs-correios-automatico:1.15.0"
 )
 THEME="twentytwentyfive" # provisório até o tema da GILDA; existir
 

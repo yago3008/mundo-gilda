@@ -16,6 +16,8 @@ x-wp-env: &wp-env
   STORE_CITY: ${STORE_CITY:-}
   STORE_STATE: ${STORE_STATE:-}
   STORE_CEP: ${STORE_CEP:-}
+  META_PIXEL_ID: ${META_PIXEL_ID:-}
+  META_PIXEL_DEBUG: ${META_PIXEL_DEBUG:-}
   # Mesmo wp-config para o site e para o WP-CLI (os dois precisam saber que é "local").
   WORDPRESS_DEBUG: 1
   WORDPRESS_CONFIG_EXTRA: |
