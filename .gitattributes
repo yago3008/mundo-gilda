@@ -1,0 +1,5 @@
+# Finais de linha LF (scripts precisam rodar em Linux/macOS/containers)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary

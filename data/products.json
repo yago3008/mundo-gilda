@@ -1,0 +1,799 @@
+{
+  "source": "https://www.mundogilda.com.br",
+  "exported_at": "2026-11-26T13:14:13.292Z",
+  "products": [
+    {
+      "slug": "calça",
+      "name": "Calça Torra",
+      "price": 569,
+      "description": "<p>A calça TORRA apresenta modelagem ballon, marcada pelo volume arredondado que acompanha o desenho das pernas e se afunila em direção à barra. As pregas frontais reforçam essa construção e valorizando a forma característica da peça.</p>\n<p>Seu nome faz referência à torra do café, momento em que o grão se transforma e revela novas cores, aromas e intensidades.</p>\n<p>Em alfaiataria, a calça TORRA combina estrutura e leveza em uma silhueta contemporânea e marcante.</p>\n<p>Composição: 74% viscose, 20% poliéster e 6% elastano.</p>\n<p>Tamanho em centímetros:</p>\n<p>36: cintura 70 cm; quadril 96 cm; comprimento da calça 101 cm.</p>\n<p>38: cintura 74 cm; quadril 100 cm; comprimento da calça 102 cm.</p>\n<p>40: cintura 78 cm; quadril 104 cm; comprimento da calça 103 cm.</p>\n<p>42: cintura 82 cm; quadril 108 cm; comprimento da calça 104 cm.</p>\n<p>44: cintura 86 cm; quadril 112 cm; comprimento da calça 105 cm.</p>\n<p>Modelo veste tamanho 36.</p>",
+      "categories": [
+        "Calças"
+      ],
+      "attributes": [
+        {
+          "name": "Cor",
+          "values": [
+            {
+              "label": "Off White",
+              "hex": "#e9e9d4"
+            },
+            {
+              "label": "Marrom",
+              "hex": "#b4522d"
+            }
+          ]
+        },
+        {
+          "name": "Tamanho",
+          "values": [
+            {
+              "label": "36"
+            },
+            {
+              "label": "38"
+            },
+            {
+              "label": "40"
+            },
+            {
+              "label": "42"
+            },
+            {
+              "label": "44"
+            }
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "36"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "38"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "40"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "42"
+          },
+          "price": 569,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "44"
+          },
+          "price": 569,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "36"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "38"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "40"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 3
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "42"
+          },
+          "price": 569,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "44"
+          },
+          "price": 569,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        }
+      ],
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_e30ade462b634f1aa4e0491df54984b2~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_575ffd954e314a669e9e36803ae867e8~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_9668038cb57240008cc6917fdae3088f~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_51d53f24c6434a89b5d4774c83db18f4~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_7c6830b42e2540f7896fcdaa89b55a84~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_110fbf5459704b6890c07c88e16db8f9~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_4ccb69c094d044c8926a582e1da14864~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_fb58d665d74345b58a96bcbffa23c332~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_a7ccb27abf654aff936b31068baf9069~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_f6b217089144413d9bdc39cac7f50e99~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_71b16c8fff654cd492a3243d8187ee05~mv2.jpg"
+      ]
+    },
+    {
+      "slug": "camisa-grão",
+      "name": "Camisa Grão",
+      "price": 429,
+      "description": "<p>A camisa GRÃO traz uma releitura da camisaria clássica a partir de proporções e acabamentos cuidadosamente elaborados. O punho duplo ganha protagonismo na construção, criando um detalhe marcante que amplia as possibilidades de uso da peça.</p>\n<p>Seu nome faz referência ao grão de café, ponto de partida de um ritual que atravessa o cotidiano brasileiro e transforma pequenos instantes em momentos de pausa e encontro.</p>\n<p>Confeccionada em algodão egípcio, possui toque macio, leveza e um caimento naturalmente sofisticado.</p>\n<p>Composição: 100% algodão egípcio.</p>\n<p>Tamanhos em centímetros:</p>\n<p>PP: busto 88 cm; cintura 70 cm.</p>\n<p>P: busto 92 cm; cintura 74 cm.</p>\n<p>M: busto 96 cm; cintura 78 cm.</p>\n<p>G: busto 100 cm; cintura 82 cm.</p>\n<p>GG: busto 104 cm; cintura 86.<br>Modelo veste tamanho PP.</p>",
+      "categories": [
+        "Camisas"
+      ],
+      "attributes": [
+        {
+          "name": "Cor",
+          "values": [
+            {
+              "label": "Off White",
+              "hex": "#e9e9d4"
+            },
+            {
+              "label": "Marrom",
+              "hex": "#b4522d"
+            }
+          ]
+        },
+        {
+          "name": "Tamanho",
+          "values": [
+            {
+              "label": "G"
+            },
+            {
+              "label": "GG"
+            },
+            {
+              "label": "M"
+            },
+            {
+              "label": "P"
+            },
+            {
+              "label": "PP"
+            }
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "G"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "GG"
+          },
+          "price": 429,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "M"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 3
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "P"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 5
+        },
+        {
+          "attributes": {
+            "Cor": "Off White",
+            "Tamanho": "PP"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "G"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "GG"
+          },
+          "price": 429,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "M"
+          },
+          "price": 429,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "P"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Cor": "Marrom",
+            "Tamanho": "PP"
+          },
+          "price": 429,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        }
+      ],
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_fd4c0f29d7124736b8587dcd5565ade4~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_a73d329fb0c6420ebb1d001e36b48718~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_4ee212cdb2514676a42e6000f4c21ca6~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_8688a9bf34354b6f8b9ab493df8577e6~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_e7efb381cd8545f59a0534b555155ce5~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_d6f71623b19a485b867a3a79afe37f6e~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c1d4c6c3b1fe45d5af369f218c1086fd~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_9bf249d6b2f94de38dc0742103191468~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_f4eeab28fa364be0ab9c2d41ce8750e6~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_af3895d6ab384b449e53ed0f68617786~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_1b6c2f95e20d442eab0c4b1da3f913e0~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c48485bb3a2240cf863fe146281c6221~mv2.jpg"
+      ]
+    },
+    {
+      "slug": "bermuda-envolto",
+      "name": "Bermuda Envolto",
+      "price": 415,
+      "description": "<p>A bermuda ENVOLTO traz uma modelagem de alfaiataria com construção pensada nos detalhes. Seu diferencial está nas pregas frontais com passante integrado, que estruturam a peça e criam movimento na silhueta.</p>\n<p>Possui bolso faca frontal e bolso traseiro embutido funcional, unindo praticidade e acabamento refinado.</p>\n<p>Composição: 74% viscose, 20% poliéster e 3% de elastano</p>",
+      "categories": [
+        "Bermudas"
+      ],
+      "attributes": [
+        {
+          "name": "Tamanho",
+          "values": [
+            {
+              "label": "36"
+            },
+            {
+              "label": "38"
+            },
+            {
+              "label": "40"
+            },
+            {
+              "label": "42"
+            },
+            {
+              "label": "44"
+            }
+          ]
+        },
+        {
+          "name": "Cor",
+          "values": [
+            {
+              "label": "Laranja",
+              "hex": "#EB6D18"
+            },
+            {
+              "label": "Off White",
+              "hex": "#e9e9d4"
+            }
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "attributes": {
+            "Tamanho": "36",
+            "Cor": "Laranja"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Tamanho": "36",
+            "Cor": "Off White"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "38",
+            "Cor": "Laranja"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "38",
+            "Cor": "Off White"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "40",
+            "Cor": "Laranja"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "40",
+            "Cor": "Off White"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "42",
+            "Cor": "Laranja"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "42",
+            "Cor": "Off White"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "44",
+            "Cor": "Laranja"
+          },
+          "price": 415,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Tamanho": "44",
+            "Cor": "Off White"
+          },
+          "price": 415,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        }
+      ],
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_6f01a48764264c3b92627768c4ff6af8~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_393fc69bca1e492b89ed1504e25db576~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_b06c4fc9492142d8a01c3c7c230837ff~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_10c57d2d75f4485fb6ab3d84ba3f075f~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_aea0c24b7e2a404b9085af741ff1de08~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_ef49aab7acfb450f992ce88b0ffb0701~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_6c5f31b304a0428a8bf9b56ed3990a4d~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_eaaf85e2e5e54b96838a897f2b6b4f07~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_a9783e761c334d5d802c2db9b09925a7~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_498e67eeea40465e9c658d5c83159de3~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_d8382faf95004b6db8debecbe04600d6~mv2.png"
+      ]
+    },
+    {
+      "slug": "lenço-manacá",
+      "name": "Lenço Manacá",
+      "price": 127,
+      "description": "<p>O lenço MANACÁ nasce da observação da borboleta brasileira que lhe dá nome, um símbolo de transformação, leveza e movimento. Sua estampa autoral, desenvolvida em aquarela, traduz em pinceladas fluidas as cores e gestos inspirados nas asas dessa borboleta.</p>\n<p>É um lenço de proporção ampla, pensado para acompanhar diferentes formas de uso e expressão.</p>\n<p>Uma peça que carrega cor, movimento e delicadeza, como um pequeno voo pousado sobre o tecido.</p>\n<p>Tamanho: 75cm x 75cm</p>\n<p>Composição: 100% poliéster (soft seda)</p>",
+      "categories": [
+        "Lenços"
+      ],
+      "attributes": [],
+      "variations": [],
+      "stock_status": "outofstock",
+      "stock_quantity": 0,
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_9385d4d5d627418a9ae480357222d3ed~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_a2794d338f62466c8deddbf8e0e1beec~mv2.png",
+        "https://static.wixstatic.com/media/ff503a_e4b5ce081dce405386c4ed73cbd890ce~mv2.jpeg",
+        "https://static.wixstatic.com/media/ff503a_de6d80d6f54b423382ef4b83c0783357~mv2.jpg"
+      ]
+    },
+    {
+      "slug": "calça-asas",
+      "name": "Calça Asas",
+      "price": 549,
+      "description": "<p>Com caimento leve e elegante, a CALÇA ASAS é confeccionada em tecido 74% viscose, 20% poliéster e 3% de elastano  e possui modelagem reta que alonga a silhueta. As pregas frontais e o cós alongado garantem um visual sofisticado, enquanto o bolso faca frontal e o bolso traseiro embutido trazem praticidade para o dia a dia. Uma peça versátil, pensada para transitar com facilidade entre o clássico e o contemporâneo.<br>~ nossa modelo usa 38.</p>",
+      "categories": [
+        "Calças"
+      ],
+      "attributes": [
+        {
+          "name": "Tamanho",
+          "values": [
+            {
+              "label": "36"
+            },
+            {
+              "label": "38"
+            },
+            {
+              "label": "40"
+            },
+            {
+              "label": "42"
+            },
+            {
+              "label": "44"
+            }
+          ]
+        },
+        {
+          "name": "Cor",
+          "values": [
+            {
+              "label": "preto",
+              "hex": "#000000"
+            },
+            {
+              "label": "verde musgo",
+              "hex": "#496148"
+            }
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "attributes": {
+            "Tamanho": "36",
+            "Cor": "preto"
+          },
+          "price": 549,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Tamanho": "36",
+            "Cor": "verde musgo"
+          },
+          "price": 549,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Tamanho": "38",
+            "Cor": "preto"
+          },
+          "price": 549,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Tamanho": "38",
+            "Cor": "verde musgo"
+          },
+          "price": 549,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Tamanho": "40",
+            "Cor": "preto"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 3
+        },
+        {
+          "attributes": {
+            "Tamanho": "40",
+            "Cor": "verde musgo"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "42",
+            "Cor": "preto"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 2
+        },
+        {
+          "attributes": {
+            "Tamanho": "42",
+            "Cor": "verde musgo"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 3
+        },
+        {
+          "attributes": {
+            "Tamanho": "44",
+            "Cor": "preto"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Tamanho": "44",
+            "Cor": "verde musgo"
+          },
+          "price": 549,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        }
+      ],
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_745e5e0818024657891114f56c5917b8~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_d4abd41c0fc6405bb2d184226d2d8187~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_9c2fec132ea34eb39cbc62b581f1a65f~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_9a1fe46e4bd040fcb61e55a30fbf5e5f~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_3a59aadf27c549d490c6d093d29b77ca~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_a5b5483dd68a4aecb8402ec06f58937c~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_0e8f5ba732034cf0b31921d5d25f1faa~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_6abd1d997c984258bfdc1026169f2a12~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_970aa9c042624836aa0acb9d41d15330~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_da7f48f9c80d4081bc752b3fbf0fd9cc~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_6fd34874b93b4941a2c22ca416c664ca~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_d8382faf95004b6db8debecbe04600d6~mv2.png"
+      ]
+    },
+    {
+      "slug": "lenço-oitenta-e-oito",
+      "name": "Lenço oitenta-e-oito",
+      "price": 97,
+      "description": "<p>Inspirado na borboleta brasileira, o LENÇO OITENTA-E-OITO traz uma estampa autoral criada e executada com intenção.<br>Com toque suave e caimento leve, é uma peça versátil que permite diferentes formas de uso — no pescoço, nos cabelos, na bolsa ou como acessório de styling. Um detalhe que transforma e adiciona identidade ao visual.</p>\n<p>Composição: 100% poliéster (soft seda)</p>",
+      "categories": [
+        "Lenços"
+      ],
+      "attributes": [],
+      "variations": [],
+      "stock_status": "outofstock",
+      "stock_quantity": 0,
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_e78f6ed8848d4563b18869f885adc72e~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c4ad66cdad1a4c3a9bd323a8381dddd4~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_2c7e3dcd55c84aafb764d0e3a9ef1f61~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_95cb3af1671840b9bf4dc24beabc6389~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_924794d0ecaa4d32a1da7ed6e477dde6~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_d11889a5f30a4ac4a08c5f250696c1be~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_e9471f0cfa2b4bff9db2eb76d8072753~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_22a0eb3f61c34867a0fc738734c26e40~mv2.jpg"
+      ]
+    },
+    {
+      "slug": "camisa-casulo",
+      "name": "Camisa Casulo",
+      "price": 399,
+      "description": "<p>Clássica e sofisticada, a Camisa Casulo é feita em tricoline de toque suave, com modelagem tradicional que valoriza a silhueta. Possui vista de botões coberta, punhos funcionais com acabamento arredondado. Nas costas, a prega fêmea que nasce da gola é o ponto de destaque, criando leve volume, movimento e design diferenciado. <br>Um essencial atemporal, pensado para vestir com leveza e elegância.</p>\n<p>~ a nossa modelo veste P</p>",
+      "categories": [
+        "Camisas"
+      ],
+      "attributes": [
+        {
+          "name": "Cor",
+          "values": [
+            {
+              "label": "branco",
+              "hex": "#FFFFFF"
+            },
+            {
+              "label": "azulclaro",
+              "hex": "#D4EDFF"
+            }
+          ]
+        },
+        {
+          "name": "Tamanho",
+          "values": [
+            {
+              "label": "PP"
+            },
+            {
+              "label": "P"
+            },
+            {
+              "label": "M"
+            },
+            {
+              "label": "G"
+            },
+            {
+              "label": "GG"
+            }
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "attributes": {
+            "Cor": "branco",
+            "Tamanho": "PP"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "branco",
+            "Tamanho": "P"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "branco",
+            "Tamanho": "M"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "branco",
+            "Tamanho": "G"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "branco",
+            "Tamanho": "GG"
+          },
+          "price": 399,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        },
+        {
+          "attributes": {
+            "Cor": "azulclaro",
+            "Tamanho": "PP"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "azulclaro",
+            "Tamanho": "P"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "azulclaro",
+            "Tamanho": "M"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "azulclaro",
+            "Tamanho": "G"
+          },
+          "price": 399,
+          "stock_status": "outofstock",
+          "stock_quantity": 0
+        },
+        {
+          "attributes": {
+            "Cor": "azulclaro",
+            "Tamanho": "GG"
+          },
+          "price": 399,
+          "stock_status": "instock",
+          "stock_quantity": 1
+        }
+      ],
+      "images": [
+        "https://static.wixstatic.com/media/ff503a_a84beb06e92d42a59ee8c297b21f88c8~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_958019d191b144e594cd5981edf25c07~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_eb4521fd5f0d4ca29cc949df4aa40ba5~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_5b7cbe5cf25b4722a7f5f440113e2ed9~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c056bc9d1a774b7dbbd1f80aa91d3971~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_e3e30dc828424479bf6fc986651e1695~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_0eb38a20037a4cd5b7b0e8c3ac82422c~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_6eda48045b03433cbfbfe57f7bdceac0~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_873c87b194064cb5a3fbd5008cfaebe6~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_a4040ab66e634880acb6656bc70e9544~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_dc81b7c6659d49dc97be103b6bc44b72~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_c74d94d3703243d0a72ec6d6200a8881~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_03b5c580a21548159683950d3ae8a150~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_740f0134648f410a896a2d7c747b7b25~mv2.jpg",
+        "https://static.wixstatic.com/media/ff503a_d8382faf95004b6db8debecbe04600d6~mv2.png"
+      ]
+    }
+  ]
+}
