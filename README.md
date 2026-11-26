@@ -48,6 +48,8 @@ docker compose down -v     # apaga TUDO (banco, plugins, uploads); depois rode .
 
 ## Pendências que dependem da GILDA;
 
+A lista completa do que pedir ou conversar com as donas, com prioridade e checklist, está em **[docs/requisitos-cliente.md](docs/requisitos-cliente.md)**. As principais:
+
 | Item | Situação atual | O que falta |
 |---|---|---|
 | **Pagamento (11.5)** | Gateway de teste (só no ambiente local) | Escolher o gateway com Visa/Master/Pix (ex.: Mercado Pago, Pagar.me, PagBank) e passar as credenciais |
