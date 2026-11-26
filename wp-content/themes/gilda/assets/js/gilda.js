@@ -715,6 +715,339 @@
 		);
 	}
 
+	function initCheckoutStepper() {
+		const form = $( 'form.checkout' );
+		const customer = $( '#customer_details', form );
+		const orderHeading = $( '#order_review_heading', form );
+		const orderReview = $( '#order_review', form );
+		const billingWrapper = $( '.woocommerce-billing-fields__field-wrapper', customer );
+		if ( ! form || ! customer || ! orderHeading || ! orderReview || ! billingWrapper || form.dataset.gildaStepper ) {
+			return;
+		}
+		form.dataset.gildaStepper = '1';
+		form.classList.add( 'gilda-checkout-enhanced' );
+		const checkoutRoot = form.parentElement;
+		checkoutRoot.classList.add( 'gilda-checkout-layout' );
+
+		const loginToggle = $( '.woocommerce-form-login-toggle', checkoutRoot );
+		const loginForm = $( 'form.woocommerce-form-login, form.login', checkoutRoot );
+		if ( loginToggle && loginForm ) {
+			const login = document.createElement( 'div' );
+			login.className = 'gilda-checkout-login';
+			loginToggle.before( login );
+			login.append( loginToggle, loginForm );
+		}
+
+		const couponToggle = $( '.woocommerce-form-coupon-toggle', checkoutRoot );
+		const couponForm = $( 'form.checkout_coupon', checkoutRoot );
+		if ( couponToggle || couponForm ) {
+			const couponSource = document.createElement( 'div' );
+			couponSource.className = 'gilda-checkout-coupon-source';
+			( couponToggle || couponForm ).before( couponSource );
+			if ( couponToggle ) {
+				couponSource.append( couponToggle );
+			}
+			if ( couponForm ) {
+				couponSource.append( couponForm );
+			}
+		}
+
+		const summary = document.createElement( 'aside' );
+		summary.className = 'gilda-checkout-summary';
+		summary.setAttribute( 'aria-label', 'Resumo do pedido e pagamento' );
+		orderHeading.before( summary );
+		summary.append( orderHeading, orderReview );
+		const itemCount = $$( '.cart_item .product-quantity', orderReview ).reduce( ( total, quantity ) => {
+			const match = quantity.textContent.match( /[×x]\s*(\d+)/i );
+			return total + ( match ? Number( match[ 1 ] ) : 1 );
+		}, 0 );
+		orderHeading.textContent = `Resumo do pedido (${ itemCount } ${ 1 === itemCount ? 'item' : 'itens' })`;
+		const customerSection = document.createElement( 'section' );
+		customerSection.className = 'gilda-checkout-fields-section gilda-checkout-step-panel';
+		customerSection.dataset.checkoutStep = '0';
+		customerSection.innerHTML = '<h2>Informações do cliente</h2>';
+		const deliverySection = document.createElement( 'section' );
+		deliverySection.className = 'gilda-checkout-fields-section gilda-checkout-step-panel';
+		deliverySection.dataset.checkoutStep = '1';
+		deliverySection.innerHTML = '<h2>Endereço de entrega</h2>';
+		const rows = new Map( Array.from( billingWrapper.children )
+			.filter( ( row ) => row.classList.contains( 'form-row' ) )
+			.map( ( row ) => [ row.id, row ] ) );
+		const addField = ( section, id, size = 'full' ) => {
+			const row = rows.get( id );
+			if ( ! row ) {
+				return;
+			}
+			rows.delete( id );
+			row.classList.add( `gilda-checkout-field--${ size }` );
+			section.append( row );
+		};
+		const addMatchingField = ( section, pattern, size = 'full' ) => {
+			const id = Array.from( rows.keys() ).find( ( fieldId ) => {
+				const row = rows.get( fieldId );
+				return 'billing_address_2_field' !== fieldId && pattern.test( `${ fieldId } ${ row.textContent }` );
+			} );
+			if ( id ) {
+				addField( section, id, size );
+			}
+		};
+		addField( customerSection, 'billing_email_field' );
+		addField( customerSection, 'billing_first_name_field', 'half' );
+		addField( customerSection, 'billing_last_name_field', 'half' );
+		addField( customerSection, 'billing_phone_field' );
+		addMatchingField( customerSection, /cpf|documento/i );
+		addField( deliverySection, 'billing_country_field' );
+		addField( deliverySection, 'billing_postcode_field' );
+		addField( deliverySection, 'billing_address_1_field', 'half' );
+		addMatchingField( deliverySection, /billing_(number|numero)|\bn[uú]mero\b/i, 'half' );
+		addMatchingField( deliverySection, /neighbou?rhood|bairro/i, 'half' );
+		addField( deliverySection, 'billing_city_field', 'half' );
+		addField( deliverySection, 'billing_state_field', 'half' );
+		rows.forEach( ( row ) => {
+			if ( 'billing_address_2_field' === row.id ) {
+				row.hidden = true;
+				deliverySection.append( row );
+			} else if ( 'billing_company_field' === row.id || ! row.classList.contains( 'validate-required' ) ) {
+				row.hidden = true;
+				deliverySection.append( row );
+			} else {
+				deliverySection.append( row );
+			}
+		} );
+		const shippingFields = $( '.woocommerce-shipping-fields', customer );
+		const additionalFields = $( '.woocommerce-additional-fields', customer );
+		if ( shippingFields ) {
+			shippingFields.remove();
+		}
+		if ( additionalFields ) {
+			const heading = $( 'h3', additionalFields );
+			if ( heading ) {
+				heading.textContent = 'Informações adicionais (opcional)';
+			}
+			const notesLabel = $( 'label[for="order_comments"]', additionalFields );
+			if ( notesLabel ) {
+				notesLabel.classList.add( 'screen-reader-text' );
+			}
+			const notes = $( 'textarea', additionalFields );
+			if ( notes ) {
+				notes.placeholder = 'Escreva aqui alguma observação para a entrega (opcional).';
+				notes.rows = 5;
+			}
+			deliverySection.append( additionalFields );
+		}
+
+		const postcodeInput = $( 'input[name="billing_postcode"]', form );
+		if ( postcodeInput ) {
+			const postcodeRow = postcodeInput.closest( '.form-row' );
+			const addressFeedback = document.createElement( 'p' );
+			addressFeedback.className = 'gilda-checkout-address-feedback';
+			addressFeedback.setAttribute( 'role', 'status' );
+			addressFeedback.setAttribute( 'aria-live', 'polite' );
+			postcodeRow.after( addressFeedback );
+			const billingField = ( name ) => $( `[name="billing_${ name }"]`, form );
+			let fillingAddress = false;
+			const getAddressControls = () => {
+				const currentNeighborhoodRow = $$( '.form-row', deliverySection ).find( ( row ) => /neighbou?rhood|bairro/i.test( `${ row.id } ${ row.textContent }` ) );
+				return {
+					street: billingField( 'address_1' ),
+					neighborhood: currentNeighborhoodRow && $( 'input, select, textarea', currentNeighborhoodRow ),
+					city: billingField( 'city' ),
+					state: billingField( 'state' ),
+				};
+			};
+			const markAddressEdited = ( event ) => {
+				if ( ! fillingAddress && Object.values( getAddressControls() ).includes( event.target ) ) {
+					event.target.dataset.userEditedAddress = '1';
+				}
+			};
+			form.addEventListener( 'input', markAddressEdited );
+			form.addEventListener( 'change', markAddressEdited );
+			let lookupTimer = 0;
+			let lookupController = null;
+			let lastLookup = '';
+			const getPostcodeInput = () => $( 'input[name="billing_postcode"]', form );
+			const lookupAddress = async () => {
+				const currentPostcode = getPostcodeInput();
+				if ( ! currentPostcode ) {
+					return;
+				}
+				const cep = currentPostcode.value.replace( /\D/g, '' );
+				const country = billingField( 'country' );
+				if ( 8 !== cep.length || ( country && 'BR' !== country.value ) || cep === lastLookup ) {
+					return;
+				}
+				lastLookup = cep;
+				lookupController?.abort();
+				lookupController = new AbortController();
+				addressFeedback.textContent = 'Buscando endereço…';
+				try {
+					let address = null;
+					for ( const url of [ `https://viacep.com.br/ws/${ cep }/json/`, `https://brasilapi.com.br/api/cep/v1/${ cep }` ] ) {
+						try {
+							const response = await fetch( url, { signal: lookupController.signal, headers: { Accept: 'application/json' } } );
+							if ( ! response.ok ) {
+								continue;
+							}
+							const result = await response.json();
+							if ( ! result.erro ) {
+								address = {
+									logradouro: result.logradouro || result.street,
+									bairro: result.bairro || result.neighborhood,
+									localidade: result.localidade || result.city,
+									uf: result.uf || result.state,
+								};
+								break;
+							}
+						} catch ( requestError ) {
+							if ( 'AbortError' === requestError.name ) {
+								throw requestError;
+							}
+						}
+					}
+					if ( ! address ) {
+						throw new Error( 'Não foi possível consultar este CEP agora. Confira sua conexão ou preencha o endereço manualmente.' );
+					}
+					fillingAddress = true;
+					const addressControls = getAddressControls();
+					const values = [
+						[ addressControls.street, address.logradouro ],
+						[ addressControls.neighborhood, address.bairro ],
+						[ addressControls.city, address.localidade ],
+						[ addressControls.state, address.uf ],
+					];
+					values.forEach( ( [ control, value ] ) => {
+						if ( ! control || control.dataset.userEditedAddress || ! value ) {
+							return;
+						}
+						control.value = value;
+						control.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+					} );
+					fillingAddress = false;
+					addressFeedback.textContent = 'Endereço encontrado. Confira e complete o número.';
+				} catch ( error ) {
+					fillingAddress = false;
+					if ( 'AbortError' !== error.name ) {
+						lastLookup = '';
+						addressFeedback.textContent = error.message || 'Não foi possível consultar o CEP.';
+					}
+				}
+			};
+			const handlePostcodeInput = ( input ) => {
+				input.value = maskCep( input.value );
+				lastLookup = '';
+				lookupController?.abort();
+				addressFeedback.textContent = '';
+				window.clearTimeout( lookupTimer );
+				if ( 8 === input.value.replace( /\D/g, '' ).length ) {
+					lookupTimer = window.setTimeout( lookupAddress, 300 );
+				}
+			};
+			form.addEventListener( 'input', ( event ) => {
+				if ( event.target.matches( 'input[name="billing_postcode"]' ) ) {
+					handlePostcodeInput( event.target );
+				}
+			} );
+			form.addEventListener( 'change', ( event ) => {
+				if ( event.target.matches( 'input[name="billing_postcode"]' ) ) {
+					handlePostcodeInput( event.target );
+				}
+			} );
+			form.addEventListener( 'focusout', ( event ) => {
+				if ( event.target.matches( 'input[name="billing_postcode"]' ) ) {
+					lookupAddress();
+				}
+			} );
+			if ( postcodeInput.value.replace( /\D/g, '' ).length === 8 ) {
+				lookupAddress();
+			}
+		}
+		const stepper = document.createElement( 'ol' );
+		stepper.className = 'gilda-checkout-stepper';
+		stepper.setAttribute( 'aria-label', 'Etapas do checkout' );
+		stepper.innerHTML = '<li><span class="gilda-checkout-stepper__number">1</span><span>Cliente</span></li><li><span class="gilda-checkout-stepper__number">2</span><span>Entrega</span></li>';
+		const stepActions = document.createElement( 'div' );
+		stepActions.className = 'gilda-checkout-step-actions';
+		stepActions.innerHTML = '<button type="button" class="gilda-btn gilda-btn--secondary gilda-checkout-back" hidden>Voltar</button><button type="button" class="gilda-btn gilda-btn--primary gilda-checkout-continue">Continuar</button>';
+		customer.replaceChildren( stepper, customerSection, deliverySection, stepActions );
+		const panels = [ customerSection, deliverySection ];
+		const progressItems = $$( 'li', stepper );
+		const backButton = $( '.gilda-checkout-back', stepActions );
+		const nextButton = $( '.gilda-checkout-continue', stepActions );
+		let activeStep = 0;
+		const setStep = ( index ) => {
+			activeStep = Math.max( 0, Math.min( panels.length - 1, index ) );
+			panels.forEach( ( panel, panelIndex ) => { panel.hidden = panelIndex !== activeStep; } );
+			progressItems.forEach( ( item, itemIndex ) => {
+				item.classList.toggle( 'is-active', itemIndex === activeStep );
+				item.classList.toggle( 'is-complete', itemIndex < activeStep );
+				if ( itemIndex === activeStep ) {
+					item.setAttribute( 'aria-current', 'step' );
+				} else {
+					item.removeAttribute( 'aria-current' );
+				}
+			} );
+			backButton.hidden = activeStep === 0;
+			nextButton.textContent = activeStep === panels.length - 1 ? 'Ir para pagamento' : 'Continuar';
+		};
+		backButton.addEventListener( 'click', () => setStep( activeStep - 1 ) );
+		nextButton.addEventListener( 'click', () => {
+			const missingRow = $$( '.form-row.validate-required', panels[ activeStep ] ).find( ( row ) => {
+				const shipToDifferent = $( '#ship-to-different-address-checkbox', form );
+				if ( row.hidden || 'none' === window.getComputedStyle( row ).display || ( row.closest( '.shipping_address' ) && shipToDifferent && ! shipToDifferent.checked ) ) {
+					return false;
+				}
+				const controls = $$( 'input:not([type="hidden"]), select, textarea', row );
+				return controls.some( ( control ) => 'checkbox' === control.type ? ! control.checked : ! String( control.value || '' ).trim() || ! control.checkValidity() );
+			} );
+			if ( missingRow ) {
+				missingRow.classList.add( 'woocommerce-invalid' );
+				const select2 = $( '.select2-selection', missingRow );
+				( $( 'input:not([type="hidden"]), select, textarea', missingRow ) || select2 )?.focus();
+				return;
+			}
+			if ( activeStep < panels.length - 1 ) {
+				setStep( activeStep + 1 );
+				customer.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				return;
+			}
+			const payment = $( '#payment', summary );
+			if ( payment ) {
+				payment.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				$( 'input[name="payment_method"]:checked', payment )?.focus( { preventScroll: true } );
+			}
+		} );
+		setStep( 0 );
+
+		const couponCode = $( 'form.checkout_coupon input[name="coupon_code"]', checkoutRoot );
+		const couponRow = document.createElement( 'tr' );
+		couponRow.className = 'gilda-checkout-coupon-row';
+		couponRow.innerHTML = '<td colspan="2"><div class="gilda-checkout-coupon"><label class="screen-reader-text" for="gilda-checkout-coupon-code">Código promocional</label><input id="gilda-checkout-coupon-code" type="text" placeholder="Código promocional"><button type="button" class="gilda-checkout-coupon__apply">Aplicar</button></div><p class="gilda-checkout-coupon__feedback" aria-live="polite"></p></td>';
+		const placeCouponRow = () => {
+			const tableBody = $( '.shop_table tbody', orderReview );
+			if ( ! tableBody || couponRow.isConnected ) {
+				return;
+			}
+			const firstTotal = $( 'tr.cart-subtotal, tr.woocommerce-shipping-totals, tr.order-total', tableBody );
+			tableBody.insertBefore( couponRow, firstTotal || null );
+		};
+		placeCouponRow();
+		if ( couponCode ) {
+			$( '.gilda-checkout-coupon__apply', couponRow ).addEventListener( 'click', () => {
+				const code = $( '#gilda-checkout-coupon-code', couponRow ).value.trim();
+				if ( ! code ) {
+					$( '#gilda-checkout-coupon-code', couponRow ).focus();
+					return;
+				}
+				couponCode.value = code;
+				$( '.gilda-checkout-coupon__feedback', couponRow ).textContent = 'Aplicando cupom…';
+				couponCode.form.dispatchEvent( new Event( 'submit', { bubbles: true, cancelable: true } ) );
+			} );
+			new MutationObserver( placeCouponRow ).observe( orderReview, { childList: true, subtree: true } );
+		} else {
+			couponRow.remove();
+		}
+	}
+
 	function initChapterShowcase() {
 		if ( reduceMotion ) {
 			return;
@@ -780,6 +1113,7 @@
 	}
 	function boot() {
 		initStickyHeader();
+		initCheckoutStepper();
 		initChapterShowcase();
 		initProductDescriptionToggle();
 		$$( '.gilda-carousel' ).forEach( initCarousel );

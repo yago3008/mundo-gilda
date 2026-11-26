@@ -25,6 +25,25 @@ function gilda_breadcrumb_defaults( $defaults ) {
 add_filter( 'woocommerce_breadcrumb_defaults', 'gilda_breadcrumb_defaults' );
 
 /**
+ * Use a dedicated street-number field in the billing address.
+ *
+ * @param array $fields Billing fields.
+ * @return array
+ */
+function gilda_checkout_billing_fields( $fields ) {
+	if ( isset( $fields['billing_address_1'] ) ) {
+		$fields['billing_address_1']['label'] = __( 'Endereço', 'gilda' );
+	}
+	if ( isset( $fields['billing_address_2'] ) ) {
+		$fields['billing_address_2']['label']       = __( 'Complemento', 'gilda' );
+		$fields['billing_address_2']['placeholder'] = __( 'Complemento (opcional)', 'gilda' );
+		$fields['billing_address_2']['required']    = false;
+	}
+	return $fields;
+}
+add_filter( 'woocommerce_billing_fields', 'gilda_checkout_billing_fields' );
+
+/**
  * On product pages always show Home › Shop › Product (no category levels).
  *
  * @param array $crumbs Crumbs as [ label, url ] pairs.
@@ -42,6 +61,41 @@ function gilda_breadcrumb_trail( $crumbs ) {
 	);
 }
 add_filter( 'woocommerce_get_breadcrumb', 'gilda_breadcrumb_trail' );
+
+/**
+ * Add a product thumbnail to each line in the classic checkout summary.
+ *
+ * @param string $name       Product name HTML.
+ * @param array  $cart_item  Cart item data.
+ * @param string $cart_key   Cart item key.
+ * @return string
+ */
+function gilda_checkout_item_name( $name, $cart_item, $cart_key ) {
+	if ( ! is_checkout() || is_order_received_page() ) {
+		return $name;
+	}
+
+	$product = $cart_item['data'] ?? null;
+	if ( ! $product instanceof WC_Product || ! $product->get_image_id() ) {
+		return '<span class="gilda-checkout-item"><span class="gilda-checkout-item__name">' . $name . '</span></span>';
+	}
+
+	$image = wp_get_attachment_image(
+		$product->get_image_id(),
+		'woocommerce_thumbnail',
+		false,
+		array(
+			'class'       => 'gilda-checkout-item__image',
+			'alt'         => '',
+			'aria-hidden' => 'true',
+			'loading'     => 'lazy',
+			'decoding'    => 'async',
+		)
+	);
+
+	return '<span class="gilda-checkout-item">' . $image . '<span class="gilda-checkout-item__name">' . $name . '</span></span>';
+}
+add_filter( 'woocommerce_cart_item_name', 'gilda_checkout_item_name', 10, 3 );
 
 /* -------------------------------------------------------------------------
  * 5.2 Accessible price label

@@ -1216,12 +1216,323 @@ select.gilda-select,
 
 .woocommerce-account .woocommerce,
 .woocommerce-checkout .woocommerce { font-family: var(--gilda-sans); }
+.woocommerce-checkout #conteudo .wp-block-shortcode.alignwide,
+.woocommerce-checkout #conteudo .wp-block-shortcode.alignwide > .woocommerce {
+	margin-inline: auto;
+	max-width: 1440px;
+	width: 100%;
+}
 .woocommerce-account .u-columns.col2-set { display: grid; gap: var(--wp--preset--spacing--60); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .woocommerce-account .u-column1,
 .woocommerce-account .u-column2,
 .woocommerce form.lost_reset_password,
 .woocommerce-checkout #customer_details,
 .woocommerce-checkout #order_review { background: var(--gilda-white); float: none !important; padding: 32px !important; width: auto !important; }
+.woocommerce-checkout form.checkout.gilda-checkout-enhanced {
+	align-items: start;
+	display: grid;
+	gap: clamp(24px, 3vw, 48px);
+	grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr);
+	margin-inline: auto;
+	max-width: none;
+	width: 100%;
+}
+.woocommerce-checkout form.checkout.gilda-checkout-enhanced #customer_details {
+	grid-column: 1;
+	grid-row: 1;
+	min-width: 0;
+	padding: clamp(22px, 3vw, 40px) !important;
+}
+.woocommerce-checkout .gilda-checkout-summary {
+	align-self: start;
+	background: var(--gilda-cream);
+	border-left: 1px solid var(--gilda-sand);
+	grid-column: 2;
+	grid-row: 1;
+	min-width: 0;
+	padding: 8px 0 8px clamp(22px, 3vw, 40px);
+	position: sticky;
+	top: calc(var(--gilda-header-h) + 20px);
+}
+.woocommerce-checkout .gilda-checkout-summary #order_review {
+	background: transparent;
+	min-width: 0;
+	padding: 0 !important;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table {
+	background: transparent;
+	border: 0;
+	border-collapse: collapse;
+	display: block;
+	width: 100% !important;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table thead { display: none; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody { display: block; width: 100%; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr {
+	align-items: start;
+	border: 0;
+	display: grid;
+	gap: 12px;
+	grid-template-columns: minmax(0, 1fr) auto;
+	width: 100%;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr.cart_item {
+	border-bottom: 1px solid var(--gilda-sand);
+	margin-bottom: 22px;
+	padding: 0 0 22px;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr:not(.cart_item) {
+	padding: 8px 0;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table th,
+.woocommerce-checkout .gilda-checkout-summary .shop_table td {
+	background: transparent;
+	border: 0;
+	color: var(--gilda-ink);
+	min-width: 0;
+	overflow-wrap: anywhere;
+	padding: 0;
+	vertical-align: top;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-name {
+	display: grid;
+	grid-column: 1;
+	grid-template-columns: 76px minmax(0, 1fr);
+	column-gap: 14px;
+}
+.woocommerce-checkout .gilda-checkout-item { display: contents; }
+.woocommerce-checkout .gilda-checkout-item__image {
+	grid-column: 1;
+	grid-row: 1 / span 4;
+	height: 96px;
+	object-fit: cover;
+	width: 76px;
+}
+.woocommerce-checkout .gilda-checkout-item__name {
+	color: var(--gilda-ink);
+	font: 500 15px/1.4 var(--gilda-display);
+	grid-column: 2;
+}
+.woocommerce-checkout .gilda-checkout-summary .product-quantity,
+.woocommerce-checkout .gilda-checkout-summary .variation {
+	font-size: 12px;
+	grid-column: 2;
+}
+.woocommerce-checkout .gilda-checkout-summary .variation { margin: 2px 0 0; }
+.woocommerce-checkout .gilda-checkout-summary .variation dt,
+.woocommerce-checkout .gilda-checkout-summary .variation dd { display: inline; float: none; margin: 0 4px 0 0; }
+.woocommerce-checkout .gilda-checkout-summary .variation dd p { display: inline; margin: 0; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-total {
+	font-size: 14px;
+	grid-column: 2;
+	grid-row: 1;
+	text-align: right;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr:not(.cart_item) th { text-align: left; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr:not(.cart_item) td { text-align: right; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total {
+	border-top: 1px solid var(--gilda-sand);
+	font-size: 17px;
+	margin-top: 8px;
+	padding-top: 15px;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total th,
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total td { font-weight: 600; }
+.woocommerce-checkout .gilda-checkout-summary #order_review_heading {
+	font: 400 clamp(24px, 2.4vw, 32px)/1.15 var(--gilda-display);
+	margin: 0 0 24px;
+}
+.gilda-checkout-progress {
+	align-items: flex-start;
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	list-style: none;
+	margin: 0 0 36px;
+	padding: 0;
+}
+.gilda-checkout-progress li {
+	align-items: center;
+	color: var(--gilda-ink);
+	display: flex;
+	flex-direction: column;
+	font-size: 11px;
+	gap: 9px;
+	line-height: 1.3;
+	text-align: center;
+}
+.gilda-checkout-progress__number {
+	align-items: center;
+	border: 1px solid var(--gilda-sand);
+	border-radius: 50%;
+	display: inline-flex;
+	font-size: 13px;
+	height: 34px;
+	justify-content: center;
+	width: 34px;
+}
+.gilda-checkout-progress li.is-active .gilda-checkout-progress__number,
+.gilda-checkout-progress li.is-complete .gilda-checkout-progress__number {
+	background: var(--gilda-terracotta);
+	border-color: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+}
+.gilda-checkout-step-panel[hidden] { display: none !important; }
+.gilda-checkout-step-panel::after { clear: both; content: ""; display: table; }
+.gilda-checkout-step-panel .form-row,
+.gilda-checkout-step-panel .form-row-first,
+.gilda-checkout-step-panel .form-row-last {
+	clear: both !important;
+	float: none !important;
+	width: 100% !important;
+}
+.gilda-checkout-step-panel h2 {
+	font: 400 clamp(24px, 2.4vw, 32px)/1.2 var(--gilda-display);
+	margin: 0 0 24px;
+}
+.gilda-checkout-step-panel .form-row { margin-bottom: 18px !important; }
+.gilda-checkout-step-actions {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	justify-content: space-between;
+	margin-top: 28px;
+}
+.gilda-checkout-step-count { color: var(--gilda-ink); font-size: 12px; }
+.gilda-checkout-step-actions [hidden] { display: none !important; }
+.gilda-checkout-step-final {
+	flex-basis: 100%;
+	font-size: 13px;
+	margin: 0;
+}
+.gilda-checkout-step-error {
+	color: var(--gilda-error);
+	font-size: 13px;
+	margin: 16px 0 0;
+}
+.gilda-checkout-summary #payment { margin-top: 24px; }
+@media (max-width: 1023px) {
+	.woocommerce-checkout form.checkout.gilda-checkout-enhanced { grid-template-columns: minmax(0, 1fr); }
+	.woocommerce-checkout form.checkout.gilda-checkout-enhanced #customer_details,
+	.woocommerce-checkout .gilda-checkout-summary { grid-column: 1; grid-row: auto; }
+	.woocommerce-checkout .gilda-checkout-summary { position: static; }
+}
+@media (max-width: 520px) {
+	.gilda-checkout-progress { gap: 3px; margin-bottom: 28px; }
+	.gilda-checkout-progress li { font-size: 10px; }
+	.gilda-checkout-progress__number { height: 30px; width: 30px; }
+	.woocommerce-checkout form.checkout.gilda-checkout-enhanced #customer_details,
+	.woocommerce-checkout .gilda-checkout-summary { border-left: 0; border-top: 1px solid var(--gilda-sand); padding: 24px 0 0 !important; }
+}
+/* Checkout layout follows the customer form and order summary. */
+.woocommerce-checkout .woocommerce.gilda-checkout-layout {
+	align-items: start;
+	display: grid;
+	gap: 22px clamp(32px, 5vw, 72px);
+	grid-template-areas: "notices notices" "login coupon-source" "fields summary";
+	grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr);
+	margin-inline: auto;
+	max-width: 1440px;
+	width: 100%;
+}
+.woocommerce-checkout .woocommerce.gilda-checkout-layout > .woocommerce-notices-wrapper { grid-area: notices; }
+.woocommerce-checkout .woocommerce.gilda-checkout-layout > .woocommerce-notices-wrapper:empty { display: none; }
+.woocommerce-checkout .woocommerce.gilda-checkout-layout > .gilda-checkout-login { grid-area: login; min-width: 0; }
+.woocommerce-checkout .gilda-checkout-login .woocommerce-form-login-toggle { margin: 0 0 18px; }
+.woocommerce-checkout .gilda-checkout-login .woocommerce-info { background: var(--gilda-linen); border: 0; color: var(--gilda-ink); margin: 0; padding: 16px 20px 16px 48px; }
+.woocommerce-checkout .gilda-checkout-login form.login { background: var(--gilda-linen); margin: 0 0 20px !important; padding: 20px !important; }
+.woocommerce-checkout .woocommerce.gilda-checkout-layout > .gilda-checkout-coupon-source { display: none !important; }
+.woocommerce-checkout form.checkout.gilda-checkout-enhanced { display: contents !important; }
+.woocommerce-checkout form.checkout.gilda-checkout-enhanced #customer_details {
+	background: transparent !important;
+	float: none !important;
+	grid-area: fields;
+	min-width: 0;
+	padding: 0 !important;
+	width: auto !important;
+}
+.woocommerce-checkout .gilda-checkout-fields-section { display: grid; gap: 14px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 0 22px; }
+.woocommerce-checkout .gilda-checkout-fields-section h2 { color: var(--gilda-ink); font: 500 20px/1.25 var(--gilda-sans); grid-column: 1 / -1; margin: 0 0 2px; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row { clear: none !important; float: none !important; grid-column: auto; margin: 0 !important; min-width: 0; width: auto !important; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row.gilda-checkout-field--full { grid-column: 1 / -1; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row[hidden] { display: none !important; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row label { color: var(--gilda-ink); font-size: 14px; margin-bottom: 7px; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .input-text,
+.woocommerce-checkout .gilda-checkout-fields-section .form-row select { background: var(--gilda-cream); border: 1px solid var(--gilda-sand); box-sizing: border-box; color: var(--gilda-ink); font: 400 15px/1.4 var(--gilda-sans); height: 48px; margin: 0; max-width: 100%; padding: 0 14px; width: 100%; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row select { padding-right: 36px; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .woocommerce-input-wrapper { display: block; width: 100%; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .woocommerce-input-wrapper input { box-sizing: border-box; width: 100%; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .select2-container { width: 100% !important; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .select2-selection { background: var(--gilda-cream); border: 1px solid var(--gilda-sand); border-radius: 0; height: 48px; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .select2-selection__rendered { line-height: 46px; padding-left: 14px; }
+.woocommerce-checkout .gilda-checkout-fields-section .form-row .select2-selection__arrow { height: 46px; }
+.woocommerce-checkout .gilda-checkout-stepper { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; margin: 0 0 22px; padding: 0; }
+.woocommerce-checkout .gilda-checkout-stepper li { align-items: center; border-bottom: 1px solid var(--gilda-sand); color: var(--gilda-ink-soft); display: flex; font-size: 13px; gap: 10px; padding: 0 0 10px; }
+.woocommerce-checkout .gilda-checkout-stepper li.is-active,
+.woocommerce-checkout .gilda-checkout-stepper li.is-complete { border-color: var(--gilda-terracotta); color: var(--gilda-terracotta); }
+.woocommerce-checkout .gilda-checkout-stepper__number { align-items: center; border: 1px solid var(--gilda-sand); border-radius: 50%; display: inline-flex; flex: 0 0 32px; font: 500 13px/1 var(--gilda-sans); height: 32px; justify-content: center; width: 32px; }
+.woocommerce-checkout .gilda-checkout-stepper li.is-active .gilda-checkout-stepper__number,
+.woocommerce-checkout .gilda-checkout-stepper li.is-complete .gilda-checkout-stepper__number { background: var(--gilda-terracotta); border-color: var(--gilda-terracotta); color: var(--gilda-cream); }
+.woocommerce-checkout .gilda-checkout-step-panel[hidden] { display: none !important; }
+.woocommerce-checkout .gilda-checkout-step-actions { align-items: center; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); margin-top: 24px; }
+.woocommerce-checkout .gilda-checkout-step-actions [hidden] { display: none !important; }
+.woocommerce-checkout .gilda-checkout-back { justify-self: start; }
+.woocommerce-checkout .gilda-checkout-continue { grid-column: 1 / -1; justify-content: center; margin-top: 4px; min-height: 48px; width: 100%; }
+.woocommerce-checkout .woocommerce-additional-fields { grid-column: 1 / -1; margin-top: 8px; }
+.woocommerce-checkout .woocommerce-additional-fields > h3 { color: var(--gilda-ink); font: 500 20px/1.25 var(--gilda-sans); margin: 0 0 14px; }
+.woocommerce-checkout .woocommerce-additional-fields #order_comments_field { margin: 0 !important; }
+.woocommerce-checkout .woocommerce-additional-fields #order_comments {
+	height: auto;
+	min-height: 120px;
+	padding: 12px 14px;
+	resize: vertical;
+}
+.woocommerce-checkout .gilda-checkout-address-feedback { color: var(--gilda-ink-soft); font-size: 12px; grid-column: 1 / -1; margin: -8px 0 0; }
+.woocommerce-checkout .gilda-checkout-summary { background: transparent; border-left: 1px solid var(--gilda-sand); grid-area: summary; min-width: 0; padding: 8px 0 8px clamp(22px, 3vw, 40px); position: sticky; top: calc(var(--gilda-header-h) + 20px); }
+.woocommerce-checkout .gilda-checkout-summary #order_review { background: transparent; min-width: 0; padding: 0 !important; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table { background: transparent; border: 0; border-collapse: collapse; display: block; width: 100% !important; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table thead { display: none; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody { display: block; width: 100%; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr { align-items: start; border: 0; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) auto; width: 100%; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr.cart_item { border-bottom: 1px solid var(--gilda-sand); padding: 0 0 22px; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tbody tr:not(.cart_item) { padding: 8px 0; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table th,
+.woocommerce-checkout .gilda-checkout-summary .shop_table td { background: transparent; border: 0; color: var(--gilda-ink); min-width: 0; overflow-wrap: anywhere; padding: 0; vertical-align: top; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-name { column-gap: 14px; display: grid; grid-column: 1; grid-template-columns: 76px minmax(0, 1fr); }
+.woocommerce-checkout .gilda-checkout-item { display: contents; }
+.woocommerce-checkout .gilda-checkout-item__image { grid-column: 1; grid-row: 1 / span 4; height: 96px; object-fit: cover; width: 76px; }
+.woocommerce-checkout .gilda-checkout-item__name { color: var(--gilda-ink); font: 500 15px/1.4 var(--gilda-display); grid-column: 2; }
+.woocommerce-checkout .gilda-checkout-summary .product-quantity,
+.woocommerce-checkout .gilda-checkout-summary .variation { font-size: 12px; grid-column: 2; }
+.woocommerce-checkout .gilda-checkout-summary .variation { margin: 2px 0 0; }
+.woocommerce-checkout .gilda-checkout-summary .variation dt,
+.woocommerce-checkout .gilda-checkout-summary .variation dd { display: inline; float: none; margin: 0 4px 0 0; }
+.woocommerce-checkout .gilda-checkout-summary .variation dd p { display: inline; margin: 0; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-total { font-size: 14px; grid-column: 2; grid-row: 1; text-align: right; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr:not(.cart_item) th { text-align: left; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr:not(.cart_item) td { text-align: right; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total { border-top: 1px solid var(--gilda-sand); font-size: 17px; margin-top: 8px; padding-top: 15px; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total th,
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.order-total td { font-weight: 600; }
+.woocommerce-checkout .gilda-checkout-summary #order_review_heading { font: 400 clamp(24px, 2.4vw, 32px)/1.15 var(--gilda-display); margin: 0 0 24px; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tr.gilda-checkout-coupon-row { padding: 18px 0; }
+.woocommerce-checkout .gilda-checkout-summary .gilda-checkout-coupon-row td { grid-column: 1 / -1; }
+.gilda-checkout-coupon { align-items: center; border: 1px solid var(--gilda-sand); display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; padding: 7px; }
+.gilda-checkout-coupon input { background: transparent; border: 0; box-sizing: border-box; color: var(--gilda-ink); font: 400 14px/1.4 var(--gilda-sans); min-width: 0; padding: 10px; width: 100%; }
+.gilda-checkout-coupon__apply { background: var(--gilda-terracotta); border: 0; color: var(--gilda-cream); cursor: pointer; font: 500 11px/1 var(--gilda-sans); letter-spacing: .08em; min-height: 42px; padding: 0 16px; text-transform: uppercase; }
+.gilda-checkout-coupon__feedback { color: var(--gilda-ink-soft); font-size: 12px; margin: 0; }
+.woocommerce-checkout .gilda-checkout-summary #payment { margin-top: 24px; }
+@media (max-width: 1023px) {
+	.woocommerce-checkout .woocommerce.gilda-checkout-layout { gap: 24px; grid-template-areas: "notices" "login" "fields" "summary"; grid-template-columns: minmax(0, 1fr); }
+	.woocommerce-checkout .gilda-checkout-summary { border-left: 0; border-top: 1px solid var(--gilda-sand); padding: 24px 0 0; position: static; }
+}
+@media (max-width: 520px) {
+	.woocommerce-checkout .gilda-checkout-fields-section { gap: 14px; grid-template-columns: minmax(0, 1fr); margin-bottom: 28px; }
+	.woocommerce-checkout .gilda-checkout-fields-section .form-row.gilda-checkout-field--half { grid-column: 1; }
+	.woocommerce-checkout .gilda-checkout-summary .shop_table tr.cart_item td.product-name { column-gap: 12px; grid-template-columns: 64px minmax(0, 1fr); }
+	.woocommerce-checkout .gilda-checkout-item__image { height: 84px; width: 64px; }
+}
 .woocommerce-account h2,
 .woocommerce-checkout h3 { font: 400 26px/1.2 var(--gilda-display); }
 .woocommerce form .form-row label { font-size: 13px; }

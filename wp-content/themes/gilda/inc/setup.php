@@ -38,7 +38,7 @@ function gilda_enqueue_assets() {
 		'gilda-theme',
 		GILDA_URI . '/assets/js/gilda.js',
 		array(),
-		GILDA_VERSION,
+		GILDA_VERSION . '.' . filemtime( GILDA_DIR . '/assets/js/gilda.js' ),
 		array(
 			'in_footer' => true,
 			'strategy'  => 'defer',
