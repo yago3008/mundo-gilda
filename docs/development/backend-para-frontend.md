@@ -90,8 +90,43 @@ Os filtros funcionam **por parâmetro na URL**. Os blocos de filtro do WooCommer
 ## 6. O que o tema NÃO deve duplicar
 
 - **SEO:** a meta description, as tags Open Graph/Twitter e o noindex já são gerados por `gilda-seo.php`. O schema de Produto, Oferta e Breadcrumb vem do WooCommerce. O tema só precisa declarar `title-tag` (temas de blocos já fazem isso) e usar a hierarquia certa de headings (H1 único por página).
-- **Meta Pixel:** `gilda-meta-pixel.php` já dispara PageView, ViewContent, AddToCart, InitiateCheckout e Purchase. O tema não deve incluir o pixel de novo.
+- **Meta Pixel:** `gilda-meta-pixel.php` já dispara PageView, ViewContent, AddToCart, InitiateCheckout e Purchase, **só depois do consentimento de marketing** (seção 6.2). O tema não deve incluir o pixel de novo, nem nenhum outro script de rastreamento sem passar pelo `gildaConsent`.
+- **Banner de cookies:** já existe (seção 6.2). O tema só estiliza e coloca o link de reabrir no rodapé.
 - **Cabeçalhos de segurança:** já existem. Se o tema carregar fontes ou scripts de outro domínio, tudo bem: não há Content Security Policy restritiva.
+
+## 6.2 Banner de cookies (LGPD)
+
+`wp-content/mu-plugins/gilda-consent.php` desenha o banner e o painel de preferências. O backend cuida da lógica (cookie, pixel, consent mode); **o visual é seu**. Já vem com um CSS neutro mínimo só pra funcionar.
+
+**Marcação** (sai logo no início do `<body>`, via `wp_body_open`):
+
+| Classe | O que é |
+|---|---|
+| `.gilda-consent` | o banner (fixo no rodapé da tela, `role="dialog"`, `aria-modal="false"`). Fica com `hidden` depois que a pessoa escolhe |
+| `.gilda-consent__inner`, `__body`, `__title`, `__text`, `__link` | conteúdo do banner (`__link` = política de privacidade, só aparece quando a página estiver publicada) |
+| `.gilda-consent__actions` | grupo de botões (no banner e no painel) |
+| `.gilda-consent__button` + `--accept` / `--reject` / `--preferences` / `--save` | botões. A ANPD recomenda **Aceitar e Recusar com o mesmo peso visual**: não destaque só o Aceitar |
+| `.gilda-consent__prefs` | o painel de preferências: um `<dialog>` nativo aberto com `showModal()` (prende o foco, fecha no Esc, fundo em `::backdrop`) |
+| `.gilda-consent__prefs-header`, `__close` | topo do painel e o botão fechar (×) |
+| `.gilda-consent__categories`, `__category` (+ `--necessary` / `--marketing`), `__checkbox`, `__label`, `__badge`, `__category-desc` | lista de categorias. "Necessários" vem marcado e desabilitado |
+| `.gilda-consent__sr` | texto só para leitor de tela (essa regra sempre é impressa) |
+| `.gilda-consent-open` | botão que reabre as preferências (shortcode abaixo). Vem com cara de link |
+| `.gilda-consent__reopen` | `<p>` com o link automático no fim da página (ver abaixo) |
+
+**Customizar o visual**
+- Sobrescreva as classes no CSS do tema, ou só as variáveis: `--gilda-consent-bg`, `--gilda-consent-fg`, `--gilda-consent-border`, `--gilda-consent-font` (definidas em `.gilda-consent` e `.gilda-consent__prefs`).
+- Pra jogar fora o CSS padrão inteiro: `add_filter( 'gilda_consent_default_css', '__return_false' );` (as regras de esconder e de leitor de tela continuam).
+- Os textos podem ser trocados pelo filtro `gilda_consent_texts` (array com `title`, `text`, `accept`, `reject`, `preferences`, `prefs_title`...).
+
+**Reabrir as preferências (obrigatório ter no site)**
+- Shortcode **`[gilda_consent_preferences]`** (ou `[gilda_consent_preferences label="Cookies"]`). Sugestão: no rodapé, ao lado do CNPJ ou do "© GILDA;", num bloco Shortcode em `parts/footer.html`.
+- Qualquer elemento com o atributo `data-gilda-consent-open`, ou um link `href="#gilda-consent"`, também abre o painel. Em JS: `gildaConsent.open()`.
+- Enquanto o tema não usar o shortcode, o mu-plugin coloca um link simples "Preferências de cookies" (`.gilda-consent__reopen`) no fim da página. Quando o rodapé tiver o shortcode, esse link some sozinho. Pra desligar de vez: `add_filter( 'gilda_consent_auto_reopen_link', '__return_false' );`.
+
+**API em JS** (pra quem precisar, ex.: um embed do Instagram que só carregue com consentimento):
+- `gildaConsent.has('marketing')`, `gildaConsent.get()` (escolha salva ou `null`), `gildaConsent.whenGranted('marketing', fn)`, `gildaConsent.onChange(fn)`.
+- Evento `gilda:consent` no `document` a cada escolha (`event.detail.consent`).
+- Cookie: `gilda_consent` (6 meses). No PHP: `gilda_consent_has( 'marketing' )`.
 
 ## 6.1 Imagens novas para o tema
 

@@ -89,6 +89,7 @@ services:
       - ./wp-content/themes/gilda:/var/www/html/wp-content/themes/gilda
       - ./scripts:/scripts:ro
       - ./data:/data:ro
+      - ./docs/legal:/legal:ro # rascunhos dos textos legais (scripts/import-legal-pages.php)
       - ./backups:/backups
 
 volumes:
