@@ -119,7 +119,15 @@ $map = array();
 foreach ( $data['images'] as $key => $image ) {
 	$alt = (string) ( $image['alt'] ?? '' );
 	if ( ! empty( $image['urls'] ) ) {
-		$map[ $key ] = array_values( array_filter( array_map( static fn( $u ) => $sideload( $u, $alt ), $image['urls'] ) ) );
+		// Cada item é uma URL ou "file:images/…" (arquivo do repositório, em data/).
+		$map[ $key ] = array_values(
+			array_filter(
+				array_map(
+					static fn( $u ) => str_starts_with( $u, 'file:' ) ? $sideload_file( substr( $u, 5 ), $alt ) : $sideload( $u, $alt ),
+					$image['urls']
+				)
+			)
+		);
 		WP_CLI::log( sprintf( '  • %s (%d imagens)', $key, count( $map[ $key ] ) ) );
 	} elseif ( ! empty( $image['file'] ) ) {
 		$map[ $key ] = $sideload_file( $image['file'], $alt );
