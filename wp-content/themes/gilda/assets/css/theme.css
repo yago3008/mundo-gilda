@@ -334,6 +334,8 @@ body.gilda-has-hero .gilda-hero {
 	gap: clamp(14px, 1.8vw, 26px) !important;
 }
 .gilda-nav-desktop .wp-block-navigation-item__content {
+	font-family: var(--gilda-sans) !important;
+	font-weight: 400 !important;
 	border-bottom: 2px solid transparent;
 	padding-block: 10px;
 	white-space: nowrap;
@@ -547,7 +549,7 @@ body.gilda-has-hero .gilda-hero {
 	text-align: left;
 }
 
-.gilda-card-media { display: grid; position: relative; }
+.gilda-card-media { display: grid; overflow: hidden; position: relative; }
 .gilda-card-media > *,
 .gilda-card-media + .gilda-card-action { grid-area: 1 / 1; }
 .gilda-card-media .wc-block-components-product-image { margin: 0 !important; overflow: hidden; }
@@ -557,7 +559,6 @@ body.gilda-has-hero .gilda-hero {
 	transition: transform .4s var(--gilda-ease);
 	width: 100%;
 }
-.wc-block-product:hover .gilda-card-media img { transform: scale(1.03); }
 
 .wc-block-components-product-image.is-soldout::after {
 	background: rgba(247, 245, 233, .35);
@@ -580,24 +581,6 @@ body.gilda-has-hero .gilda-hero {
 	z-index: 2;
 }
 
-.gilda-quickview-btn {
-	align-items: center;
-	align-self: start;
-	background: var(--gilda-cream);
-	border: 0;
-	border-radius: 50%;
-	color: var(--gilda-ink);
-	cursor: pointer;
-	display: inline-flex;
-	height: var(--gilda-touch);
-	justify-content: center;
-	justify-self: end;
-	margin: 10px;
-	opacity: 0;
-	transition: opacity .2s;
-	width: var(--gilda-touch);
-	z-index: 2;
-}
 
 /* The add-to-cart button sits over the bottom of the image and is revealed on hover/focus. */
 .wc-block-product { position: relative; }
@@ -607,9 +590,21 @@ body.gilda-has-hero .gilda-hero {
 	position: relative;
 }
 @supports selector(:has(*)) {
-	.wc-block-product:has(.gilda-card-media) { display: grid !important; grid-template-columns: 1fr; }
-	.wc-block-product:has(.gilda-card-media) > .gilda-card-media { grid-row: 1; grid-column: 1; }
-	.wc-block-product:has(.gilda-card-media) > .gilda-card-action { align-self: end; grid-row: 1; grid-column: 1; z-index: 3; }
+	.wc-block-product:has(> .gilda-card-media) {
+		display: grid !important;
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.wc-block-product:has(> .gilda-card-media) > .gilda-card-media { grid-area: 1 / 1; }
+	.wc-block-product:has(> .gilda-card-media) > .gilda-card-action {
+		align-self: end;
+		grid-area: 1 / 1;
+		margin: 0 !important;
+		position: relative;
+		width: 100%;
+		z-index: 3;
+	}
+	.wc-block-product:has(> .gilda-card-media) > .wp-block-post-title { grid-row: 2; }
+	.wc-block-product:has(> .gilda-card-media) > .wc-block-components-product-price { grid-row: 3; }
 }
 .wc-block-product .gilda-card-action .wp-block-button__link,
 .wc-block-product .gilda-card-action button {
@@ -617,15 +612,9 @@ body.gilda-has-hero .gilda-hero {
 	width: 100%;
 }
 @media (hover: hover) {
-	.wc-block-product .gilda-card-action,
-	.wc-block-product .gilda-quickview-btn { opacity: 0; transition: opacity .2s; }
+	.wc-block-product .gilda-card-action { opacity: 0; transition: opacity .2s; }
 	.wc-block-product:hover .gilda-card-action,
-	.wc-block-product:focus-within .gilda-card-action,
-	.wc-block-product:hover .gilda-quickview-btn,
-	.wc-block-product:focus-within .gilda-quickview-btn { opacity: 1; }
-}
-@media (hover: none) {
-	.gilda-quickview-btn { opacity: 1; }
+	.wc-block-product:focus-within .gilda-card-action { opacity: 1; }
 }
 .wc-block-product .gilda-card-action .wc-block-components-product-button__button { margin: 0; }
 .wc-block-product .added_to_cart { display: none !important; }
@@ -704,7 +693,8 @@ body.gilda-has-hero .gilda-hero {
 	width: 18px;
 }
 
-.gilda-sizes { display: grid; gap: 6px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.gilda-sizes { display: flex; flex-wrap: wrap; gap: 8px; }
+.gilda-size { height: 44px; width: 44px; }
 .gilda-size { position: relative; }
 .gilda-size input { inset: 0; margin: 0; opacity: 0; position: absolute; cursor: pointer; }
 .gilda-size span {
@@ -718,6 +708,7 @@ body.gilda-has-hero .gilda-hero {
 }
 .gilda-size input:checked + span { background: var(--gilda-terracotta); border-color: var(--gilda-terracotta); color: var(--gilda-cream); }
 .gilda-size input:focus-visible + span { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
+.gilda-size.has-error span { border-color: var(--gilda-error); }
 .gilda-size input:disabled { cursor: not-allowed; }
 .gilda-size input:disabled + span { background: transparent; border-style: dashed; color: var(--gilda-taupe); text-decoration: line-through; }
 
@@ -817,13 +808,42 @@ body.gilda-has-hero .gilda-hero {
 
 /* ---------- Single product (Epic 5) ---------- */
 
-.gilda-pdp-summary { display: flex; flex-direction: column; gap: 20px; }
-.gilda-pdp-summary .wp-block-post-title { margin: 0; }
+.gilda-pdp-summary { display: flex; flex-direction: column; gap: 14px; }
+.gilda-pdp-summary > * { margin-block: 0 !important; }
+.gilda-pdp-summary .wp-block-post-title {
+	font: 400 34px/1.15 var(--gilda-display) !important;
+	margin: 0;
+}
 .gilda-pdp-summary .wc-block-components-product-price,
-.gilda-pdp-summary .wp-block-woocommerce-product-price { font: 400 20px/1.2 var(--gilda-sans) !important; letter-spacing: 1px; }
-.gilda-pdp-description { font-family: var(--gilda-serif); font-size: 18px; line-height: 1.55; }
-.gilda-pdp-description p { margin: 0 0 1em; }
-
+.gilda-pdp-summary .wp-block-woocommerce-product-price { font: 400 18px/1.3 var(--gilda-sans) !important; letter-spacing: .5px; }
+.gilda-pdp-description {
+	color: var(--gilda-ink);
+	font-family: var(--gilda-serif);
+	font-size: 16px;
+	line-height: 1.55;
+	margin: 0;
+}
+.gilda-pdp-description p { margin: 0 0 .65em; }
+.gilda-pdp-description.is-collapsed {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 4;
+}
+.gilda-pdp-description.is-expanded { display: block; overflow: visible; }
+.gilda-pdp-read-more {
+	align-self: flex-start;
+	background: transparent;
+	border: 0;
+	border-bottom: 1px solid currentColor;
+	color: var(--gilda-terracotta);
+	cursor: pointer;
+	font: 500 11px/1.5 var(--gilda-sans);
+	letter-spacing: 1.5px;
+	margin-top: 0;
+	padding: 0 0 3px;
+	text-transform: uppercase;
+}
 .gilda-composition {
 	align-self: flex-start;
 	background: var(--gilda-linen);
@@ -861,16 +881,33 @@ body.gilda-has-hero .gilda-hero {
 	width: var(--gilda-touch);
 }
 
+/* Product purchase panel follows the compact shop layout. */
+.gilda-pdp-summary .gilda-buy-now {
+	background: transparent !important;
+	border: 1px solid var(--gilda-terracotta) !important;
+	color: var(--gilda-terracotta) !important;
+	grid-column: 1 / -1;
+	width: 100%;
+}
+.gilda-pdp-summary .gilda-buy-now:hover {
+	background: var(--gilda-terracotta) !important;
+	color: var(--gilda-cream) !important;
+}
+.gilda-pdp-summary .single_add_to_cart_button { min-height: 52px; }
 /* Add to cart form */
-.gilda-pdp-summary form.cart { display: flex; flex-direction: column; gap: 16px; }
+.gilda-pdp-summary form.cart { display: flex; flex-direction: column; gap: 12px; }
+.gilda-pdp-summary form.variations_form { gap: 8px; }
+.gilda-pdp-summary .single_variation_wrap, .gilda-pdp-summary .woocommerce-variation, .gilda-pdp-summary .woocommerce-variation-add-to-cart { margin: 0 !important; }
+.gilda-pdp-summary .stock { margin: 0 !important; }
 .gilda-pdp-summary form.cart:not(.variations_form),
 .gilda-pdp-summary .woocommerce-variation-add-to-cart { display: grid !important; gap: 12px; grid-template-columns: auto 1fr; }
 .gilda-pdp-summary .gilda-buy-now { grid-column: 1 / -1; }
 .gilda-pdp-summary .single_add_to_cart_button { margin: 0 !important; }
 .gilda-pdp-summary .single_add_to_cart_button.wc-variation-selection-needed { opacity: 1 !important; }
 
-.gilda-pdp-summary table.variations { border: 0; margin: 0; width: 100%; }
-.gilda-pdp-summary table.variations tr { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.gilda-pdp-summary table.variations { border: 0; border-spacing: 0; margin: 0 !important; width: 100%; }
+.gilda-pdp-summary table.variations tbody { display: flex; flex-direction: column; gap: 12px; }
+.gilda-pdp-summary table.variations tr { display: flex; flex-direction: column; gap: 4px; margin: 0 !important; }
 .gilda-pdp-summary table.variations th,
 .gilda-pdp-summary table.variations td { border: 0; padding: 0; text-align: left; }
 .gilda-pdp-summary table.variations th label {
@@ -1004,9 +1041,9 @@ select.gilda-select,
 /* Shipping calculator (5.10) */
 .gilda-shipping { border-top: 1px solid var(--gilda-sand); display: flex; flex-direction: column; gap: 10px; padding-top: 20px; }
 .gilda-shipping__title { font: 400 18px/1.2 var(--gilda-display); margin: 0; }
-.gilda-shipping__row { display: flex; gap: 10px; align-items: stretch; }
-.gilda-shipping__row .gilda-input { flex: 1 1 auto; min-width: 0; width: auto; }
-.gilda-shipping__row .gilda-btn { flex: 0 0 auto; min-height: 50px; padding: 0 22px; white-space: nowrap; }
+.gilda-shipping__row { align-items: stretch; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; width: 100%; }
+.gilda-shipping__row .gilda-input { box-sizing: border-box; min-width: 0; width: 100%; }
+.gilda-shipping__row .gilda-btn { align-self: stretch; min-height: 50px; padding: 0 22px; white-space: nowrap; }
 .gilda-shipping__help { font-size: 13px; align-self: flex-start; }
 .gilda-shipping__feedback:empty { display: none; }
 .gilda-shipping__error { color: var(--gilda-error); font-size: 13px; margin: 0; }
@@ -1027,38 +1064,6 @@ select.gilda-select,
 @media (max-width: 767px) {
 	.gilda-breadcrumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-wrap: nowrap; }
 }
-
-/* ---------- Quick view dialog (3.2) ---------- */
-
-.gilda-dialog {
-	background: var(--gilda-cream);
-	border: 0;
-	color: var(--gilda-ink);
-	max-height: 90vh;
-	max-width: min(880px, 94vw);
-	padding: 0;
-	width: 100%;
-}
-.gilda-dialog::backdrop { background: rgba(36, 26, 22, .6); }
-.gilda-dialog__close {
-	background: var(--gilda-cream);
-	border: 0;
-	cursor: pointer;
-	height: var(--gilda-touch);
-	position: absolute;
-	right: 8px;
-	top: 8px;
-	width: var(--gilda-touch);
-	z-index: 1;
-	display: inline-flex; align-items: center; justify-content: center;
-}
-.gilda-quickview { display: grid; gap: 28px; grid-template-columns: 1fr 1fr; padding: 28px; }
-.gilda-quickview img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
-.gilda-quickview__info { display: flex; flex-direction: column; gap: 14px; }
-.gilda-quickview__name { font: 400 28px/1.2 var(--gilda-display); margin: 0; }
-.gilda-quickview__price { font-size: 18px; letter-spacing: 1px; }
-.gilda-quickview__desc { font: 400 17px/1.5 var(--gilda-serif); }
-@media (max-width: 767px) { .gilda-quickview { grid-template-columns: 1fr; padding: 56px 16px 20px; } }
 
 /* ---------- Editorial (Epics 2, 8, 9) ---------- */
 
@@ -1179,3 +1184,220 @@ select.gilda-select,
 
 .gilda-lookbook .wp-block-image { margin: 0; }
 .gilda-lookbook img { aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
+
+/* Keep shortcode actions vertically aligned with the header navigation and logo. */
+.gilda-header__nav,
+.gilda-header__actions,
+.gilda-header__actions .wp-block-shortcode {
+	align-items: center;
+	display: flex;
+}
+
+.gilda-header__actions .wp-block-shortcode {
+	min-height: var(--gilda-touch);
+}
+
+
+/* Keep the header on one line and remove icon-only shortcuts from the main navigation. */
+.gilda-header {
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.gilda-header__nav {
+	min-width: 0;
+	flex-wrap: nowrap;
+}
+
+.gilda-nav-desktop .wp-block-navigation-item:has(svg) {
+	display: none !important;
+}
+
+.gilda-header__actions {
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+
+/* WooCommerce injects account and mini-cart blocks after the navigation; keep header actions on the right only. */
+.gilda-header__nav > .wp-block-woocommerce-customer-account,
+.gilda-header__nav > .wp-block-woocommerce-mini-cart {
+	display: none !important;
+}
+
+
+/* Gutenberg flow layout adds a top margin to header children; remove it from the grid row. */
+.gilda-header > * {
+	margin-block: 0 !important;
+}
+
+
+/* Remove the coupon ribbon, decorative mark and availability button from the hero banner. */
+.gilda-hero__ribbon,
+.gilda-hero__mark,
+.gilda-hero .wp-block-buttons {
+	display: none !important;
+}
+
+
+/* Keep the mobile menu button centered on the same header row as the logo and actions. */
+.gilda-nav-mobile {
+	align-self: center;
+	margin-block: 0 !important;
+}
+
+.gilda-nav-mobile .wp-block-navigation__responsive-container-open {
+	align-items: center;
+	align-self: center;
+	margin-block: 0 !important;
+}
+
+
+/* Overlay both price-range thumbs on the same slider track. */
+.gilda-range input[type="range"] {
+	top: 0;
+}
+
+
+/* Align product cards with the content inside the filter panel. */
+.gilda-shop-results {
+	padding-top: 24px;
+}
+
+
+/* Fade marquee text at both viewport edges as messages enter and leave. */
+.gilda-marquee__viewport {
+	-webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+	mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+
+/* Keep the first product row level with the filter heading. */
+.gilda-shop-results {
+	padding-top: 0;
+}
+
+
+/* Crossfade to a product's first gallery image while its card is hovered. */
+.gilda-card-media > .gilda-card-image--hover {
+	grid-area: 1 / 1;
+	height: 100%;
+	inset: 0;
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+	transition: opacity .3s ease;
+	z-index: 1;
+}
+
+.gilda-card-media:hover > .gilda-card-image--hover,
+.gilda-card-media:focus-within > .gilda-card-image--hover {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.gilda-card-media > .gilda-card-image--hover { transition: none; }
+}
+
+
+/* Keep the alternate image inside the same 3:4 card frame. */
+.gilda-card-media > .gilda-card-image--hover {
+	aspect-ratio: auto;
+	transform: none !important;
+}
+
+
+/* Product page control refinements */
+.woocommerce-product-gallery .woocommerce-product-gallery__trigger,
+.woocommerce-product-gallery__trigger { display: none !important; }
+.gilda-pdp-summary .gilda-sizes { align-items: flex-start; gap: 8px; }
+.gilda-pdp-summary .gilda-size {
+	box-sizing: border-box;
+	display: block;
+	flex: 0 0 44px;
+	height: 44px;
+	width: 44px;
+}
+.gilda-pdp-summary .gilda-size span {
+	box-sizing: border-box;
+	height: 100%;
+	padding: 0;
+	width: 100%;
+}
+.gilda-pdp-summary table.variations tr { gap: 3px; }
+.gilda-pdp-summary table.variations tbody { gap: 10px; }
+.gilda-shipping__row { align-items: stretch; }
+.gilda-shipping__row .gilda-input,
+.gilda-shipping__row .gilda-btn {
+	box-sizing: border-box;
+	height: 50px;
+}
+/* Tighten the inherited WooCommerce spacing around variation labels. */
+.gilda-pdp-summary table.variations th,
+.gilda-pdp-summary table.variations td {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.gilda-pdp-summary table.variations th label {
+	display: block;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.gilda-pdp-summary table.variations tr { gap: 2px !important; }
+.gilda-pdp-summary table.variations tbody { gap: 6px !important; }
+.gilda-pdp-summary form.variations_form { gap: 6px !important; }
+/* Full-width product imagery, related cards, and shipping input on mobile. */
+.single-product .gilda-shipping { min-width: 0; width: 100% !important; }
+.single-product .gilda-shipping__row {
+	grid-template-columns: minmax(0, 1fr) auto;
+	width: 100% !important;
+}
+.single-product .gilda-shipping__row .gilda-input {
+	max-width: none;
+	width: 100% !important;
+}
+@media (max-width: 767px) {
+	.single-product #conteudo > .wp-block-columns.alignwide {
+		display: flex !important;
+		flex-direction: column;
+	}
+	.single-product #conteudo > .wp-block-columns.alignwide > .wp-block-column {
+		flex-basis: 100% !important;
+		max-width: 100% !important;
+		width: 100% !important;
+	}
+	.single-product .wp-block-woocommerce-product-image-gallery,
+	.single-product .woocommerce-product-gallery,
+	.single-product .woocommerce-product-gallery__wrapper,
+	.single-product .woocommerce-product-gallery__image {
+		float: none !important;
+		max-width: 100% !important;
+		width: 100% !important;
+	}
+	.single-product .woocommerce-product-gallery__image img { width: 100% !important; }
+	.single-product .gilda-carousel .wc-block-product-template > li {
+		flex-basis: 100% !important;
+		width: 100% !important;
+	}
+}
+/* Keep the accessible CEP label out of the calculator grid tracks. */
+.single-product .gilda-shipping__row {
+	grid-template-columns: minmax(0, 1fr) auto !important;
+}
+.single-product .gilda-shipping__row > .screen-reader-text {
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute !important;
+	white-space: nowrap;
+	width: 1px;
+}
+.single-product .gilda-shipping__row > .gilda-input {
+	grid-column: 1;
+	grid-row: 1;
+	width: 100% !important;
+}
+.single-product .gilda-shipping__row > button[type="submit"] {
+	grid-column: 2;
+	grid-row: 1;
+}

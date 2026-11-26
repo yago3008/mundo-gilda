@@ -174,87 +174,6 @@
 	} );
 
 	/* ------------------------------------------------------------------ */
-	/* 3.2 Quick view                                                      */
-	/* ------------------------------------------------------------------ */
-
-	let dialog;
-	function getDialog() {
-		if ( dialog ) {
-			return dialog;
-		}
-		dialog = document.createElement( 'dialog' );
-		dialog.className = 'gilda-dialog';
-		dialog.setAttribute( 'aria-labelledby', 'gilda-qv-title' );
-		dialog.innerHTML = `<button type="button" class="gilda-dialog__close" aria-label="${ escapeHTML( t( 'close' ) ) }">${ ICONS.close }</button><div class="gilda-dialog__body"></div>`;
-		$( '.gilda-dialog__close', dialog ).addEventListener( 'click', () => dialog.close() );
-		dialog.addEventListener( 'click', ( e ) => {
-			if ( e.target === dialog ) {
-				dialog.close();
-			}
-		} );
-		document.body.appendChild( dialog );
-		return dialog;
-	}
-
-	async function openQuickView( button ) {
-		const id = button.dataset.productId;
-		const dlg = getDialog();
-		const body = $( '.gilda-dialog__body', dlg );
-		body.innerHTML = `<div class="gilda-quickview"><p>${ escapeHTML( t( 'calculating' ) ) }</p></div>`;
-		dlg.showModal();
-		try {
-			const p = await storeApi( `products/${ encodeURIComponent( id ) }` );
-			const img = p.images && p.images[ 0 ];
-			const price = p.prices ? formatBRL( p.prices.price, p.prices.currency_minor_unit ) : '';
-			const canAdd = 'simple' === p.type && p.is_purchasable && p.is_in_stock;
-			let action;
-			if ( ! p.is_in_stock ) {
-				action = `<button type="button" class="gilda-btn gilda-btn--disabled" disabled>${ escapeHTML( t( 'soldOut' ) ) }</button>`;
-			} else if ( canAdd ) {
-				action = `<button type="button" class="gilda-btn gilda-btn--primary" data-qv-add="${ p.id }">${ escapeHTML( t( 'addToCart' ) ) }</button>`;
-			} else {
-				action = '';
-			}
-			body.innerHTML = `
-				<div class="gilda-quickview">
-					${ img ? `<img src="${ escapeHTML( img.src ) }" alt="${ escapeHTML( img.alt || p.name ) }" />` : '<div></div>' }
-					<div class="gilda-quickview__info">
-						<h2 id="gilda-qv-title" class="gilda-quickview__name">${ escapeHTML( p.name ) }</h2>
-						<p class="gilda-quickview__price">${ p.is_in_stock ? escapeHTML( price ) : escapeHTML( t( 'soldOut' ) ) }</p>
-						<div class="gilda-quickview__desc">${ p.short_description || '' }</div>
-						${ action }
-						<a class="gilda-btn gilda-btn--secondary" href="${ escapeHTML( p.permalink ) }">${ escapeHTML( t( 'seeProduct' ) ) }</a>
-					</div>
-				</div>`;
-		} catch ( err ) {
-			body.innerHTML = `<div class="gilda-quickview"><p class="gilda-form-error">${ escapeHTML( err.message ) }</p></div>`;
-		}
-	}
-
-	document.addEventListener( 'click', async ( e ) => {
-		const qv = e.target.closest( '.gilda-quickview-btn' );
-		if ( qv ) {
-			e.preventDefault();
-			openQuickView( qv );
-			return;
-		}
-		const add = e.target.closest( '[data-qv-add]' );
-		if ( add ) {
-			add.disabled = true;
-			try {
-				const cart = await storeApi( 'cart/add-item', { method: 'POST', body: JSON.stringify( { id: Number( add.dataset.qvAdd ), quantity: 1 } ) } );
-				setCartCount( cart.items_count || 0 );
-				document.body.dispatchEvent( new Event( 'wc-blocks_added_to_cart' ) );
-				dialog?.close();
-				toast( t( 'added' ), { href: S.cartUrl, label: t( 'viewCart' ) } );
-			} catch ( err ) {
-				add.disabled = false;
-				add.insertAdjacentHTML( 'afterend', `<p class="gilda-form-error" role="alert">${ escapeHTML( err.message ) }</p>` );
-			}
-		}
-	} );
-
-	/* ------------------------------------------------------------------ */
 	/* 5.7 Quantity stepper                                                */
 	/* ------------------------------------------------------------------ */
 
@@ -359,7 +278,37 @@
 	}
 
 	/* ------------------------------------------------------------------ */
-	/* 5.6 / 5.8 / 5.9 Validation + AJAX add to cart                       */
+		function initSizeButtons( select ) {
+		if ( select.dataset.sizeButtons ) return;
+		select.dataset.sizeButtons = '1';
+		const label = select.closest( 'tr' )?.querySelector( 'th label' );
+		const group = document.createElement( 'div' );
+		group.className = 'gilda-sizes';
+		group.setAttribute( 'role', 'radiogroup' );
+		if ( label ) {
+			label.id = label.id || 'gilda-label-' + select.id;
+			group.setAttribute( 'aria-labelledby', label.id );
+		}
+		select.classList.add( 'gilda-hidden-select' );
+		select.setAttribute( 'aria-hidden', 'true' );
+		select.tabIndex = -1;
+		select.after( group );
+		const render = () => {
+			group.innerHTML = Array.from( select.options ).filter( ( option ) => option.value ).map( ( option ) => `
+				<label class="gilda-size"><input type="radio" name="gilda_${ escapeHTML( select.name ) }" value="${ escapeHTML( option.value ) }"${ option.selected ? ' checked' : '' }${ option.disabled ? ' disabled' : '' } /><span>${ escapeHTML( option.textContent.trim() ) }</span></label>` ).join( '' );
+		};
+		group.addEventListener( 'change', ( event ) => {
+			if ( event.target.matches( 'input[type="radio"]' ) ) {
+				select.value = event.target.value;
+				select.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+				clearFormError( select.form );
+			}
+		} );
+		new MutationObserver( render ).observe( select, { childList: true, subtree: true, attributes: true } );
+		select.addEventListener( 'change', render );
+		render();
+	}
+/* 5.6 / 5.8 / 5.9 Validation + AJAX add to cart                       */
 	/* ------------------------------------------------------------------ */
 
 	function formErrorEl( form ) {
@@ -411,8 +360,12 @@
 		el.hidden = false;
 		missing.forEach( ( s ) => {
 			s.classList.add( 'has-error' );
-			s.nextElementSibling?.classList?.contains( 'gilda-swatches' ) &&
-				$$( '.gilda-swatch-option', s.nextElementSibling ).forEach( ( o ) => o.classList.add( 'has-error' ) );
+			const options = s.nextElementSibling;
+			if ( options?.classList.contains( 'gilda-swatches' ) ) {
+				$$( '.gilda-swatch-option', options ).forEach( ( option ) => option.classList.add( 'has-error' ) );
+			} else if ( options?.classList.contains( 'gilda-sizes' ) ) {
+				$$( '.gilda-size', options ).forEach( ( option ) => option.classList.add( 'has-error' ) );
+			}
 		} );
 		const first = missing[ 0 ];
 		( first.classList.contains( 'gilda-hidden-select' ) ? $( 'input', first.nextElementSibling ) : first )?.focus();
@@ -754,11 +707,36 @@
 		);
 	}
 
+	function initProductDescriptionToggle() {
+		$$( '.gilda-pdp-description' ).forEach( ( description ) => {
+			description.classList.add( 'is-expanded' );
+			const fullHeight = description.scrollHeight;
+			description.classList.remove( 'is-expanded' );
+			description.classList.add( 'is-collapsed' );
+			if ( fullHeight <= description.clientHeight + 1 ) {
+				description.classList.remove( 'is-collapsed' );
+				return;
+			}
+			const button = document.createElement( 'button' );
+			button.type = 'button';
+			button.className = 'gilda-pdp-read-more';
+			button.setAttribute( 'aria-expanded', 'false' );
+			button.textContent = 'Ler mais +';
+			description.after( button );
+			button.addEventListener( 'click', () => {
+				const expanded = description.classList.toggle( 'is-expanded' );
+				button.setAttribute( 'aria-expanded', String( expanded ) );
+				button.textContent = expanded ? 'Ler menos −' : 'Ler mais +';
+			} );
+		} );
+	}
 	function boot() {
 		initStickyHeader();
+		initProductDescriptionToggle();
 		$$( '.gilda-carousel' ).forEach( initCarousel );
 		$$( 'form.cart .quantity' ).forEach( initStepper );
 		$$( 'form.variations_form select[name="attribute_pa_cor"]' ).forEach( initSwatches );
+		$$( 'form.variations_form select[name*=tamanho], form.variations_form select[name*=size]' ).forEach( initSizeButtons );
 		$$( '.gilda-shipping' ).forEach( initShipping );
 		$$( '.gilda-filters' ).forEach( initFilters );
 	}

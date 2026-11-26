@@ -104,7 +104,7 @@ function gilda_block_product( $instance ) {
 }
 
 /**
- * Product image in collections: sold-out badge + quick view trigger (3.2).
+ * Product image in collections: secondary hover image + sold-out badge.
  *
  * @param string        $content  Block HTML.
  * @param array         $block    Parsed block.
@@ -118,19 +118,29 @@ function gilda_render_product_image( $content, $block, $instance = null ) {
 	}
 
 	$extra = '';
+	$secondary_image = '';
+	$gallery_image_ids = $product->get_gallery_image_ids();
+	$secondary_image_id = ! empty( $gallery_image_ids ) ? absint( $gallery_image_ids[0] ) : 0;
+	if ( $secondary_image_id && $secondary_image_id !== $product->get_image_id() ) {
+		$secondary_image = wp_get_attachment_image(
+			$secondary_image_id,
+			'woocommerce_thumbnail',
+			false,
+			array(
+				'class'       => 'gilda-card-image--hover',
+				'alt'         => '',
+				'aria-hidden' => 'true',
+				'loading'     => 'lazy',
+				'decoding'    => 'async',
+			)
+		);
+	}
 	if ( ! $product->is_in_stock() ) {
 		$extra .= '<span class="gilda-badge gilda-badge--soldout">' . esc_html__( 'Esgotado', 'gilda' ) . '</span>';
 		$content = str_replace( 'wc-block-components-product-image', 'wc-block-components-product-image is-soldout', $content );
 	}
-	$extra .= sprintf(
-		'<button type="button" class="gilda-quickview-btn" data-product-id="%1$d" aria-label="%2$s">%3$s</button>',
-		$product->get_id(),
-		/* translators: %s: product name. */
-		esc_attr( sprintf( __( 'Visualização rápida de %s', 'gilda' ), $product->get_name() ) ),
-		gilda_icon( 'eye', 20 )
-	);
 
-	return '<div class="gilda-card-media">' . $content . $extra . '</div>';
+	return '<div class="gilda-card-media">' . $content . $secondary_image . $extra . '</div>';
 }
 add_filter( 'render_block_woocommerce/product-image', 'gilda_render_product_image', 10, 3 );
 
@@ -183,40 +193,6 @@ function gilda_variation_dropdown_args( $args ) {
 	return $args;
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_args', 'gilda_variation_dropdown_args' );
-
-/* -------------------------------------------------------------------------
- * 5.9 "Comprar" (buy now)
- * ---------------------------------------------------------------------- */
-
-/**
- * Second submit button inside the add-to-cart form.
- */
-function gilda_buy_now_button() {
-	global $product;
-	if ( ! $product instanceof WC_Product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
-		return;
-	}
-	printf(
-		'<button type="submit" name="gilda_buy_now" value="1" class="button alt gilda-buy-now">%s</button>',
-		esc_html__( 'Comprar', 'gilda' )
-	);
-}
-add_action( 'woocommerce_after_add_to_cart_button', 'gilda_buy_now_button' );
-
-/**
- * Buy now goes straight to checkout.
- *
- * @param string $url Redirect URL.
- * @return string
- */
-function gilda_buy_now_redirect( $url ) {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WooCommerce validates the add-to-cart request.
-	if ( isset( $_REQUEST['gilda_buy_now'] ) ) {
-		return wc_get_checkout_url();
-	}
-	return $url;
-}
-add_filter( 'woocommerce_add_to_cart_redirect', 'gilda_buy_now_redirect', 99 );
 
 /* -------------------------------------------------------------------------
  * 1.5 Header cart counter stays in sync with classic AJAX add-to-cart

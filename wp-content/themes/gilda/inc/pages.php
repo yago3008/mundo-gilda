@@ -42,6 +42,21 @@ function gilda_ensure_pages() {
 }
 add_action( 'after_switch_theme', 'gilda_ensure_pages' );
 add_action( 'init', 'gilda_ensure_pages', 20 );
+/**
+ * Send the old editorial /produtos/ landing page to the actual WooCommerce catalog.
+ */
+function gilda_redirect_products_landing_to_catalog() {
+	if ( ! is_page( 'produtos' ) || ! function_exists( 'wc_get_page_permalink' ) ) {
+		return;
+	}
+
+	$shop_url = wc_get_page_permalink( 'shop' );
+	if ( $shop_url && untrailingslashit( $shop_url ) !== untrailingslashit( get_permalink() ) ) {
+		wp_safe_redirect( $shop_url, 302, 'GILDA' );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'gilda_redirect_products_landing_to_catalog', 1 );
 
 /**
  * Permalink of a product by slug (falls back to the /product-page/ base).

@@ -32,7 +32,7 @@ add_action( 'after_setup_theme', 'gilda_setup' );
  * Front-end assets.
  */
 function gilda_enqueue_assets() {
-	wp_enqueue_style( 'gilda-theme', GILDA_URI . '/assets/css/theme.css', array(), GILDA_VERSION );
+	wp_enqueue_style( 'gilda-theme', GILDA_URI . '/assets/css/theme.css', array(), filemtime( GILDA_DIR . '/assets/css/theme.css' ) );
 
 	wp_enqueue_script(
 		'gilda-theme',
@@ -74,9 +74,6 @@ function gilda_enqueue_assets() {
 				'calculating'     => __( 'Calculando…', 'gilda' ),
 				'decrease'        => __( 'Remover 1', 'gilda' ),
 				'increase'        => __( 'Adicionar 1', 'gilda' ),
-				'quickView'       => __( 'Visualização rápida', 'gilda' ),
-				'close'           => __( 'Fechar', 'gilda' ),
-				'seeProduct'      => __( 'Ver produto', 'gilda' ),
 				'addToCart'       => __( 'Adicionar ao carrinho', 'gilda' ),
 				'soldOut'         => __( 'Esgotado', 'gilda' ),
 				'filter'          => __( 'Filtrar', 'gilda' ),

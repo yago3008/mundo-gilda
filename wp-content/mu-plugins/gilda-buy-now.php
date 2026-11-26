@@ -27,7 +27,7 @@ add_action(
 		printf(
 			'<button type="submit" name="gilda_buy_now" value="1" class="%s">%s</button>',
 			esc_attr( $classes ),
-			esc_html__( 'Comprar', 'gilda' )
+			esc_html__( 'Compre já', 'gilda' )
 		);
 	}
 );
