@@ -123,6 +123,20 @@ function gilda_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'gilda_enqueue_assets' );
 
 /**
+ * Segunda metade da transição dos cards de categoria: inline no começo do <body>, para a tela
+ * creme com o nome já sair na primeira pintura da página de destino (assets/js/category-zoom-arrive.js).
+ * Não faz nada se a página não foi aberta por um card.
+ */
+function gilda_category_zoom_arrive() {
+	$file = GILDA_DIR . '/assets/js/category-zoom-arrive.js';
+	if ( is_admin() || ! is_readable( $file ) ) {
+		return;
+	}
+	echo '<script id="gilda-category-zoom-arrive">' . file_get_contents( $file ) . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput, WordPress.WP.AlternativeFunctions
+}
+add_action( 'wp_body_open', 'gilda_category_zoom_arrive', 1 );
+
+/**
  * Product colour swatches (docs/design/01-colors.md → Product colors).
  * Keys are attribute term slugs of `pa_cor`.
  *
