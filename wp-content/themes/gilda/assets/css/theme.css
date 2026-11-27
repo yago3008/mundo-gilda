@@ -3053,3 +3053,12 @@ body.tax-product_tag main > .wp-block-query-title::after {
 	min-height: 56px;
 	width: 100% !important;
 }
+
+/* "Finalizar pedido" apagado até as etapas estarem completas (gilda.js → syncPlaceOrder); o clique leva ao que falta. */
+.woocommerce-checkout #payment #place_order.is-waiting { background: var(--gilda-sand) !important; border-color: var(--gilda-sand) !important; color: var(--gilda-ink-soft) !important; cursor: pointer; }
+.woocommerce-checkout .gilda-checkout-place-note { color: var(--gilda-ink-soft); font: 400 13px/1.45 var(--gilda-sans); margin: 0 0 10px; }
+.woocommerce-checkout .gilda-checkout-place-note[hidden] { display: none; }
+/* No computador (resumo ao lado), na etapa de entrega o "Ir para pagamento" sobra: o pagamento já está à vista. */
+@media (min-width: 1024px) {
+	.woocommerce-checkout .gilda-checkout-step-actions.is-last-step .gilda-checkout-continue { display: none; }
+}

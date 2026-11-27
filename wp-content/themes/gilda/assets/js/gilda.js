@@ -1288,21 +1288,31 @@
 			} );
 			backButton.hidden = activeStep === 0;
 			nextButton.textContent = activeStep === panels.length - 1 ? 'Ir para pagamento' : 'Continuar';
+			// No computador o pagamento já está à vista ao lado: na última etapa o botão some (CSS).
+			stepActions.classList.toggle( 'is-last-step', activeStep === panels.length - 1 );
+			if ( typeof syncPlaceOrder === 'function' ) {
+				syncPlaceOrder();
+			}
+		};
+		/** Primeira linha obrigatória sem preencher (ou inválida) de uma etapa, ou undefined. */
+		const missingRowIn = ( panel ) => $$( '.form-row.validate-required', panel ).find( ( row ) => {
+			const shipToDifferent = $( '#ship-to-different-address-checkbox', form );
+			if ( row.hidden || 'none' === window.getComputedStyle( row ).display || ( row.closest( '.shipping_address' ) && shipToDifferent && ! shipToDifferent.checked ) ) {
+				return false;
+			}
+			const controls = $$( 'input:not([type="hidden"]), select, textarea', row );
+			return controls.some( ( control ) => 'checkbox' === control.type ? ! control.checked : ! String( control.value || '' ).trim() || ! control.checkValidity() );
+		} );
+		const showMissing = ( missingRow ) => {
+			missingRow.classList.add( 'woocommerce-invalid' );
+			const select2 = $( '.select2-selection', missingRow );
+			( $( 'input:not([type="hidden"]), select, textarea', missingRow ) || select2 )?.focus();
 		};
 		backButton.addEventListener( 'click', () => setStep( activeStep - 1 ) );
 		nextButton.addEventListener( 'click', () => {
-			const missingRow = $$( '.form-row.validate-required', panels[ activeStep ] ).find( ( row ) => {
-				const shipToDifferent = $( '#ship-to-different-address-checkbox', form );
-				if ( row.hidden || 'none' === window.getComputedStyle( row ).display || ( row.closest( '.shipping_address' ) && shipToDifferent && ! shipToDifferent.checked ) ) {
-					return false;
-				}
-				const controls = $$( 'input:not([type="hidden"]), select, textarea', row );
-				return controls.some( ( control ) => 'checkbox' === control.type ? ! control.checked : ! String( control.value || '' ).trim() || ! control.checkValidity() );
-			} );
+			const missingRow = missingRowIn( panels[ activeStep ] );
 			if ( missingRow ) {
-				missingRow.classList.add( 'woocommerce-invalid' );
-				const select2 = $( '.select2-selection', missingRow );
-				( $( 'input:not([type="hidden"]), select, textarea', missingRow ) || select2 )?.focus();
+				showMissing( missingRow );
 				return;
 			}
 			if ( activeStep < panels.length - 1 ) {
@@ -1316,6 +1326,63 @@
 				$( 'input[name="payment_method"]:checked', payment )?.focus( { preventScroll: true } );
 			}
 		} );
+		/*
+		 * "Finalizar pedido" só fica ativo com as duas etapas completas. Enquanto falta algo ele aparece
+		 * apagado, com um aviso em cima; o clique (ou Enter num campo) leva até o que falta, em vez de
+		 * mandar o formulário e voltar com uma lista de erros. O #payment é refeito pelo WooCommerce a cada
+		 * atualização do checkout (frete, cupom), então o estado é reaplicado no "updated_checkout".
+		 */
+		const stepsComplete = () => panels.every( ( panel ) => ! missingRowIn( panel ) );
+		function syncPlaceOrder() {
+			const button = $( '#place_order', form );
+			if ( ! button ) {
+				return;
+			}
+			const ready = stepsComplete();
+			button.classList.toggle( 'is-waiting', ! ready );
+			button.setAttribute( 'aria-disabled', ready ? 'false' : 'true' );
+			let note = $( '.gilda-checkout-place-note', form );
+			if ( ! note ) {
+				note = document.createElement( 'p' );
+				note.className = 'gilda-checkout-place-note';
+				note.id = 'gilda-checkout-place-note';
+				note.textContent = 'Preencha seus dados e o endereço de entrega para finalizar o pedido.';
+			}
+			if ( note.nextElementSibling !== button ) {
+				button.before( note );
+			}
+			note.hidden = ready;
+			if ( ready ) {
+				button.removeAttribute( 'aria-describedby' );
+			} else {
+				button.setAttribute( 'aria-describedby', note.id );
+			}
+		}
+		form.addEventListener(
+			'click',
+			( event ) => {
+				if ( ! event.target.closest( '#place_order' ) || stepsComplete() ) {
+					return;
+				}
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				const index = panels.findIndex( ( panel ) => missingRowIn( panel ) );
+				setStep( index );
+				customer.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				showMissing( missingRowIn( panels[ index ] ) );
+			},
+			true
+		);
+		let syncTimer;
+		const queueSync = () => {
+			clearTimeout( syncTimer );
+			syncTimer = setTimeout( syncPlaceOrder, 150 );
+		};
+		form.addEventListener( 'input', queueSync );
+		form.addEventListener( 'change', queueSync );
+		if ( window.jQuery ) {
+			window.jQuery( document.body ).on( 'updated_checkout', syncPlaceOrder );
+		}
 		setStep( 0 );
 
 		const couponCode = $( 'form.checkout_coupon input[name="coupon_code"]', checkoutRoot );
