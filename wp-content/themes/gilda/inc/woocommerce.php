@@ -244,7 +244,53 @@ add_filter( 'woocommerce_get_stock_html', 'gilda_stock_html', 10, 2 );
 function gilda_variation_dropdown_args( $args ) {
 	$args['show_option_none'] = __( 'Selecionar', 'gilda' );
 	$args['class']            = trim( ( $args['class'] ?? '' ) . ' gilda-select' );
+
+	// A página da peça já abre com a primeira cor escolhida (a primeira que tem estoque; se nenhuma tiver,
+	// a primeira da lista). Respeita a cor que vier no link (?attribute_pa_cor=…) ou já definida na peça.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$requested = isset( $_REQUEST['attribute_pa_cor'] ) ? sanitize_title( wp_unslash( $_REQUEST['attribute_pa_cor'] ) ) : '';
+	$product   = $args['product'] ?? null;
+	if ( 'pa_cor' === ( $args['attribute'] ?? '' ) && '' === (string) $args['selected'] && '' === $requested && $product instanceof WC_Product_Variable ) {
+		$args['selected'] = gilda_first_color_slug( $product, (array) ( $args['options'] ?? array() ) );
+	}
 	return $args;
+}
+
+/**
+ * Primeira cor da peça na ordem em que aparece, de preferência uma com estoque.
+ *
+ * @param WC_Product_Variable $product Peça.
+ * @param string[]            $options Cores (slugs) que a peça usa.
+ * @return string Slug da cor, ou '' se a peça não tiver cor.
+ */
+function gilda_first_color_slug( $product, array $options ) {
+	$terms = wc_get_product_terms( $product->get_id(), 'pa_cor', array( 'fields' => 'all' ) );
+	$order = array();
+	foreach ( $terms as $term ) {
+		if ( in_array( $term->slug, $options, true ) ) {
+			$order[] = $term->slug;
+		}
+	}
+	if ( ! $order ) {
+		return '';
+	}
+	$in_stock = array();
+	foreach ( $product->get_children() as $child_id ) {
+		$variation = wc_get_product( $child_id );
+		if ( $variation && $variation->is_in_stock() && $variation->is_purchasable() ) {
+			$color = (string) ( $variation->get_attributes()['pa_cor'] ?? '' );
+			if ( '' === $color ) {
+				return $order[0]; // variação que vale para qualquer cor: a primeira serve
+			}
+			$in_stock[ $color ] = true;
+		}
+	}
+	foreach ( $order as $slug ) {
+		if ( isset( $in_stock[ $slug ] ) ) {
+			return $slug;
+		}
+	}
+	return $order[0];
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_args', 'gilda_variation_dropdown_args' );
 
