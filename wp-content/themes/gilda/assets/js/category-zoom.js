@@ -95,7 +95,7 @@
 		document.querySelectorAll('.gilda-category, .gilda-chapter-card').forEach((card) => io.observe(card));
 	}
 
-	const loadPreview = (href) => {
+	const loadPreview = (href, html = null) => {
 		if (preview && preview.href === href) return preview;
 		if (overlay || !window.fetch || !window.DOMParser) return preview; // já animando: não troca
 		dropPreview();
@@ -107,7 +107,7 @@
 		frame.setAttribute('title', '');
 		document.body.appendChild(frame);
 		const p = { href, frame, ready: false, loaded: null };
-		p.loaded = fetchPage(href)
+		p.loaded = (html ? Promise.resolve(html) : fetchPage(href))
 			.then((html) => {
 				if (preview !== p) return Promise.reject(new Error('trocou'));
 				const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -357,6 +357,7 @@
 			cover.setAttribute('width', b.w);
 			cover.setAttribute('height', b.h);
 			if (page) page.frame.style.clipPath = `inset(${b.y}px ${fw - b.x - b.w}px ${vh - b.y - b.h}px ${b.x}px)`;
+			if (page && solid) page.frame.style.visibility = parseFloat(cover.style.opacity || '0') >= 0.999 ? '' : 'hidden';
 		};
 
 		const open = (p) => {
@@ -425,6 +426,12 @@
 				const px = lerp(origin.x, center.x, slide);
 				const py = lerp(origin.y, center.y, slide);
 				zoom.setAttribute('transform', `translate(${px} ${py}) scale(${sc}) translate(${-origin.x} ${-origin.y})`);
+				if (solid) {
+					// letras sólidas (login) ficam transparentes enquanto o ";" cresce, revelando a página
+					solidLayer.setAttribute('transform', zoom.getAttribute('transform'));
+					solidLayer.style.opacity = 1 - smooth(clamp((q - 0.3) / 0.4));
+					page.frame.style.visibility = '';
+				}
 				if (p < pEnd) requestAnimationFrame(step);
 				else arrive();
 			};
@@ -553,9 +560,11 @@
 
 		let res = null;
 		let doc = null;
+		let html = '';
 		try {
 			res = await fetch(form.action || window.location.href, { method: 'POST', body: data, credentials: 'same-origin' });
-			doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+			html = await res.text();
+			doc = new DOMParser().parseFromString(html, 'text/html');
 		} catch (err) {
 			// sem rede/resposta estranha: envio normal, sem animação
 			authBusy = false;
@@ -568,9 +577,13 @@
 			const next = res.url || window.location.href;
 			// já busca a página da conta enquanto o "GILDA;" cresce (já logado): o mergulho não espera o servidor
 			prefetch(next);
+			// e monta ela por trás das letras com o HTML que acabou de chegar: o mergulho acontece aqui mesmo
+			// e a página real carrega só no fim, igual à que já está na tela (sem "atualizar" no meio)
+			let page = null;
+			try { page = loadPreview(next, html); } catch (err) { page = null; }
 			let ok = false;
 			try {
-				ok = play(brand, { zoomInto: 'last', requireLogin: true, go: () => window.location.assign(next) });
+				ok = play(brand, { zoomInto: 'last', requireLogin: true, page, go: () => window.location.assign(next) });
 			} catch (err) {
 				cleanup();
 			}
