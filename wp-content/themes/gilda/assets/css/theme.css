@@ -2464,3 +2464,97 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	.gilda-faq > summary::after,
 	.gilda-faq[open] .gilda-faq__answer { animation: none; transition: none; }
 }
+
+/* ---------- Página do produto: área de compra organizada ----------
+ * 1. linha de estoque (bolinha verde "Em estoque" / terracota "Resta só 1");
+ * 2. quantidade + "Adicionar ao carrinho" na mesma altura, o botão ocupando o resto da linha;
+ * 3. "Compre já" na largura toda, alinhado às mesmas bordas;
+ * 4. frete logo abaixo, com o "Não sei meu CEP" colado no campo. */
+.gilda-pdp-summary .single_variation_wrap { display: flex; flex-direction: column; gap: 14px; }
+.gilda-pdp-summary .woocommerce-variation:empty,
+.gilda-pdp-summary .woocommerce-variation-description:empty,
+.gilda-pdp-summary .woocommerce-variation-price:empty { display: none; }
+.gilda-pdp-summary .woocommerce-variation { display: flex; flex-direction: column; gap: 6px; }
+
+.gilda-pdp-summary .woocommerce-variation-availability .stock,
+.gilda-pdp-summary form.cart:not(.variations_form) .stock {
+	align-items: center;
+	color: var(--gilda-success);
+	display: inline-flex;
+	font: 500 12px/1 var(--gilda-sans);
+	gap: 8px;
+	letter-spacing: .14em;
+	margin: 0 !important;
+	text-transform: uppercase;
+}
+.gilda-pdp-summary .woocommerce-variation-availability .stock::before,
+.gilda-pdp-summary form.cart:not(.variations_form) .stock::before {
+	background: currentColor;
+	border-radius: 50%;
+	content: "";
+	flex: 0 0 7px;
+	height: 7px;
+	width: 7px;
+}
+.gilda-pdp-summary .stock.gilda-low-stock { color: var(--gilda-terracotta); }
+.gilda-pdp-summary .stock.out-of-stock { color: var(--gilda-error); }
+
+.gilda-pdp-summary form.cart:not(.variations_form),
+.gilda-pdp-summary .woocommerce-variation-add-to-cart {
+	align-items: stretch;
+	display: grid !important;
+	gap: 10px !important;
+	grid-template-columns: auto minmax(0, 1fr);
+	width: 100%;
+}
+.gilda-pdp-summary .quantity.gilda-stepper {
+	background: var(--gilda-white);
+	box-sizing: border-box;
+	height: 54px;
+	margin: 0 !important;
+}
+.gilda-pdp-summary .gilda-stepper .qty { background: transparent !important; }
+.gilda-pdp-summary .single_add_to_cart_button,
+.gilda-pdp-summary .gilda-buy-now {
+	align-items: center;
+	box-sizing: border-box;
+	display: flex !important;
+	justify-content: center;
+	justify-self: stretch;
+	letter-spacing: .14em;
+	margin: 0 !important;
+	max-width: none !important;
+	min-height: 54px;
+	width: 100% !important;
+}
+/* o estilo do bloco do WooCommerce põe todo .single_add_to_cart_button na 2ª coluna; o "Compre já" ocupa a linha toda */
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form .variations_button > .gilda-buy-now,
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form form.cart > .gilda-buy-now { grid-column: 1 / -1; justify-self: stretch; }
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form .variations_button > .single_add_to_cart_button,
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form form.cart > .single_add_to_cart_button { justify-self: stretch; white-space: nowrap; }
+@media (max-width: 420px) {
+	.gilda-pdp-summary .gilda-stepper button { width: 38px; }
+	.gilda-pdp-summary .gilda-stepper .qty { width: 34px !important; }
+	.gilda-pdp-summary .single_add_to_cart_button,
+	.gilda-pdp-summary .gilda-buy-now { font-size: 12.5px !important; letter-spacing: .1em; padding-inline: 12px !important; }
+}
+
+/* Tamanho/cor esgotado: o "Avise-me" já é a ação; some a quantidade, os botões apagados e a linha vazia de estoque. */
+.gilda-pdp-summary .single_variation_wrap:has(.gilda-notify:not([hidden])) .woocommerce-variation-add-to-cart,
+.gilda-pdp-summary .single_variation_wrap:has(.gilda-notify:not([hidden])) .woocommerce-variation { display: none !important; }
+.gilda-pdp-summary .single_variation_wrap .gilda-notify { margin: 0; }
+/* sem a margem de baixo padrão do formulário do WooCommerce: o frete vem logo depois, no mesmo ritmo */
+.gilda-pdp-summary form.cart { margin-bottom: 0 !important; }
+
+/* frete: o link fica logo abaixo do campo, na coluna dele */
+.single-product .gilda-shipping { gap: 12px; margin-top: 6px; padding-top: 22px; }
+.single-product .gilda-shipping__row { row-gap: 8px; }
+.gilda-shipping__row .gilda-shipping__help {
+	align-self: start;
+	color: var(--gilda-ink-soft);
+	font-size: 12.5px;
+	grid-column: 1;
+	justify-self: start;
+	text-underline-offset: 3px;
+}
+.gilda-shipping__row .gilda-shipping__help:hover { color: var(--gilda-terracotta); }
