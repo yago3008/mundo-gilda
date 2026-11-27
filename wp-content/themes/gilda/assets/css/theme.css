@@ -2856,3 +2856,200 @@ body.tax-product_tag main > .wp-block-query-title::after {
 	.gilda-dropdown.is-open .gilda-dropdown__list { animation: none; }
 	.gilda-dropdown__chevron { transition: none; }
 }
+
+/* ---------- Pedido recebido (templates/order-confirmation.html + inc/order-confirmation.php) ---------- */
+.gilda-thanks { box-sizing: border-box; margin: 0 auto; max-width: 1170px; padding: clamp(40px, 6vw, 80px) 24px clamp(56px, 8vw, 96px); }
+.gilda-thanks > * { margin-block: 0 !important; }
+.gilda-thanks__hero { border-bottom: 1px solid var(--gilda-sand); margin-bottom: clamp(32px, 5vw, 56px) !important; padding-bottom: clamp(28px, 4vw, 44px); }
+.gilda-thanks__eyebrow { color: var(--gilda-terracotta); font: 600 12px/1 var(--gilda-sans); letter-spacing: .2em; margin: 0 0 18px; text-transform: uppercase; }
+.gilda-thanks__title { color: var(--gilda-ink); font: italic 300 clamp(64px, 10vw, 140px)/.9 var(--gilda-display); letter-spacing: -.02em; margin: 0 0 20px; text-transform: lowercase; }
+.gilda-thanks__title span { color: var(--gilda-terracotta); font-style: normal; font-weight: 400; margin-left: .03em; }
+.gilda-thanks__lead { color: var(--gilda-ink-soft); font: 300 clamp(18px, 2vw, 22px)/1.45 var(--gilda-display); margin: 0 0 clamp(28px, 4vw, 44px); max-width: 48ch; }
+.gilda-thanks__steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0; max-width: 820px; padding: 0; }
+.gilda-thanks__steps li { color: var(--gilda-taupe); font: 500 11.5px/1.3 var(--gilda-sans); letter-spacing: .12em; padding: 30px 12px 0 0; position: relative; text-transform: uppercase; }
+.gilda-thanks__steps li::before { background: var(--gilda-sand); content: ""; height: 2px; left: 0; position: absolute; right: 0; top: 7px; }
+.gilda-thanks__steps li.is-done::before { background: var(--gilda-terracotta); }
+.gilda-thanks__steps li:last-child::before { right: auto; width: 16px; }
+.gilda-thanks__dot { background: var(--gilda-cream); border: 2px solid var(--gilda-sand); border-radius: 50%; box-sizing: border-box; height: 16px; left: 0; position: absolute; top: 0; width: 16px; }
+.gilda-thanks__steps li.is-done .gilda-thanks__dot { background: var(--gilda-terracotta); border-color: var(--gilda-terracotta); }
+.gilda-thanks__steps li.is-current .gilda-thanks__dot { border-color: var(--gilda-terracotta); box-shadow: 0 0 0 4px color-mix(in srgb, var(--gilda-terracotta) 18%, transparent); }
+.gilda-thanks__steps li.is-done { color: var(--gilda-terracotta); }
+.gilda-thanks__steps li.is-current { color: var(--gilda-ink); font-weight: 600; }
+
+.gilda-thanks__grid { align-items: start; display: grid; gap: clamp(28px, 4vw, 48px); grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); }
+.gilda-thanks__grid > * { margin-block: 0 !important; }
+.gilda-thanks__main { display: flex; flex-direction: column; gap: 22px; }
+.gilda-thanks__main > * { margin: 0 !important; }
+.gilda-thanks__main > .gilda-thanks__box,
+.gilda-thanks__addresses .wp-block-column > * { background: var(--gilda-white); border: 1px solid var(--gilda-sand); box-sizing: border-box; padding: clamp(20px, 2.4vw, 28px); }
+.gilda-thanks__addresses { gap: 22px !important; margin: 0 !important; }
+.gilda-thanks__addresses .wp-block-column > * { height: 100%; margin: 0; }
+.gilda-thanks .wp-block-heading { color: var(--gilda-ink); font: 400 clamp(21px, 2vw, 25px)/1.2 var(--gilda-display) !important; margin: 0 0 16px !important; text-transform: none; }
+/* peças e valores */
+.gilda-thanks .wc-block-order-confirmation-totals table,
+.gilda-thanks .wc-block-order-confirmation-totals__table { border: 0 !important; border-collapse: collapse; margin: 0; width: 100%; }
+.gilda-thanks .wc-block-order-confirmation-totals th,
+.gilda-thanks .wc-block-order-confirmation-totals td { background: none !important; border: 0 !important; border-bottom: 1px solid var(--gilda-linen) !important; font: 400 15px/1.45 var(--gilda-sans); padding: 14px 0 !important; text-align: left; vertical-align: top; }
+.gilda-thanks .wc-block-order-confirmation-totals thead th { color: var(--gilda-graphite); font: 500 11px/1 var(--gilda-sans); letter-spacing: .16em; padding-top: 0 !important; text-transform: uppercase; }
+.gilda-thanks .wc-block-order-confirmation-totals th:last-child,
+.gilda-thanks .wc-block-order-confirmation-totals td:last-child { text-align: right; }
+.gilda-thanks .wc-block-order-confirmation-totals tbody a { color: var(--gilda-ink); font: 400 17px/1.35 var(--gilda-display); text-decoration: none; }
+.gilda-thanks .wc-block-order-confirmation-totals tbody a:hover { color: var(--gilda-terracotta); text-decoration: underline; text-underline-offset: 3px; }
+.gilda-thanks .wc-block-order-confirmation-totals tfoot th { color: var(--gilda-ink-soft); font-weight: 400; }
+.gilda-thanks .wc-block-order-confirmation-totals tfoot tr:last-child th,
+.gilda-thanks .wc-block-order-confirmation-totals tfoot tr:last-child td { border-bottom: 0 !important; color: var(--gilda-ink); font: 400 24px/1.2 var(--gilda-display); padding-top: 18px !important; }
+/* endereços e dados extras (sem a moldura interna do WooCommerce; o cartão já é a moldura) */
+.gilda-thanks .wc-block-order-confirmation-shipping-address,
+.gilda-thanks .wc-block-order-confirmation-billing-address { background: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; }
+.gilda-thanks .wc-block-order-confirmation-shipping-address p,
+.gilda-thanks .wc-block-order-confirmation-billing-address p { color: var(--gilda-ink-soft); font: 400 15px/1.75 var(--gilda-sans); margin: 0; }
+/* "Informações adicionais" (o CPF vem do plugin de campos brasileiros, como tabela, dentro deste bloco) */
+.gilda-thanks .wc-block-order-confirmation-additional-information:not(:empty) { background: var(--gilda-white); border: 1px solid var(--gilda-sand); box-sizing: border-box; padding: clamp(20px, 2.4vw, 28px); }
+.gilda-thanks .wc-block-order-confirmation-additional-information > :first-child { margin-top: 0 !important; }
+.gilda-thanks .wc-block-order-confirmation-additional-information h2,
+.gilda-thanks .wc-block-order-confirmation-additional-information h3 { color: var(--gilda-ink); font: 400 clamp(21px, 2vw, 25px)/1.2 var(--gilda-display) !important; margin: 0 0 16px !important; }
+.gilda-thanks .wc-block-order-confirmation-additional-information table { border: 0; border-collapse: collapse; margin: 0; width: auto; }
+.gilda-thanks .wc-block-order-confirmation-additional-information th,
+.gilda-thanks .wc-block-order-confirmation-additional-information td { background: none; border: 0; padding: 4px 24px 4px 0; text-align: left; }
+.gilda-thanks .wc-block-order-confirmation-additional-information th { color: var(--gilda-graphite); font: 500 11px/1.9 var(--gilda-sans); letter-spacing: .14em; text-transform: uppercase; }
+.gilda-thanks .wc-block-order-confirmation-additional-information td { font: 400 15px/1.5 var(--gilda-sans); }
+.gilda-thanks .wp-block-woocommerce-order-confirmation-additional-fields-wrapper { background: var(--gilda-white); border: 1px solid var(--gilda-sand); box-sizing: border-box; padding: clamp(20px, 2.4vw, 28px); }
+.gilda-thanks .wp-block-woocommerce-order-confirmation-additional-fields-wrapper .wc-block-order-confirmation-additional-fields,
+.gilda-thanks .wc-block-components-additional-fields-list { margin: 0 !important; padding: 0 !important; }
+.gilda-thanks address,
+.gilda-thanks .wc-block-order-confirmation-address-wrapper address { border: 0 !important; color: var(--gilda-ink-soft); font: 400 15px/1.75 var(--gilda-sans); font-style: normal; margin: 0; padding: 0 !important; }
+.gilda-thanks .wc-block-order-confirmation-additional-fields dl,
+.gilda-thanks .wc-block-components-additional-fields-list { display: grid; gap: 6px 24px; grid-template-columns: max-content 1fr; margin: 0; }
+.gilda-thanks .wc-block-order-confirmation-additional-fields dt,
+.gilda-thanks .wc-block-components-additional-fields-list dt { color: var(--gilda-graphite); font: 500 11px/1.9 var(--gilda-sans); letter-spacing: .14em; margin: 0; padding: 0 !important; text-transform: uppercase; }
+.gilda-thanks .wc-block-order-confirmation-additional-fields dd,
+.gilda-thanks .wc-block-components-additional-fields-list dd { font: 400 15px/1.5 var(--gilda-sans); margin: 0; padding: 0 !important; }
+
+/* cartão de resumo */
+.gilda-thanks__card { background: var(--gilda-terracotta); color: var(--gilda-cream); padding: clamp(26px, 3vw, 34px); position: sticky; top: calc(var(--gilda-header-h) + 24px); }
+.gilda-thanks__card > * { margin: 0; }
+.gilda-thanks__card-label { font: 500 11px/1 var(--gilda-sans); letter-spacing: .2em; opacity: .8; text-transform: uppercase; }
+.gilda-thanks__total { font: 400 clamp(38px, 4vw, 48px)/1.05 var(--gilda-display); margin: 10px 0 22px !important; }
+.gilda-thanks__total .woocommerce-Price-amount { color: inherit; }
+.gilda-thanks__facts { margin: 0 0 24px !important; }
+.gilda-thanks__facts div { border-top: 1px solid color-mix(in srgb, var(--gilda-cream) 22%, transparent); display: flex; flex-direction: column; gap: 3px; padding: 12px 0; }
+.gilda-thanks__facts dt { font: 500 10.5px/1 var(--gilda-sans); letter-spacing: .18em; opacity: .75; text-transform: uppercase; }
+.gilda-thanks__facts dd { font: 400 15px/1.4 var(--gilda-sans); margin: 0; overflow-wrap: anywhere; }
+.gilda-thanks__actions { display: flex; flex-direction: column; gap: 10px; }
+.gilda-thanks__btn { align-items: center; background: var(--gilda-cream); border: 1px solid var(--gilda-cream); color: var(--gilda-terracotta); display: flex; font: 500 12px/1 var(--gilda-sans); justify-content: center; letter-spacing: .14em; min-height: 48px; padding: 0 18px; text-decoration: none; text-transform: uppercase; transition: background-color .2s, color .2s; }
+.gilda-thanks__btn:hover { background: var(--gilda-white); color: var(--gilda-terracotta); }
+.gilda-thanks__btn--ghost { background: transparent; color: var(--gilda-cream); }
+.gilda-thanks__btn--ghost:hover { background: var(--gilda-cream); color: var(--gilda-terracotta); }
+.gilda-thanks__btn:focus-visible { outline: 2px solid var(--gilda-cream); outline-offset: 3px; }
+.gilda-thanks__help { font: 400 13px/1.5 var(--gilda-sans); margin-top: 18px !important; opacity: .9; }
+.gilda-thanks__help a { color: inherit; text-underline-offset: 3px; }
+
+@media (max-width: 900px) {
+	.gilda-thanks__grid { grid-template-columns: minmax(0, 1fr); }
+	.gilda-thanks__card { order: -1; position: static; } /* no celular, total e botões logo depois do "obrigada;" */
+}
+@media (max-width: 600px) {
+	.gilda-thanks__steps { grid-template-columns: minmax(0, 1fr); row-gap: 14px; }
+	.gilda-thanks__steps li { padding: 0 0 0 28px; }
+	.gilda-thanks__steps li::before { bottom: -14px; height: auto; left: 7px; right: auto; top: 16px; width: 2px; }
+	.gilda-thanks__steps li:last-child::before { display: none; }
+	.gilda-thanks__addresses { flex-direction: column; }
+}
+
+/* ---------- Checkout: hierarquia (cartões, total em destaque, frete e pagamento como opções) ----------
+ * Camada final sobre o checkout em etapas (gilda.js → initCheckoutStepper). Só visual: não muda campos. */
+.woocommerce-checkout .gilda-checkout-fields-section {
+	background: var(--gilda-white);
+	border: 1px solid var(--gilda-sand);
+	box-sizing: border-box;
+	padding: clamp(20px, 2.6vw, 32px) !important;
+}
+.woocommerce-checkout .gilda-checkout-fields-section > h2,
+.woocommerce-checkout .gilda-checkout-fields-section h3 {
+	color: var(--gilda-ink);
+	font: 400 clamp(22px, 2.2vw, 28px)/1.15 var(--gilda-display) !important;
+	margin: 0 0 20px !important;
+	text-transform: none;
+}
+/* resumo num cartão */
+.woocommerce-checkout .gilda-checkout-summary {
+	background: var(--gilda-white) !important;
+	border: 1px solid var(--gilda-sand) !important;
+	box-sizing: border-box;
+	padding: clamp(22px, 2.6vw, 32px) !important;
+}
+.woocommerce-checkout .gilda-checkout-summary #order_review_heading { margin-bottom: 20px !important; }
+/* subtotal, envio e total: linhas com rótulo à esquerda e valor à direita (antes quebravam letra por letra) */
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot { display: block; width: 100%; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr {
+	align-items: baseline;
+	border-bottom: 1px solid var(--gilda-linen);
+	display: grid;
+	gap: 6px 16px;
+	grid-template-columns: auto minmax(0, 1fr);
+	padding: 12px 0;
+	width: 100%;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot th,
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot td {
+	background: none !important;
+	border: 0 !important;
+	color: var(--gilda-ink-soft);
+	font: 400 14px/1.4 var(--gilda-sans);
+	overflow-wrap: normal;
+	padding: 0 !important;
+	white-space: normal;
+	word-break: normal;
+}
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot th { text-align: left; white-space: nowrap; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot td { color: var(--gilda-ink); text-align: right; }
+/* envio: as opções embaixo do rótulo, na largura toda */
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.woocommerce-shipping-totals { grid-template-columns: minmax(0, 1fr); }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.woocommerce-shipping-totals td { text-align: left; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.order-total { border-bottom: 0; padding-top: 18px; }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.order-total th { color: var(--gilda-ink); font: 400 20px/1.2 var(--gilda-display); }
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.order-total td,
+.woocommerce-checkout .gilda-checkout-summary .shop_table tfoot tr.order-total td strong { color: var(--gilda-ink); font: 400 clamp(26px, 2.6vw, 32px)/1.1 var(--gilda-display); }
+/* opções de frete como cartões */
+.woocommerce-checkout #shipping_method { display: flex; flex-direction: column; gap: 8px; list-style: none; margin: 4px 0 0 !important; padding: 0 !important; }
+.woocommerce-checkout #shipping_method li {
+	align-items: center;
+	border: 1px solid var(--gilda-sand);
+	cursor: pointer;
+	display: flex;
+	gap: 10px;
+	margin: 0 !important;
+	padding: 12px 14px !important;
+	position: relative;
+	transition: border-color .2s, background-color .2s;
+}
+.woocommerce-checkout #shipping_method li:hover { border-color: var(--gilda-taupe); }
+.woocommerce-checkout #shipping_method li:has(input:checked) { background: color-mix(in srgb, var(--gilda-terracotta) 5%, var(--gilda-white)); border-color: var(--gilda-terracotta); }
+.woocommerce-checkout #shipping_method li input { accent-color: var(--gilda-terracotta); margin: 0 !important; }
+.woocommerce-checkout #shipping_method li label { color: var(--gilda-ink); cursor: pointer; font: 400 14px/1.35 var(--gilda-sans); margin: 0; }
+.woocommerce-checkout #shipping_method li label::after { content: ""; inset: 0; position: absolute; } /* o cartão inteiro escolhe */
+.woocommerce-checkout .woocommerce-shipping-totals td p,
+.woocommerce-checkout .woocommerce-shipping-totals td .woocommerce-shipping-destination { color: var(--gilda-graphite); font-size: 13px; margin: 8px 0 0; }
+/* pagamento: sem o lilás padrão */
+.woocommerce-checkout #payment { background: transparent !important; }
+.woocommerce-checkout #payment .payment_box {
+	background: var(--gilda-cream) !important;
+	border-left: 3px solid var(--gilda-terracotta);
+	border-radius: 0 !important;
+	color: var(--gilda-ink-soft) !important;
+	font: 400 13.5px/1.5 var(--gilda-sans);
+	margin: 10px 0 0 !important;
+	padding: 12px 14px !important;
+}
+.woocommerce-checkout #payment .payment_box::before { display: none !important; }
+.woocommerce-checkout #payment ul.payment_methods { border: 0 !important; margin: 0 !important; padding: 0 !important; }
+.woocommerce-checkout #payment ul.payment_methods li > label { color: var(--gilda-ink); font: 500 14px/1.3 var(--gilda-sans); }
+.woocommerce-checkout #payment .place-order { margin: 0 !important; padding: 18px 0 0 !important; }
+.woocommerce-checkout #payment .woocommerce-privacy-policy-text p { color: var(--gilda-graphite); font: 400 12.5px/1.55 var(--gilda-sans); margin: 0 0 16px; }
+.woocommerce-checkout #payment #place_order {
+	float: none !important;
+	font: 500 13px/1 var(--gilda-sans) !important;
+	letter-spacing: .16em;
+	min-height: 56px;
+	width: 100% !important;
+}

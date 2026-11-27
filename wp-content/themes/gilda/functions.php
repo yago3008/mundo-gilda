@@ -21,6 +21,7 @@ require GILDA_DIR . '/inc/transitions.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require GILDA_DIR . '/inc/woocommerce.php';
+	require GILDA_DIR . '/inc/order-confirmation.php';
 	require GILDA_DIR . '/inc/shipping.php';
 	require GILDA_DIR . '/inc/filters.php';
 }
