@@ -2,10 +2,10 @@
  * Cards de categoria (pattern gilda/categories): ao clicar, a tela "entra" no nome do card
  * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai no catálogo.
  *
- * 1. abertura (aqui): o card vira creme com o nome vazado (a foto aparece pelas letras), cresce até
- *    ocupar a tela e o nome vai para o centro, grande;
+ * 1. abertura (aqui): o card vira marrom com o nome vazado (a foto do card some das letras logo no
+ *    começo e elas ficam creme, a cor da página), cresce até ocupar a tela e o nome vai para o centro;
  * 2. navega para o link do card. Enquanto o catálogo carrega, o navegador segura esse último quadro;
- * 3. mergulho (no catálogo, assets/js/category-zoom-arrive.js): a mesma tela creme com o nome aparece
+ * 3. mergulho (no catálogo, assets/js/category-zoom-arrive.js): a mesma tela marrom com o nome aparece
  *    já na primeira pintura e o zoom entra numa letra revelando o próprio catálogo.
  *    Os dados do quadro passam pelo sessionStorage ('gilda-czoom').
  *
@@ -211,7 +211,11 @@
 			const s = lerp(startScale, 1, t);
 			zoom.setAttribute('transform', `translate(${cx} ${cy}) scale(${s}) translate(${-center.x} ${-center.y})`);
 			pic.style.transform = `scale(${lerp(1, 1.2, t)})`;
-			shade.style.opacity = shadeFrom * (1 - 0.5 * t);
+			// A foto do card some logo no começo: as letras ficam na cor da página (creme) sobre o marrom,
+			// iguais às do catálogo quando ele abre por baixo (category-zoom-arrive.js).
+			const fade = 1 - smooth(clamp(p / 0.3));
+			pic.style.opacity = fade;
+			shade.style.opacity = shadeFrom * fade;
 		};
 
 		// O catálogo continua daqui: mesmo nome, mesma posição, mesmo ponto de entrada do zoom.

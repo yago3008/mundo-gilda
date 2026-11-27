@@ -1,6 +1,6 @@
 /*
  * Segunda metade da transição dos cards de categoria (a primeira é assets/js/category-zoom.js).
- * Impresso inline logo no começo do <body> (inc/setup.php), para a tela creme com o nome vazado
+ * Impresso inline logo no começo do <body> (inc/setup.php), para a tela marrom com o nome vazado
  * já sair na primeira pintura do catálogo. Depois o zoom entra numa letra e revela a página.
  */
 (() => {
@@ -55,7 +55,7 @@
 	overlay.appendChild(svg);
 	document.body.appendChild(overlay);
 
-	// Enquanto a fonte do nome não carregou, a tela fica só creme (sem a letra "errada" piscando).
+	// Enquanto a fonte do nome não carregou, a tela fica só marrom (sem a letra "errada" piscando).
 	const fontSpec = `${s.font.style} ${s.font.weight} ${Math.round(size)}px ${s.font.family}`;
 	let fontReady = Promise.resolve();
 	try {
@@ -94,10 +94,10 @@
 		};
 		// um respiro curto: a página por baixo termina de montar antes do mergulho
 		setTimeout(() => requestAnimationFrame(frame), 150);
-		// aba em segundo plano (sem requestAnimationFrame): não deixa a tela creme presa
+		// aba em segundo plano (sem requestAnimationFrame): não deixa a tela marrom presa
 		setTimeout(() => overlay.remove(), 150 + DIVE_MS + 1500);
 	});
 
-	// Voltar/avançar pelo navegador não pode reaparecer com a tela creme.
+	// Voltar/avançar pelo navegador não pode reaparecer com a tela marrom.
 	window.addEventListener('pageshow', (e) => { if (e.persisted) overlay.remove(); });
 })();
