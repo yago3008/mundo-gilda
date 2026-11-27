@@ -72,16 +72,16 @@ Quando a cor/tamanho escolhida (ou o produto simples) está esgotada, aparece um
 
 **Marcação** (o plugin já traz o estilo em `gilda-stock-alerts/assets/stock-alerts.css`, com as cores da paleta)
 
-- **Logado** (`.gilda-notify--member`): um botão só, que manda o aviso para o e-mail da conta, e a nota "Vamos avisar em …".
+- **Logado** (`.gilda-notify--member`): um botão só, que manda o aviso para o e-mail da conta (sem nota embaixo).
 - **Sem login** (`.gilda-notify--guest`): o botão abre um `<dialog class="gilda-notify-modal">` marrom que só pede o e-mail.
-- O consentimento é o próprio pedido: o texto diz que o e-mail serve só para este aviso e linka a política; vai `consent=1` escondido.
+- O consentimento é o próprio pedido (vai `consent=1` escondido); a política de privacidade fica no rodapé do site.
 
 ```html
 <div class="gilda-notify gilda-notify--variation gilda-notify--guest" id="gilda-notify-33" data-product-id="33" data-form-id="gilda-notify-form-33" hidden>
-  <p class="gilda-notify__title">Esgotado. <span class="gilda-notify__text">Quer saber quando <span class="gilda-notify__variation">Marrom / M</span> voltar?</span></p>
+  <p class="gilda-notify__title">Esgotado.</p>
   <span class="gilda-notify__hp" aria-hidden="true" …>…</span> <!-- anti-robô: não mostre -->
   <input type="hidden" name="action|product_id|variation_id|consent|_gilda_nonce" …>
-  <!-- logado: <input type="hidden" name="email"> + <button type="submit" class="gilda-notify__submit gilda-notify__open"> + <p class="gilda-notify__note"> -->
+  <!-- logado: <input type="hidden" name="email"> + <button type="submit" class="gilda-notify__submit gilda-notify__open"> -->
   <button type="button" class="gilda-notify__open" aria-haspopup="dialog">Avise-me quando chegar</button>
   <dialog class="gilda-notify-modal">
     <button class="gilda-notify-modal__close" data-gilda-notify-close>×</button>
@@ -89,7 +89,6 @@ Quando a cor/tamanho escolhida (ou o produto simples) está esgotada, aparece um
     <p class="gilda-notify-modal__text">Deixe seu e-mail e avisamos quando <span class="gilda-notify__variation">Marrom / M</span> voltar.</p>
     <div class="gilda-notify-modal__row"><input class="gilda-notify__email" type="email" name="email" required …><button type="submit" class="gilda-notify__submit">Avisar</button></div>
     <p class="gilda-notify__message" role="status" hidden></p> <!-- erro fica aqui, no modal -->
-    <p class="gilda-notify-modal__privacy">Usamos seu e-mail só para este aviso (política de privacidade).</p>
   </dialog>
   <p class="gilda-notify__message gilda-notify__message--inline" role="status" hidden></p> <!-- "Pronto!" -->
 </div>
