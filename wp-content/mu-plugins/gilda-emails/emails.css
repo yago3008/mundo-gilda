@@ -1,0 +1,33 @@
+/* Tela "E-mails" do painel (usa o visual de gilda-painel/assets/painel.css; aqui só o que é desta tela). */
+.gilda-emails__group { margin-bottom: 24px; }
+.gilda-emails__list { list-style: none; margin: 0; padding: 0; }
+.gilda-emails__list li + li { border-top: 1px solid #e3dfd4; }
+.gilda-emails__item {
+	align-items: center;
+	color: inherit;
+	display: grid;
+	gap: 4px 18px;
+	grid-template-columns: minmax(0, 1fr) auto auto;
+	padding: 16px 4px;
+	text-decoration: none;
+}
+.gilda-emails__item:hover .gilda-emails__name,
+.gilda-emails__item:focus-visible .gilda-emails__name { color: #77270c; text-decoration: underline; text-underline-offset: 3px; }
+.gilda-emails__name { font-size: 15px; font-weight: 600; grid-column: 1; }
+.gilda-emails__when { color: #676767; font-size: 13px; grid-column: 1; grid-row: 2; }
+.gilda-emails__status { border: 1px solid currentColor; font-size: 11px; font-weight: 600; grid-column: 2; grid-row: 1 / span 2; letter-spacing: .1em; padding: 4px 10px; text-transform: uppercase; }
+.gilda-emails__status.is-on { color: #3e4519; }
+.gilda-emails__status.is-off { color: #a69f88; }
+.gilda-emails__edit { color: #77270c; font-size: 13px; grid-column: 3; grid-row: 1 / span 2; }
+.gilda-emails__form input[type="text"],
+.gilda-emails__form textarea { width: 100%; }
+.gilda-emails__placeholders code { background: #f7f5e9; border: 1px solid #e3dfd4; display: inline-block; font-size: 12px; margin: 0 6px 6px 0; padding: 2px 6px; }
+.gilda-emails__preview .gilda-card__head { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; }
+.gilda-emails__frame { background: #f7f5e9; border: 1px solid #e3dfd4; display: block; height: 640px; width: 100%; }
+.gilda-emails .gilda-btn--block + .gilda-btn--block { margin-top: 10px; }
+@media (max-width: 782px) {
+	.gilda-emails__item { grid-template-columns: minmax(0, 1fr) auto; }
+	.gilda-emails__edit { display: none; }
+}
+.gilda-emails .gilda-emails__toggle { align-items: center; display: flex !important; flex-direction: row !important; font-size: 14px; width: auto; gap: 10px; justify-content: flex-start; letter-spacing: 0; text-align: left; text-transform: none; }
+.gilda-emails .gilda-emails__toggle input { flex: 0 0 auto; margin: 0; }

@@ -96,8 +96,12 @@ test('a dona vê só o menu do painel e não abre as telas técnicas', async ({ 
     'Categorias e cores',
     'Cupons',
     'Dados da loja',
+    'E-mails',
     'Páginas',
   ]);
+  // A tela de e-mails abre para a dona (gilda-emails.php).
+  await page.goto('/wp-admin/admin.php?page=gilda-emails');
+  await expect(page.locator('.gilda-emails__item').first()).toBeVisible();
 
   await page.goto('/wp-admin/admin.php?page=wc-settings');
   await expect(page).toHaveURL(/page=gilda-painel/);

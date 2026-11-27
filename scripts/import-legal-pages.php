@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$dir   = '/legal';
+$dir   = rtrim( getenv( 'GILDA_LEGAL_DIR' ) ?: '/legal', '/' ); // produção: GILDA_LEGAL_DIR=<pasta-de-deploy>/docs/legal
 $files = glob( $dir . '/*.md' ) ?: array();
 if ( ! $files ) {
 	WP_CLI::error( "Nenhum .md em $dir. O serviço wpcli monta ./docs/legal em /legal (docker-compose.yml)." );
