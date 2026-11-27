@@ -57,15 +57,8 @@ function gilda_apply_product_filters( $q ) {
 
 	$chapter_params = gilda_filter_param( 'capitulo' );
 	if ( $chapter_params ) {
-		$chapter_products = gilda_chapter_product_slugs();
-		$product_slugs    = $chapter_products[ $chapter_params[0] ] ?? array();
-		$product_ids      = array();
-		foreach ( $product_slugs as $product_slug ) {
-			$product = get_page_by_path( $product_slug, OBJECT, 'product' );
-			if ( $product ) {
-				$product_ids[] = (int) $product->ID;
-			}
-		}
+		// Peças do capítulo (campo "Capítulo" da peça, no painel). Capítulo fora do site: loja vazia.
+		$product_ids = gilda_chapter_product_ids( $chapter_params[0] );
 		$q->set( 'post__in', $product_ids ? $product_ids : array( 0 ) );
 	}
 }
@@ -169,12 +162,13 @@ function gilda_shortcode_product_filters() {
 		esc_html__( 'Capítulo', 'gilda' ),
 		esc_html__( 'Todos os capítulos', 'gilda' )
 	);
-	foreach ( array_keys( gilda_chapter_product_slugs() ) as $chapter_slug ) {
-		$chapter_label = sprintf( __( 'Capítulo %s', 'gilda' ), substr( $chapter_slug, -1 ) );
+	foreach ( gilda_book_chapters() as $chapter ) {
+		/* translators: 1: chapter number, 2: chapter name */
+		$chapter_label = sprintf( __( 'Capítulo %1$d — %2$s', 'gilda' ), $chapter['number'], $chapter['name'] );
 		$chapter_html .= sprintf(
 			'<option value="%1$s"%2$s>%3$s</option>',
-			esc_attr( $chapter_slug ),
-			selected( in_array( $chapter_slug, $capitulo, true ), true, false ),
+			esc_attr( $chapter['anchor'] ),
+			selected( in_array( $chapter['anchor'], $capitulo, true ), true, false ),
 			esc_html( $chapter_label )
 		);
 	}

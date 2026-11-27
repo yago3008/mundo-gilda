@@ -1,6 +1,7 @@
 <!-- wp:html -->
 <style>
-/* Footer GILDA; — estilos embutidos para não depender do theme.css compartilhado. */
+/* Footer GILDA; — estilos embutidos para não depender do theme.css compartilhado.
+   Contatos, empresa e redes vêm da tela "Dados da loja" do painel (shortcodes em inc/shortcodes.php). */
 .gilda-footer a { color: var(--wp--preset--color--cream); }
 .gilda-footer__top { align-items: start; display: grid; gap: clamp(32px, 4vw, 72px); grid-template-columns: 1.4fr 1fr 1fr 1fr; }
 .gilda-footer__heading { color: color-mix(in srgb, var(--wp--preset--color--cream) 75%, transparent); font: 500 11px/1 var(--wp--preset--font-family--sans); letter-spacing: 2px; margin: 0 0 22px; text-transform: uppercase; }
@@ -44,10 +45,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<ul class="gilda-footer__social-list">
-<li><a href="https://www.instagram.com/gildapontoevirgula/" target="_blank" rel="noreferrer noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg><span>@gildapontoevirgula</span></a></li>
-<li><a href="https://wa.me/5541991008303" target="_blank" rel="noreferrer noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7L4 20z"></path><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1-1.2 1.8.8c-.2 1-1.1 1.6-2.1 1.5-3.2-.4-5.8-3-6.2-6.2-.1-1 .5-1.9 1.5-2.1l.8 1.8L9 9.5z"></path></svg><span>WhatsApp</span></a></li>
-</ul>
+[gilda_footer_social]
 <!-- /wp:html --></div>
 <!-- /wp:group -->
 
@@ -104,15 +102,9 @@
 <h2 class="wp-block-heading gilda-footer__heading">Contato</h2>
 <!-- /wp:heading -->
 
-<!-- wp:list {"className":"gilda-footer__links"} -->
-<ul class="wp-block-list gilda-footer__links"><!-- wp:list-item -->
-<li><a href="tel:+5541991008303">41.991008303</a></li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><a href="mailto:mundogilda@gmail.com">mundogilda@gmail.com</a></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list --></div>
+<!-- wp:html -->
+[gilda_footer_contact]
+<!-- /wp:html --></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 
@@ -120,9 +112,9 @@
 <div class="wp-block-group gilda-footer__brand" style="border-top-color:color-mix(in srgb, var(--wp--preset--color--cream) 30%, transparent);border-top-width:1px;padding-bottom:var(--wp--preset--spacing--70)"><!-- wp:group {"className":"gilda-footer__brand-id","layout":{"type":"default"}} -->
 <div class="wp-block-group gilda-footer__brand-id"><!-- wp:site-title {"level":0,"isLink":true,"className":"gilda-logo is-light"} /-->
 
-<!-- wp:paragraph {"className":"gilda-footer__legal"} -->
-<p class="gilda-footer__legal">GILDA ALFAIATARIA LTDA&nbsp;·&nbsp;CNPJ 45.822.638/0001-09<br>Curitiba/PR&nbsp;·&nbsp;CEP 82.015-384</p>
-<!-- /wp:paragraph --></div>
+<!-- wp:html -->
+[gilda_footer_legal]
+<!-- /wp:html --></div>
 <!-- /wp:group -->
 
 <!-- wp:paragraph {"className":"gilda-footer__mark gilda-decorative"} -->
@@ -132,7 +124,7 @@
 <!-- /wp:group -->
 
 <!-- wp:group {"className":"gilda-footer__bar","backgroundColor":"terracotta-900","textColor":"cream","style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0"}}},"layout":{"type":"constrained","contentSize":"1280px"}} -->
-<div class="wp-block-group gilda-footer__bar has-cream-color has-terracotta-900-background-color has-text-color has-background" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--50)"><!-- wp:paragraph {"className":"gilda-footer__copyright"} -->
-<p class="gilda-footer__copyright">© 2006 by GILDA;&nbsp;·&nbsp;Todos os direitos reservados.</p>
-<!-- /wp:paragraph --></div>
+<div class="wp-block-group gilda-footer__bar has-cream-color has-terracotta-900-background-color has-text-color has-background" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--50)"><!-- wp:html -->
+[gilda_copyright]
+<!-- /wp:html --></div>
 <!-- /wp:group -->
