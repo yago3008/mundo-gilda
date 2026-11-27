@@ -48,6 +48,7 @@ async function og(page: Page, url: string): Promise<Record<string, string>> {
   });
 }
 
+// A foto vem do capítulo mais novo; numa loja sem fotos importadas (CI), do logo ou da foto do tema.
 test('prévia no WhatsApp: peça com nome e preço; Livro e home com foto do capítulo mais novo', async ({ page }) => {
   const product = await og(page, '/product-page/camisa-grao/');
   expect(product['og:title']).toBe('Camisa Grão — GILDA;');

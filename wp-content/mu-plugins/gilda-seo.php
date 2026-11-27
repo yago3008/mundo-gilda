@@ -152,7 +152,8 @@ final class Gilda_SEO {
 
 	/**
 	 * Foto da prévia: a imagem destacada; sem ela, a foto principal do capítulo mais novo (a cara da
-	 * coleção atual); sem capítulo, o ícone do site.
+	 * coleção atual); depois o logo dos Dados da loja, o ícone do site e, por último, a foto que vem com
+	 * o tema (loja recém-instalada, sem fotos importadas): a prévia nunca sai sem imagem.
 	 */
 	private function image( int $post_id ): string {
 		$url = $post_id ? get_the_post_thumbnail_url( $post_id, 'large' ) : '';
@@ -160,8 +161,14 @@ final class Gilda_SEO {
 			$chapter = $this->latest_chapter();
 			$url     = $chapter && $chapter['main'] ? wp_get_attachment_image_url( (int) $chapter['main'], 'large' ) : '';
 		}
+		if ( ! $url && function_exists( 'gilda_store_logo_id' ) && gilda_store_logo_id() ) {
+			$url = wp_get_attachment_image_url( gilda_store_logo_id(), 'large' );
+		}
 		if ( ! $url && has_site_icon() ) {
 			$url = get_site_icon_url( 512 );
+		}
+		if ( ! $url && file_exists( get_theme_file_path( 'assets/images/quem-cria-livros.png' ) ) ) {
+			$url = get_theme_file_uri( 'assets/images/quem-cria-livros.png' );
 		}
 		return (string) $url;
 	}
