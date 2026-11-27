@@ -230,6 +230,65 @@ body.woocommerce-account .woocommerce-MyAccount-content button.button:active {
 	transform: translateY(0);
 }
 
+/* ----- Página de Endereços ----- */
+body.woocommerce-account .woocommerce-Addresses {
+	align-items: start;
+	direction: ltr;
+	display: grid;
+	gap: clamp(20px, 2.5vw, 28px);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-top: 24px;
+}
+body.woocommerce-account .woocommerce-Addresses .col-1 { grid-column: 1; }
+body.woocommerce-account .woocommerce-Addresses .col-2 { grid-column: 2; }
+body.woocommerce-account .woocommerce-Address {
+	background: var(--gilda-acc-cream) !important;
+	border: 1px solid var(--gilda-acc-linen);
+	float: none !important;
+	margin: 0 !important;
+	padding: 26px 28px !important;
+	width: auto !important;
+}
+body.woocommerce-account .woocommerce-Address-title {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 16px;
+	justify-content: space-between;
+	margin: 0 0 16px;
+}
+body.woocommerce-account .woocommerce-Address-title h2 {
+	font-family: var(--gilda-acc-display);
+	font-size: 22px;
+	font-weight: 400;
+	margin: 0;
+}
+body.woocommerce-account .woocommerce-Address-title .edit {
+	border: 1px solid var(--gilda-acc-terracotta);
+	color: var(--gilda-acc-terracotta);
+	font: 500 10px/1 var(--gilda-acc-sans);
+	letter-spacing: 1.2px;
+	padding: 9px 14px;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: background-color .2s ease, color .2s ease;
+	white-space: nowrap;
+}
+body.woocommerce-account .woocommerce-Address-title .edit:hover {
+	background: var(--gilda-acc-terracotta);
+	color: var(--gilda-acc-cream);
+}
+body.woocommerce-account .woocommerce-Address address {
+	color: var(--gilda-acc-ink);
+	font: 400 16px/1.7 var(--gilda-acc-serif);
+	font-style: normal;
+}
+@media (max-width: 782px) {
+	body.woocommerce-account .woocommerce-Addresses { grid-template-columns: minmax(0, 1fr); }
+	body.woocommerce-account .woocommerce-Addresses .col-1,
+	body.woocommerce-account .woocommerce-Addresses .col-2 { grid-column: 1; }
+}
+
 /* ----- Mobile: empilha menu acima do conteúdo ----- */
 @media (max-width: 782px) {
 	body.woocommerce-account .woocommerce { grid-template-columns: minmax(0, 1fr); gap: 24px; }
