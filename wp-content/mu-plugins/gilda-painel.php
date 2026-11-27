@@ -29,6 +29,7 @@ require GILDA_PAINEL_DIR . 'store-data.php';
 require GILDA_PAINEL_DIR . 'chapters.php';
 require GILDA_PAINEL_DIR . 'role.php';
 require GILDA_PAINEL_DIR . 'login.php';
+require GILDA_PAINEL_DIR . 'traducoes.php';
 
 if ( is_admin() ) {
 	require GILDA_PAINEL_DIR . 'admin-skin.php';
