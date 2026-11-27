@@ -27,6 +27,7 @@ function gilda_account_dashboard_styles() {
 <style id="gilda-account-dashboard">
 /* ===== GILDA; — Minha conta (área logada) ===== */
 body.woocommerce-account .woocommerce-MyAccount-content,
+body.woocommerce-account .gilda-account-side,
 body.woocommerce-account .woocommerce-MyAccount-navigation {
 	--gilda-acc-terracotta: var(--gilda-terracotta, var(--wp--preset--color--terracotta, #77270c));
 	--gilda-acc-terracotta-900: var(--gilda-terracotta-900, var(--wp--preset--color--terracotta-900, #4e1a08));
@@ -50,52 +51,81 @@ body.woocommerce-account .woocommerce {
 }
 body.woocommerce-account .woocommerce-notices-wrapper { grid-column: 1 / -1; }
 
-/* ----- Navegação (menu lateral) ----- */
+/* ----- Navegação: saudação + menu com ícones (coluna da esquerda; abas roláveis no celular) ----- */
+body.woocommerce-account .gilda-account-side { grid-column: 1; position: sticky; top: calc(var(--gilda-header-h, 72px) + 24px); }
+body.woocommerce-account .gilda-account-side__hello { border-bottom: 1px solid var(--gilda-acc-linen); margin: 0 0 14px; padding: 0 0 18px; }
+body.woocommerce-account .gilda-account-side__name { color: var(--gilda-acc-ink); font: italic 300 32px/1.05 var(--gilda-acc-display); letter-spacing: -.01em; margin: 0; }
+body.woocommerce-account .gilda-account-side__name span { color: var(--gilda-acc-terracotta); font-style: normal; font-weight: 400; margin-left: .03em; }
+body.woocommerce-account .gilda-account-side__email { color: var(--gilda-acc-ink-soft); font: 400 13px/1.4 var(--gilda-acc-sans); margin: 8px 0 0; overflow-wrap: anywhere; }
 body.woocommerce-account .woocommerce-MyAccount-navigation {
-	background: var(--gilda-acc-white);
-	border: 1px solid var(--gilda-acc-linen);
+	background: none;
+	border: 0;
 	float: none !important;
-	grid-column: 1;
-	margin: 0;
-	padding: 8px;
-	width: auto !important;
-}
-body.woocommerce-account .woocommerce-MyAccount-navigation ul {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	list-style: none;
 	margin: 0;
 	padding: 0;
+	width: auto !important;
 }
+body.woocommerce-account .woocommerce-MyAccount-navigation ul { display: flex; flex-direction: column; gap: 2px; list-style: none; margin: 0; padding: 0; }
 body.woocommerce-account .woocommerce-MyAccount-navigation li { margin: 0; padding: 0; }
 body.woocommerce-account .woocommerce-MyAccount-navigation li a {
-	border-left: 2px solid transparent;
+	align-items: center;
+	border: 0;
 	color: var(--gilda-acc-ink);
-	display: block;
-	font: 500 12px/1.3 var(--gilda-acc-sans);
-	letter-spacing: 1.4px;
-	padding: 19px 20px;
-	text-decoration: none;
-	text-transform: uppercase;
-	transition: color .18s ease, background .18s ease, border-color .18s ease, padding .18s ease;
+	display: flex;
+	font: 500 14px/1.2 var(--gilda-acc-sans);
+	gap: 14px;
+	letter-spacing: .02em;
+	min-height: 48px;
+	padding: 0 16px;
+	text-decoration: none !important;
+	text-transform: none;
+	transition: background-color .18s ease, color .18s ease;
 }
-body.woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
-	background: var(--gilda-acc-cream);
-	color: var(--gilda-acc-terracotta);
-	padding-left: 22px;
+body.woocommerce-account .woocommerce-MyAccount-navigation li a::before {
+	background: currentColor;
+	content: "";
+	flex: 0 0 20px;
+	height: 20px;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	opacity: .75;
+	transition: transform .18s ease, opacity .18s ease;
+	width: 20px;
 }
-body.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a {
-	background: var(--gilda-acc-cream);
-	border-left-color: var(--gilda-acc-terracotta);
-	color: var(--gilda-acc-terracotta);
-	font-weight: 600;
-}
-body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a {
-	color: var(--gilda-acc-ink-soft);
-}
-body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a:hover {
-	color: var(--gilda-acc-terracotta);
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--edit-account a::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/%3E%3C/svg%3E"); }
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--orders a::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8h14l-1 13H6z'/%3E%3Cpath d='M9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8h14l-1 13H6z'/%3E%3Cpath d='M9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E"); }
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--edit-address a::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z'/%3E%3Ccircle cx='12' cy='9' r='2.5'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z'/%3E%3Ccircle cx='12' cy='9' r='2.5'/%3E%3C/svg%3E"); }
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--senha a::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E"); }
+body.woocommerce-account .woocommerce-MyAccount-navigation-link--customer-logout a::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4H5v16h4'/%3E%3Cpath d='M14 8l4 4-4 4'/%3E%3Cpath d='M18 12H9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4H5v16h4'/%3E%3Cpath d='M14 8l4 4-4 4'/%3E%3Cpath d='M18 12H9'/%3E%3C/svg%3E"); }
+body.woocommerce-account .woocommerce-MyAccount-navigation li:not(.is-active) a:hover { background: var(--gilda-acc-white); color: var(--gilda-acc-terracotta); }
+body.woocommerce-account .woocommerce-MyAccount-navigation li:not(.is-active) a:hover::before { opacity: 1; transform: translateX(2px); }
+body.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a { background: var(--gilda-acc-terracotta); color: var(--gilda-acc-cream); }
+body.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a::before { opacity: 1; }
+body.woocommerce-account .woocommerce-MyAccount-navigation li a:focus-visible { outline: 2px solid var(--gilda-acc-terracotta); outline-offset: 2px; }
+/* "Sair" separado, mais discreto. */
+body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout { border-top: 1px solid var(--gilda-acc-linen); margin-top: 12px; padding-top: 12px; }
+body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a { color: var(--gilda-acc-ink-soft); }
+body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout a:hover { background: none; color: var(--gilda-acc-terracotta); }
+@media (max-width: 782px) {
+	body.woocommerce-account .gilda-account-side { min-width: 0; position: static; }
+	body.woocommerce-account .gilda-account-side__hello { align-items: baseline; border: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0 0 12px; padding: 0; }
+	body.woocommerce-account .gilda-account-side__name { font-size: 26px; }
+	body.woocommerce-account .gilda-account-side__email { display: none; }
+	/* Abas numa linha só, roláveis de lado; a borda de baixo marca a linha. */
+	body.woocommerce-account .woocommerce-MyAccount-navigation { border-bottom: 1px solid var(--gilda-acc-linen); margin: 0 -16px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation::-webkit-scrollbar { display: none; }
+	/* Degradê na borda direita: sinal de que há mais abas para o lado. */
+	body.woocommerce-account .woocommerce-MyAccount-navigation { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+	body.woocommerce-account .woocommerce-MyAccount-navigation.is-scrolled-end { -webkit-mask-image: none; mask-image: none; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation ul { flex-direction: row; gap: 4px; width: max-content; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation li a { font-size: 13px; gap: 8px; min-height: 44px; padding: 0 14px; white-space: nowrap; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation li a::before { flex-basis: 17px; height: 17px; width: 17px; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a { background: none; box-shadow: inset 0 -2px 0 var(--gilda-acc-terracotta); color: var(--gilda-acc-terracotta); }
+	body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--customer-logout { border: 0; margin: 0; padding: 0; }
 }
 
 /* ----- Conteúdo ----- */
@@ -299,6 +329,7 @@ body.woocommerce-account #wc_better_calc_checkbox_shipping_field {
 /* ----- Mobile: empilha menu acima do conteúdo ----- */
 @media (max-width: 782px) {
 	body.woocommerce-account .woocommerce { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+	body.woocommerce-account .gilda-account-side,
 	body.woocommerce-account .woocommerce-MyAccount-navigation,
 	body.woocommerce-account .woocommerce-MyAccount-content { grid-column: 1; }
 }
@@ -306,6 +337,51 @@ body.woocommerce-account #wc_better_calc_checkbox_shipping_field {
 	<?php
 }
 add_action( 'wp_head', 'gilda_account_dashboard_styles', 99 );
+
+/*
+ * Coluna da esquerda: "olá, {nome};" e o e-mail em cima do menu. O template de navegação do WooCommerce
+ * continua o mesmo; os ganchos antes/depois dele abrem e fecham o <aside> que vira a coluna do grid.
+ */
+add_action(
+	'woocommerce_before_account_navigation',
+	static function () {
+		$user = wp_get_current_user();
+		$name = $user->first_name ? $user->first_name : $user->display_name;
+		echo '<aside class="gilda-account-side">';
+		if ( $user->exists() ) {
+			echo '<div class="gilda-account-side__hello">';
+			/* translators: %s: primeiro nome da cliente */
+			echo '<p class="gilda-account-side__name">' . esc_html( sprintf( __( 'olá, %s', 'gilda' ), $name ) ) . '<span>;</span></p>';
+			echo '<p class="gilda-account-side__email">' . esc_html( $user->user_email ) . '</p>';
+			echo '</div>';
+		}
+	},
+	1
+);
+add_action(
+	'woocommerce_after_account_navigation',
+	static function () {
+		echo '</aside>';
+		// No celular as abas rolam de lado: a ativa entra na tela, e o degradê some quando chega ao fim.
+		?>
+<script>
+( function () {
+	var nav = document.querySelector( '.woocommerce-MyAccount-navigation' );
+	if ( ! nav ) { return; }
+	var sync = function () { nav.classList.toggle( 'is-scrolled-end', nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 4 ); };
+	var active = nav.querySelector( 'li.is-active' );
+	if ( active && nav.scrollWidth > nav.clientWidth ) {
+		nav.scrollLeft = active.offsetLeft - ( nav.clientWidth - active.offsetWidth ) / 2;
+	}
+	sync();
+	nav.addEventListener( 'scroll', sync, { passive: true } );
+	window.addEventListener( 'resize', sync );
+} )();
+</script>
+		<?php
+	},
+	99
+);
 
 /**
  * Menu da conta: remove "Painel" e "Downloads".
