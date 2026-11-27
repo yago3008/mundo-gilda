@@ -283,6 +283,13 @@ body.woocommerce-account .woocommerce-Address address {
 	font: 400 16px/1.7 var(--gilda-acc-serif);
 	font-style: normal;
 }
+/* Esconde o País (Brasil é padrão) e o checkbox de CEP nos formulários de endereço. */
+body.woocommerce-account #billing_country_field,
+body.woocommerce-account #shipping_country_field,
+body.woocommerce-account #wc_better_calc_checkbox_billing_field,
+body.woocommerce-account #wc_better_calc_checkbox_shipping_field {
+	display: none !important;
+}
 @media (max-width: 782px) {
 	body.woocommerce-account .woocommerce-Addresses { grid-template-columns: minmax(0, 1fr); }
 	body.woocommerce-account .woocommerce-Addresses .col-1,
@@ -335,12 +342,24 @@ function gilda_account_default_endpoint() {
 	if ( is_admin() || ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
 		return;
 	}
-	if ( function_exists( 'is_account_page' ) && is_account_page()
-		&& function_exists( 'is_wc_endpoint_url' ) && ! is_wc_endpoint_url()
-		&& is_user_logged_in()
-		&& function_exists( 'wc_get_account_endpoint_url' ) ) {
+	if ( ! function_exists( 'is_account_page' ) || ! is_account_page() || ! is_user_logged_in() ) {
+		return;
+	}
+
+	// Raiz da conta -> Detalhes da conta.
+	if ( function_exists( 'is_wc_endpoint_url' ) && ! is_wc_endpoint_url() && function_exists( 'wc_get_account_endpoint_url' ) ) {
 		wp_safe_redirect( wc_get_account_endpoint_url( 'edit-account' ) );
 		exit;
+	}
+
+	// Enderecos (visao geral) -> formulario de Endereco de entrega.
+	if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'edit-address' ) && function_exists( 'wc_get_endpoint_url' ) ) {
+		global $wp;
+		$sub = isset( $wp->query_vars['edit-address'] ) ? $wp->query_vars['edit-address'] : '';
+		if ( '' === $sub ) {
+			wp_safe_redirect( wc_get_endpoint_url( 'edit-address', 'shipping', wc_get_page_permalink( 'myaccount' ) ) );
+			exit;
+		}
 	}
 }
 add_action( 'template_redirect', 'gilda_account_default_endpoint' );
