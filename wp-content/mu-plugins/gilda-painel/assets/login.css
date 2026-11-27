@@ -1,0 +1,170 @@
+/* Login GILDA; (painel-proto/Main.dc.html). Cores: terracota #77270C, terracota-900 #4E1A08,
+   creme #F7F5E9, tinta #241A16, linho #E3DFD4, areia #D9D3C2, grafite #676767. */
+body.login.gilda-login {
+	background: #F7F5E9;
+	color: #241A16;
+	display: flex;
+	flex-wrap: wrap;
+	font-family: Jost, "Helvetica Neue", Arial, sans-serif;
+	margin: 0;
+	min-height: 100vh;
+}
+.gilda-login a { color: #77270C; }
+.gilda-login a:hover, .gilda-login a:focus { color: #4E1A08; }
+
+.gilda-login-photo {
+	background: #4E1A08;
+	flex: 1 1 520px;
+	min-height: 420px;
+	overflow: hidden;
+	position: relative;
+}
+.gilda-login-photo img {
+	height: 100%;
+	inset: 0;
+	object-fit: cover;
+	object-position: center 35%;
+	position: absolute;
+	width: 100%;
+}
+.gilda-login-photo__text {
+	bottom: 48px;
+	color: #F7F5E9;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	left: 48px;
+	position: absolute;
+	right: 48px;
+	text-shadow: 0 1px 14px rgb(36 26 22 / 45%);
+}
+.gilda-login-photo__kicker { font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+.gilda-login-photo__quote { font: italic 300 40px/1.05 Fraunces, Georgia, serif; }
+
+.gilda-login #login {
+	box-sizing: border-box;
+	display: flex;
+	flex: 1 1 480px;
+	flex-direction: column;
+	justify-content: center;
+	margin: 0;
+	padding: 64px 32px;
+	width: auto;
+}
+.gilda-login #login > * { box-sizing: border-box; margin-left: auto; margin-right: auto; max-width: 400px; width: 100%; }
+.gilda-login #login h1.wp-login-logo { height: 1px; margin: 0 auto; overflow: hidden; position: absolute; width: 1px; clip: rect(0 0 0 0); }
+
+.gilda-login-intro { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
+.gilda-login-intro__brand { color: #77270C; font: 400 44px/1.1 Fraunces, Georgia, serif; letter-spacing: .02em; }
+.gilda-login-intro__title { color: #241A16; font: italic 300 32px/1.15 Fraunces, Georgia, serif; margin: 0; }
+.gilda-login-intro__text { color: #676767; font: 400 19px/1.5 "EB Garamond", Georgia, serif; margin: 0; }
+
+.gilda-login #loginform,
+.gilda-login #lostpasswordform,
+.gilda-login #resetpassform,
+.gilda-login #registerform {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	margin-top: 0;
+	overflow: visible;
+	padding: 0;
+}
+.gilda-login #loginform p, .gilda-login #lostpasswordform p { margin: 0; }
+.gilda-login .user-pass-wrap { margin: 0; }
+.gilda-login form label,
+.gilda-login .user-pass-wrap > label {
+	color: #241A16;
+	display: block;
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 2px;
+	margin-bottom: 8px;
+	text-transform: uppercase;
+}
+.gilda-login form .input,
+.gilda-login input[type="text"],
+.gilda-login input[type="password"],
+.gilda-login input[type="email"] {
+	background: #FFFFFF;
+	border: 1px solid #241A16;
+	border-radius: 2px;
+	box-shadow: none;
+	box-sizing: border-box;
+	color: #241A16;
+	font: 400 16px Jost, sans-serif;
+	height: 48px;
+	letter-spacing: 0;
+	margin: 0;
+	min-height: 48px;
+	padding: 0 16px;
+	width: 100%;
+}
+.gilda-login input:focus, .gilda-login button:focus-visible { border-color: #241A16; box-shadow: none; outline: 2px solid #77270C; outline-offset: 2px; }
+.gilda-login .wp-pwd { margin: 0; }
+.gilda-login .wp-pwd .button.wp-hide-pw { color: #676767; height: 48px; min-height: 48px; }
+.gilda-login .wp-pwd .button.wp-hide-pw:focus { box-shadow: none; outline: 2px solid #77270C; }
+
+.gilda-login .forgetmenot { float: none; margin: 0; }
+.gilda-login .forgetmenot label {
+	align-items: center;
+	display: flex;
+	font-size: 14px;
+	font-weight: 400;
+	gap: 10px;
+	letter-spacing: 0;
+	margin: 0;
+	text-transform: none;
+}
+.gilda-login input[type="checkbox"] { accent-color: #77270C; border-color: #241A16; height: 18px; margin: 0; width: 18px; }
+.gilda-login input[type="checkbox"]:checked::before { content: none; }
+.gilda-login input[type="checkbox"]:checked { background: #77270C; }
+
+.gilda-login .submit { float: none; margin-top: 10px; }
+.gilda-login .button-primary,
+.gilda-login #wp-submit {
+	background: #77270C;
+	border: 0;
+	border-radius: 2px;
+	box-shadow: none;
+	color: #F7F5E9;
+	float: none;
+	font: 500 14px Jost, sans-serif;
+	height: 52px;
+	letter-spacing: 1.5px;
+	min-height: 52px;
+	text-shadow: none;
+	text-transform: uppercase;
+	width: 100%;
+}
+.gilda-login .button-primary:hover, .gilda-login #wp-submit:hover { background: #4E1A08; color: #F7F5E9; }
+
+.gilda-login #nav { margin: 28px auto 0; padding: 0; }
+.gilda-login #nav a { font: italic 400 18px "EB Garamond", Georgia, serif; text-decoration: underline; text-underline-offset: 5px; }
+.gilda-login #backtoblog { margin: 18px auto 0; padding: 0; }
+.gilda-login #backtoblog a { color: #676767; font-size: 13px; }
+.gilda-login .privacy-policy-page-link { margin: 24px auto 0; text-align: left; }
+.gilda-login .privacy-policy-page-link a { color: #676767; font-size: 13px; }
+
+.gilda-login .message,
+.gilda-login .notice,
+.gilda-login #login_error {
+	background: #FFFFFF;
+	border: 1px solid #D9D3C2;
+	border-left: 4px solid #77270C;
+	box-shadow: none;
+	color: #241A16;
+	font-size: 14px;
+	margin: 0 auto 20px;
+	padding: 12px 16px;
+}
+
+@media (max-width: 760px) {
+	.gilda-login-photo { flex-basis: 100%; min-height: 240px; }
+	.gilda-login-photo__text { bottom: 24px; left: 24px; right: 24px; }
+	.gilda-login-photo__quote { font-size: 28px; }
+	.gilda-login #login { padding: 40px 20px 56px; }
+}

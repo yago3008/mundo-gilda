@@ -122,47 +122,12 @@ function gilda_orders_menu_slug(): string {
 add_action(
 	'admin_menu',
 	static function () {
-		$hook = add_menu_page( 'Painel GILDA;', 'Painel GILDA;', 'gilda_painel', GILDA_PAINEL_PAGE, 'gilda_painel_screen', 'dashicons-heart', 2 );
-		add_action(
-			'load-' . $hook,
-			static fn() => wp_enqueue_style( 'gilda-painel-admin', GILDA_PAINEL_URL . 'assets/painel-admin.css', array(), GILDA_PAINEL_VERSION )
-		);
+		$hook = add_menu_page( 'Painel GILDA;', gilda_is_owner() ? 'Início' : 'Painel GILDA;', 'gilda_painel', GILDA_PAINEL_PAGE, 'gilda_painel_screen', 'dashicons-heart', 2 );
+		add_action( 'load-' . $hook, 'gilda_painel_enqueue_ui' );
 	}
 );
 
-/** Atalhos da página inicial do painel. */
-function gilda_painel_screen(): void {
-	$processing = 0;
-	if ( function_exists( 'wc_orders_count' ) ) {
-		$processing = (int) wc_orders_count( 'processing' );
-	}
-	$chapters = function_exists( 'gilda_chapters' ) ? count( gilda_chapters() ) : 0;
-	$cards    = array(
-		array( 'Pedidos', $processing ? sprintf( '%d pedido(s) para separar e enviar.', $processing ) : 'Nenhum pedido esperando envio.', admin_url( gilda_orders_menu_slug() ), 'dashicons-cart' ),
-		array( 'Nova peça', 'Cadastrar uma peça: fotos, preço, cores, tamanhos e estoque.', admin_url( 'post-new.php?post_type=product' ), 'dashicons-tag' ),
-		array( 'Novo capítulo', sprintf( 'Hoje são %d capítulo(s) no site. Crie o próximo com fotos, textos e peças.', $chapters ), admin_url( 'post-new.php?post_type=' . GILDA_CHAPTER_CPT ), 'dashicons-book-alt' ),
-		array( 'Cupons', 'Criar ou mudar cupons de desconto.', admin_url( 'edit.php?post_type=shop_coupon' ), 'dashicons-tickets-alt' ),
-		array( 'Dados da loja', 'Endereço, CNPJ, telefone, WhatsApp, e-mail, Instagram e logo.', admin_url( 'admin.php?page=gilda-dados-da-loja' ), 'dashicons-store' ),
-		array( 'Páginas', 'Política de privacidade, trocas, cuidados com as peças, dúvidas frequentes.', admin_url( 'edit.php?post_type=page' ), 'dashicons-media-document' ),
-	);
-	$user = wp_get_current_user();
-	?>
-	<div class="wrap gilda-panel">
-		<h1>Olá, <?php echo esc_html( $user->first_name ? $user->first_name : $user->display_name ); ?>!</h1>
-		<p class="gilda-panel__intro">Este é o painel da GILDA;. Tudo o que você muda aqui aparece sozinho no site. Dúvidas? Veja o guia do painel.</p>
-		<div class="gilda-panel__grid">
-			<?php foreach ( $cards as $card ) : ?>
-				<a class="gilda-panel__tile" href="<?php echo esc_url( $card[2] ); ?>">
-					<span class="dashicons <?php echo esc_attr( $card[3] ); ?>" aria-hidden="true"></span>
-					<strong><?php echo esc_html( $card[0] ); ?></strong>
-					<span><?php echo esc_html( $card[1] ); ?></span>
-				</a>
-			<?php endforeach; ?>
-		</div>
-		<p><a class="button" href="<?php echo esc_url( home_url( '/' ) ); ?>" target="_blank" rel="noopener">Ver o site</a></p>
-	</div>
-	<?php
-}
+// A página em si: home.php (gilda_painel_screen).
 
 /* ---------- Menu enxuto da dona ---------- */
 
@@ -179,11 +144,13 @@ add_action(
 		$orders  = 'edit.php?post_type=shop_order';
 		$catalog = 'edit-tags.php?taxonomy=product_cat&post_type=product';
 
-		add_menu_page( 'Pedidos', 'Pedidos', 'edit_shop_orders', $orders, '', 'dashicons-cart' );
+		$to_ship = function_exists( 'wc_orders_count' ) ? (int) wc_orders_count( 'processing' ) : 0;
+		$badge   = $to_ship ? sprintf( ' <span class="awaiting-mod count-%1$d"><span class="pending-count">%1$d</span></span>', $to_ship ) : '';
+		add_menu_page( 'Pedidos', 'Pedidos' . $badge, 'edit_shop_orders', $orders, '', 'dashicons-cart' );
 		add_submenu_page( $orders, 'Pedidos', 'Pedidos', 'edit_shop_orders', $orders );
 		add_submenu_page( $orders, 'Clientes', 'Clientes', 'view_woocommerce_reports', 'admin.php?page=wc-admin&path=/customers' );
 
-		add_menu_page( 'Categorias, Cores e Tamanhos', 'Categorias, Cores e Tamanhos', 'manage_product_terms', $catalog, '', 'dashicons-category' );
+		add_menu_page( 'Categorias e cores', 'Categorias e cores', 'manage_product_terms', $catalog, '', 'dashicons-category' );
 		add_submenu_page( $catalog, 'Categorias', 'Categorias', 'manage_product_terms', $catalog );
 		foreach ( array( 'pa_cor' => 'Cores', 'pa_tamanho' => 'Tamanhos' ) as $taxonomy => $label ) {
 			if ( taxonomy_exists( $taxonomy ) ) {
@@ -210,10 +177,14 @@ add_action(
 				$by_slug[ $item[2] ] = $item;
 			}
 		}
-		$new = array();
+		// Ícones do protótipo (assets/owner.css desenha pela classe).
+		$icons = array( 'inicio', 'pedidos', 'pecas', 'capitulos', 'catalogo', 'cupons', 'dados', 'paginas' );
+		$new   = array();
 		foreach ( $order as $i => $slug ) {
 			if ( isset( $by_slug[ $slug ] ) ) {
-				$new[ ( $i + 1 ) * 5 ] = $by_slug[ $slug ];
+				$item     = $by_slug[ $slug ];
+				$item[4]  = trim( ( $item[4] ?? '' ) . ' gilda-ico gilda-ico--' . $icons[ $i ] );
+				$new[ ( $i + 1 ) * 5 ] = $item;
 			}
 		}
 		$menu = $new; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
@@ -223,11 +194,11 @@ add_action(
 			$menu[15][0] = 'Peças'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
 		}
 		$submenu['edit.php?post_type=product'] = array( // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-			array( 'Todas as peças', 'edit_products', 'edit.php?post_type=product' ),
-			array( 'Nova peça', 'edit_products', 'post-new.php?post_type=product' ),
+			array( 'Todas as peças', 'edit_products', 'edit.php?post_type=product', 'Peças' ),
+			array( 'Nova peça', 'edit_products', GILDA_PECA_PAGE, 'Nova peça' ),
 		);
 		$submenu['edit.php?post_type=page'] = array( // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-			array( 'Todas as páginas', 'edit_pages', 'edit.php?post_type=page' ),
+			array( 'Todas as páginas', 'edit_pages', 'edit.php?post_type=page', 'Páginas' ),
 		);
 	},
 	9999

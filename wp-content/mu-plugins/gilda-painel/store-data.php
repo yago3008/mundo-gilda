@@ -180,8 +180,8 @@ function gilda_store_screen_load(): void {
 		exit;
 	}
 	wp_enqueue_media();
-	wp_enqueue_style( 'gilda-painel-admin', GILDA_PAINEL_URL . 'assets/painel-admin.css', array(), GILDA_PAINEL_VERSION );
-	wp_enqueue_script( 'gilda-painel-media', GILDA_PAINEL_URL . 'assets/painel-media.js', array( 'jquery', 'jquery-ui-sortable' ), GILDA_PAINEL_VERSION, true );
+	gilda_painel_enqueue_ui();
+	wp_enqueue_script( 'gilda-painel-media', GILDA_PAINEL_URL . 'assets/painel-media.js', array( 'jquery', 'jquery-ui-sortable' ), gilda_painel_ver( 'assets/painel-media.js' ), true );
 }
 
 /** Logo que o site usa hoje (o salvo aqui ou, sem ele, o importado do site antigo). */
@@ -200,55 +200,67 @@ function gilda_store_screen(): void {
 	$data = gilda_store();
 	?>
 	<div class="wrap gilda-panel">
-		<h1>Dados da loja</h1>
-		<p class="gilda-panel__intro">Estes dados aparecem no rodapé de todas as páginas, na faixa de avisos (Instagram) e no cabeçalho (logo). Mudou aqui, muda no site inteiro.</p>
+		<header class="gilda-page-head">
+			<h1 class="gilda-display">dados da loja;</h1>
+			<p class="gilda-lead">Aparecem no rodapé de todas as páginas, na faixa de avisos (Instagram) e no cabeçalho (logo). Mudou aqui, muda no site inteiro.</p>
+		</header>
 		<?php if ( isset( $_GET['saved'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
-			<div class="notice notice-success is-dismissible"><p>Dados salvos. O site já mostra as informações novas.</p></div>
+			<div class="gilda-notice gilda-notice--ok notice-success" role="status"><p>Dados salvos. O site já mostra as informações novas.</p></div>
 		<?php endif; ?>
-		<form method="post" class="gilda-panel__form">
+		<form method="post" class="gilda-edit">
 			<?php wp_nonce_field( 'gilda_store_save' ); ?>
-			<div class="gilda-panel__card">
-				<?php
-				foreach ( gilda_store_fields() as $key => $field ) :
-					$id    = 'gilda-store-' . $key;
-					$name  = 'gilda_store[' . $key . ']';
-					$value = $data[ $key ] ?? '';
-					$type  = $field['type'] ?? 'text';
-					?>
-					<div class="gilda-field gilda-field--<?php echo esc_attr( $type ); ?>">
-						<label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
-						<?php if ( 'uf' === $type ) : ?>
-							<select id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>">
-								<option value="">—</option>
-								<?php foreach ( gilda_store_states() as $uf => $state ) : ?>
-									<option value="<?php echo esc_attr( $uf ); ?>" <?php selected( $value, $uf ); ?>><?php echo esc_html( $uf . ' — ' . $state ); ?></option>
-								<?php endforeach; ?>
-							</select>
-						<?php elseif ( 'image' === $type ) : ?>
-							<?php $logo = gilda_store_logo_id(); ?>
-							<div class="gilda-photos gilda-photos--single" data-gilda-photos data-name="<?php echo esc_attr( $name ); ?>" data-max="1" data-title="Escolher o logo" data-button="Usar este logo" data-alt="0">
-								<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="" /><?php // vazio = logo importado do site antigo ?>
-								<ul class="gilda-photos__list">
-									<?php if ( $logo ) : ?>
-										<li class="gilda-photo" data-id="<?php echo esc_attr( $logo ); ?>">
-											<img src="<?php echo esc_url( (string) wp_get_attachment_image_url( $logo, 'medium' ) ); ?>" alt="" />
-											<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ? $logo : '' ); ?>" />
-											<button type="button" class="gilda-photo__remove" aria-label="Tirar o logo">×</button>
-										</li>
-									<?php endif; ?>
-								</ul>
-								<button type="button" class="button gilda-photos__add" id="<?php echo esc_attr( $id ); ?>"><?php echo $logo ? 'Trocar logo' : 'Escolher logo'; ?></button>
-							</div>
-						<?php else : ?>
-							<input id="<?php echo esc_attr( $id ); ?>" type="<?php echo 'email' === $type ? 'email' : 'text'; ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( (string) $value ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ?? '' ); ?>" class="regular-text" />
-						<?php endif; ?>
-						<?php if ( ! empty( $field['help'] ) ) : ?>
-							<p class="description"><?php echo esc_html( $field['help'] ); ?></p>
-						<?php endif; ?>
+			<div class="gilda-edit__main">
+				<section class="gilda-card" aria-labelledby="gilda-store-t">
+					<h2 id="gilda-store-t" class="gilda-h2">A loja</h2>
+					<div class="gilda-store-form">
+					<?php
+					foreach ( gilda_store_fields() as $key => $field ) :
+						$id    = 'gilda-store-' . $key;
+						$name  = 'gilda_store[' . $key . ']';
+						$value = $data[ $key ] ?? '';
+						$type  = $field['type'] ?? 'text';
+						?>
+						<div class="gilda-field gilda-field--<?php echo esc_attr( $type ); ?>">
+							<?php if ( 'image' === $type ) : ?>
+								<span class="gilda-label"><?php echo esc_html( $field['label'] ); ?></span>
+								<?php
+								$logo = gilda_store_logo_id();
+								// Vazio = continua o logo importado do site antigo.
+								gilda_photo_field(
+									$name,
+									$logo ? array( $logo ) : array(),
+									1,
+									array( 'title' => 'Escolher o logo', 'button' => 'Usar este logo', 'style' => 'logo', 'alt' => false, 'saved' => (bool) $value, 'add' => '+ Escolher logo' )
+								);
+								?>
+							<?php else : ?>
+								<label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
+								<?php if ( 'uf' === $type ) : ?>
+									<select id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>">
+										<option value="">—</option>
+										<?php foreach ( gilda_store_states() as $uf => $state ) : ?>
+											<option value="<?php echo esc_attr( $uf ); ?>" <?php selected( $value, $uf ); ?>><?php echo esc_html( $uf . ' — ' . $state ); ?></option>
+										<?php endforeach; ?>
+									</select>
+								<?php else : ?>
+									<input id="<?php echo esc_attr( $id ); ?>" type="<?php echo 'email' === $type ? 'email' : 'text'; ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( (string) $value ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ?? '' ); ?>" />
+								<?php endif; ?>
+							<?php endif; ?>
+							<?php if ( ! empty( $field['help'] ) ) : ?>
+								<p class="description"><?php echo esc_html( $field['help'] ); ?></p>
+							<?php endif; ?>
+						</div>
+					<?php endforeach; ?>
 					</div>
-				<?php endforeach; ?>
+				</section>
 			</div>
-			<p class="gilda-panel__actions"><button type="submit" class="button button-primary button-hero">Salvar dados da loja</button></p>
+			<aside class="gilda-edit__side">
+				<section class="gilda-card gilda-publish" aria-labelledby="gilda-store-save-t">
+					<h2 id="gilda-store-save-t" class="gilda-h2">Salvar</h2>
+					<button type="submit" class="gilda-btn gilda-btn--big">Salvar dados da loja</button>
+					<p class="gilda-publish__note">O rodapé, a faixa de avisos e o logo mudam na hora, em todas as páginas.</p>
+				</section>
+			</aside>
 		</form>
 	</div>
 	<?php
