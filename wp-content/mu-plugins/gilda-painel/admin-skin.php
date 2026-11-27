@@ -130,3 +130,31 @@ add_filter(
 	10,
 	2
 );
+
+/* O painel da dona usa as cores da GILDA;, por cima do esquema "Padrão" do WordPress
+   (os esquemas azul/roxo/etc. pintavam o submenu por baixo). */
+add_filter( 'get_user_option_admin_color', static fn( $color ) => gilda_is_owner() ? 'fresh' : $color, 99 );
+
+/*
+ * O menu da dona nunca "recolhe" no computador: o WordPress encolhe o menu (auto-fold) entre 783 e
+ * 960 px, o que espremia os nomes. No celular (até 782 px) o comportamento do WordPress continua.
+ */
+add_action(
+	'in_admin_header',
+	static function () {
+		if ( ! gilda_is_owner() ) {
+			return;
+		}
+		?>
+		<script>
+		( function () {
+			var body = document.body, wide = window.matchMedia( '(min-width: 783px)' );
+			function sync() { body.classList.toggle( 'auto-fold', ! wide.matches ); body.classList.remove( 'folded' ); }
+			sync();
+			if ( wide.addEventListener ) { wide.addEventListener( 'change', sync ); }
+		} )();
+		</script>
+		<?php
+	},
+	0
+);

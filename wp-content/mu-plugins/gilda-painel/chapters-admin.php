@@ -39,7 +39,7 @@ add_filter(
 	'admin_body_class',
 	static function ( $classes ) {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		return ( $screen && GILDA_CHAPTER_CPT === $screen->post_type ) ? $classes . ' gilda-chapter-screen' : $classes;
+		return ( $screen && GILDA_CHAPTER_CPT === $screen->post_type && 'post' === $screen->base ) ? $classes . ' gilda-chapter-screen' : $classes;
 	}
 );
 

@@ -66,12 +66,22 @@ body.gilda-owner #adminmenu li.menu-top > a {
 body.gilda-owner #adminmenu li.menu-top:hover > a,
 body.gilda-owner #adminmenu li.opensub > a.menu-top,
 body.gilda-owner #adminmenu li > a.menu-top:focus { background: rgb(78 26 8 / 60%); color: var(--g-cream); }
-body.gilda-owner #adminmenu li.wp-has-current-submenu > a.wp-has-current-submenu,
-body.gilda-owner #adminmenu li.current > a.current,
-body.gilda-owner #adminmenu .current a.menu-top { background: var(--g-terra-900); color: var(--g-cream); }
-body.gilda-owner #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu::after,
-body.gilda-owner #adminmenu li.current a.menu-top::after,
-body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head { display: none; }
+body.gilda-owner #adminmenu > li.wp-has-current-submenu > a.wp-has-current-submenu,
+body.gilda-owner #adminmenu > li.menu-top.current > a.menu-top { background: var(--g-terra-900); color: var(--g-cream); }
+/* Sem a setinha branca do item atual nem o cabeçalho azul do submenu (esquemas de cor do WordPress) */
+body.gilda-owner ul#adminmenu a.menu-top::after,
+body.gilda-owner ul#adminmenu a.wp-has-current-submenu::after,
+body.gilda-owner ul#adminmenu > li.current > a.current::after,
+body.gilda-owner #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
+body.gilda-owner #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after { border: 0 !important; content: none !important; display: none !important; }
+body.gilda-owner #adminmenu li::after,
+body.gilda-owner #adminmenu li:hover::after { border: 0 !important; content: none !important; display: none !important; }
+body.gilda-owner #adminmenu li.menu-top,
+body.gilda-owner #adminmenu li.menu-top:hover,
+body.gilda-owner #adminmenu li.menu-top:focus-within,
+body.gilda-owner #adminmenu li.opensub { background: transparent !important; }
+body.gilda-owner #adminmenu .wp-submenu-head,
+body.gilda-owner #adminmenu .wp-submenu .wp-submenu-head { display: none !important; }
 body.gilda-owner #adminmenu .wp-menu-name { color: inherit; flex: 1; padding: 0; display: flex; align-items: center; gap: 8px; }
 body.gilda-owner #adminmenu .awaiting-mod,
 body.gilda-owner #adminmenu .update-plugins {
@@ -102,18 +112,53 @@ body.gilda-owner #adminmenu li.gilda-ico--cupons { --ico: url("data:image/svg+xm
 body.gilda-owner #adminmenu li.gilda-ico--dados { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M4 10l1.5-5h13L20 10M4 10h16v10H4zM9 20v-5h6v5'/%3E%3C/svg%3E"); }
 body.gilda-owner #adminmenu li.gilda-ico--paginas { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7'/%3E%3C/svg%3E"); }
 
-/* Submenu: dentro do menu, sem caixinha */
+/* Submenu: só o do item atual, dentro do menu, sem caixinha nem a barra azul de "passar o mouse".
+   Os outros itens não abrem submenu flutuante: o clique leva à 1ª tela e o submenu aparece aqui. */
 body.gilda-owner #adminmenu .wp-submenu,
 body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu,
-body.gilda-owner #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: transparent; box-shadow: none; padding: 4px 0 8px 42px; }
-body.gilda-owner #adminmenu .wp-not-current-submenu .wp-submenu { background: var(--g-terra-900); border-radius: 2px; padding: 8px 0; }
-body.gilda-owner #adminmenu .wp-submenu a { color: rgb(247 245 233 / 80%); font: 400 14px var(--g-sans); letter-spacing: 0; padding: 6px 12px; text-transform: none; }
+body.gilda-owner #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
+body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu.sub-open {
+	background: transparent !important;
+	border: 0;
+	box-shadow: none;
+	left: auto;
+	margin: 0;
+	padding: 4px 0 8px 42px;
+	position: static;
+	top: auto;
+	width: auto;
+}
+body.gilda-owner #adminmenu li.wp-not-current-submenu .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu.opensub .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu:hover .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu:focus-within .wp-submenu { display: none !important; }
+body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu { display: block !important; }
+body.gilda-owner #adminmenu .wp-submenu li,
+body.gilda-owner #adminmenu .wp-submenu li.current { background: transparent !important; border: 0; margin: 0; padding: 0; }
+body.gilda-owner #adminmenu .wp-submenu a,
+body.gilda-owner #adminmenu .wp-submenu a:hover,
+body.gilda-owner #adminmenu .wp-submenu a:focus,
+body.gilda-owner #adminmenu .wp-submenu li.current a,
+body.gilda-owner #adminmenu .wp-submenu li.current a:hover {
+	background: transparent !important;
+	border: 0;
+	box-shadow: none !important;
+	color: rgb(247 245 233 / 80%);
+	display: block;
+	font: 400 14px var(--g-sans);
+	letter-spacing: 0;
+	padding: 6px 12px;
+	text-transform: none;
+}
 body.gilda-owner #adminmenu .wp-submenu a:hover,
 body.gilda-owner #adminmenu .wp-submenu a:focus,
 body.gilda-owner #adminmenu .wp-submenu li.current a { color: var(--g-cream); }
-body.gilda-owner #adminmenu .wp-submenu li.current a { text-decoration: underline; text-underline-offset: 4px; }
-body.gilda-owner #adminmenu li.wp-not-current-submenu .wp-menu-arrow,
-body.gilda-owner #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after { display: none; }
+body.gilda-owner #adminmenu .wp-submenu li.current a { font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+body.gilda-owner #adminmenu .wp-submenu a:focus-visible { outline: 2px solid var(--g-cream); outline-offset: -2px; }
+body.gilda-owner #adminmenu li.menu-top > a,
+body.gilda-owner #adminmenu li.menu-top > a:hover,
+body.gilda-owner #adminmenu li.menu-top > a:focus { box-shadow: none !important; }
+body.gilda-owner #adminmenu li.menu-top > a:focus-visible { outline: 2px solid var(--g-cream); outline-offset: -2px; }
 
 .gilda-menu-foot { color: var(--g-cream); display: flex; flex-direction: column; font-size: 14px; gap: 14px; padding: 20px 12px; }
 @media screen and (min-width: 783px) {
