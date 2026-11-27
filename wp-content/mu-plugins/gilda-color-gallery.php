@@ -15,7 +15,7 @@
 defined( 'ABSPATH' ) || exit;
 
 const GILDA_COLOR_GALLERY_TAXONOMY = 'pa_cor';
-const GILDA_COLOR_GALLERY_VERSION  = '1.0.0';
+const GILDA_COLOR_GALLERY_VERSION  = '1.1.0';
 
 /** Cores (slug => nome) usadas nas variações do produto. */
 function gilda_color_gallery_colors( WC_Product $product ): array {
