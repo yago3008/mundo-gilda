@@ -1,6 +1,6 @@
 # Deploy em produção — GILDA;
 
-Roteiro para levar a loja do ambiente local para a hospedagem definitiva. A hospedagem ainda não foi escolhida (ver [requisitos-cliente.md](../requisitos-cliente.md), item 3), então este guia serve para qualquer hospedagem com **SSH + WP-CLI** (VPS ou WordPress gerenciado).
+Roteiro para levar a loja do ambiente local para a hospedagem definitiva. O que ainda falta (das donas e nosso) está em [antes-de-producao.md](antes-de-producao.md). A hospedagem ainda não foi escolhida (ver [requisitos-cliente.md](../requisitos-cliente.md), item 3), então este guia serve para qualquer hospedagem com **SSH + WP-CLI** (VPS ou WordPress gerenciado).
 
 ## 1. Requisitos do servidor
 
@@ -77,33 +77,61 @@ Os mu-plugins leem configuração por variável de ambiente (`getenv`). Se o hos
 | `META_PIXEL_DEBUG` | **não definir** | — |
 | `GILDA_CLIENT_IP_HEADER` | ex.: `HTTP_CF_CONNECTING_IP` se houver Cloudflare/CDN | IP real para o limite de login |
 | `GILDA_LOGIN_MAX_ATTEMPTS` / `GILDA_LOGIN_LOCKOUT_MIN` | 5 / 15 (padrão) | limite de login |
+| `GILDA_DATA_DIR` / `GILDA_LEGAL_DIR` | `<pasta-de-deploy>/data` e `<pasta-de-deploy>/docs/legal` | onde os scripts de carga acham os JSON e os textos legais (só no WP-CLI; padrão `/data` e `/legal`, do Docker) |
+| `GILDA_CATALOG_CACHE` / `GILDA_CATALOG_CACHE_DAYS` | não definir (ligado, 3 dias) | cache do catálogo para visitantes (`gilda-catalog-cache`); `0` desliga |
 
 ## 4. Primeira instalação
+
+Reproduz no servidor o que o `./scripts/setup.sh` faz no Docker local. **O site precisa de três partes do repositório:** os mu-plugins (funcionalidades), o **tema `gilda`** (todo o visual: sem ele o site sobe com o tema padrão do WordPress) e as pastas de carga (`scripts/`, `data/`, `docs/legal/`).
 
 ```bash
 # No servidor, na pasta do WordPress
 wp core download --locale=pt_BR
 wp config create --dbname=... --dbuser=... --dbpass=... --dbhost=...   # depois aplicar a seção 2
-wp core install --url=https://www.mundogilda.com.br --title="GILDA;" \
-  --admin_user=<usuario-nao-obvio> --admin_email=<email-da-gilda> --prompt=admin_password
+wp core install --url=https://www.mundogilda.com.br --title="GILDA;"   --admin_user=<usuario-nao-obvio> --admin_email=<email-da-gilda> --prompt=admin_password
 
-# Plugins de terceiros — MESMAS versões do scripts/setup.sh
+# Ajustes do site (iguais ao setup local)
+wp option update timezone_string America/Sao_Paulo
+wp option update date_format 'd/m/Y'
+wp option update blogdescription 'Alfaiataria criativa'
+wp rewrite structure '/%postname%/'
+wp plugin delete akismet hello
+
+# Plugins de terceiros — MESMAS versões do PLUGINS=(…) em scripts/setup.sh
 wp plugin install woocommerce --version=11.3.1 --activate
 wp plugin install woo-better-shipping-calculator-for-brazil --version=5.2.6 --activate
 wp plugin install infixs-correios-automatico --version=1.15.0 --activate
 wp language core install pt_BR --activate && wp language plugin install --all pt_BR
+wp wc update
 
-# Nosso código (do repositório)
-rsync -av wp-content/mu-plugins/ <servidor>:<wp>/wp-content/mu-plugins/
-rsync -av scripts/ data/ <servidor>:<pasta-de-deploy>/
+# Nosso código (do repositório, branch main) — mu-plugins E tema
+rsync -av --delete wp-content/mu-plugins/   <servidor>:<wp>/wp-content/mu-plugins/
+rsync -av --delete wp-content/themes/gilda/ <servidor>:<wp>/wp-content/themes/gilda/
+wp theme activate gilda
 
-# Configuração da loja e produtos (os mesmos scripts do ambiente local)
+# Pastas de carga, fora da pasta pública (os scripts leem GILDA_DATA_DIR e GILDA_LEGAL_DIR;
+# no Docker local elas ficam em /data e /legal)
+rsync -avR scripts data docs/legal <servidor>:<pasta-de-deploy>/   # -R mantém scripts/, data/ e docs/legal/
+export GILDA_DATA_DIR=<pasta-de-deploy>/data
+export GILDA_LEGAL_DIR=<pasta-de-deploy>/docs/legal
+
+# Configuração da loja e carga inicial — mesma ordem do setup.sh
 wp eval-file <pasta-de-deploy>/scripts/setup-store.php
-# Produtos: só na PRIMEIRA carga (o import sobrescreve estoque!)
-#   ajustar o caminho /data/products.json no import-products.php ou criar um link /data → <pasta-de-deploy>/data
-wp eval-file <pasta-de-deploy>/scripts/import-products.php
+# Produtos: só na PRIMEIRA carga (o import sobrescreve estoque!). Com fotos do Wix: IMPORT_IMAGES=1
+IMPORT_IMAGES=1 wp eval-file <pasta-de-deploy>/scripts/import-products.php
+wp eval-file <pasta-de-deploy>/scripts/import-color-images.php           # fotos por cor
+wp eval-file <pasta-de-deploy>/scripts/import-legal-pages.php --user=<admin>   # páginas legais
+SITE_IMAGES=1 wp eval-file <pasta-de-deploy>/scripts/import-site-images.php    # logo, banners, capítulos
+wp eval-file <pasta-de-deploy>/scripts/import-chapters.php               # capítulos
+wp eval-file <pasta-de-deploy>/scripts/import-skus.php                   # SKUs
 wp rewrite flush
 ```
+
+Depois da instalação, conferir:
+
+- Home, loja, uma peça, carrinho e checkout abrem **com o visual da GILDA;** (se aparecer o tema padrão, o tema não foi copiado ou ativado).
+- `wp theme list` mostra `gilda` como `active`; `wp plugin list --status=must-use` lista os `gilda-*`.
+- As sementes são seguras de rodar de novo: elas só preenchem o que falta e nunca desfazem o que as donas editaram no painel.
 
 > **Usuário admin:** não usar `admin`. Criar um usuário para cada pessoa (item 14 dos requisitos), com perfil **Gerente de loja** para quem só cuida de pedidos e estoque.
 
@@ -138,6 +166,8 @@ Os scripts `scripts/backup.sh` e `scripts/restore.sh` fazem isso no Docker local
 
 ## 8. Virada (dia D)
 
+> Checklist do que falta antes e no dia: [antes-de-producao.md](antes-de-producao.md).
+
 1. **Congelar o Wix:** nada de novos produtos nem mudanças de estoque (requisitos, item 13).
 2. Rodar `node scripts/export-wix-products.mjs` para pegar **o estoque do dia** e importar na produção.
 3. Importar clientes/pedidos exportados do Wix (se combinado).
@@ -157,4 +187,4 @@ Os scripts `scripts/backup.sh` e `scripts/restore.sh` fazem isso no Docker local
 
 - Plugins de terceiros: mudar a versão em `scripts/setup.sh`, testar localmente (`./scripts/setup.sh` + roteiro de compra), depois atualizar a produção com `wp plugin update <slug> --version=<nova>`.
 - **Sempre fazer backup antes** de atualizar o WooCommerce.
-- Nosso código (`wp-content/mu-plugins/`): deploy por `git pull` ou `rsync` a partir da branch `main`.
+- Nosso código (`wp-content/mu-plugins/` **e** `wp-content/themes/gilda/`): deploy por `git pull` ou `rsync` a partir da branch `main`. Depois de um deploy do tema, o cache do catálogo se renova sozinho; se o host tiver cache de página próprio, limpar também.
