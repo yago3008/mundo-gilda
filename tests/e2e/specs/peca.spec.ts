@@ -174,8 +174,8 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
   await expect(sizeG).toHaveClass(/is-soldout/);
   await expect(sizeG.locator('input')).toHaveAttribute('aria-label', 'G esgotado');
   await expect(sizeG.locator('input')).toBeEnabled();
-  // O X (duas diagonais) sobre o quadrado do tamanho.
-  expect(await sizeG.locator('span').evaluate((el) => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
+  // O ";" da marca por cima do tamanho esgotado.
+  expect(await sizeG.locator('span').evaluate((el) => getComputedStyle(el, '::after').content)).toBe('";"');
   await expect(v.page.locator('.gilda-sizes .gilda-size', { hasText: /^M$/ })).not.toHaveClass(/is-soldout/);
   await swatches.filter({ hasText: newColor.name }).locator('input').check({ force: true });
   await expect(sizeG).not.toHaveClass(/is-soldout/);
