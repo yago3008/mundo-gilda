@@ -402,9 +402,10 @@ function gilda_account_cep_autofill() {
 <script>
 (function () {
     function digits(s) { return (s || '').replace(/[^0-9]/g, ''); }
-    function fill(id, val) {
+    // force: o CEP mudou, então rua/bairro/cidade antigos são de outro endereço e são trocados.
+    function fill(id, val, force) {
         var el = document.getElementById(id);
-        if (el && val && !el.value) {
+        if (el && val && (force || !el.value)) {
             el.value = val;
             el.dispatchEvent(new Event('input', { bubbles: true }));
             el.dispatchEvent(new Event('change', { bubbles: true }));
@@ -421,17 +422,21 @@ function gilda_account_cep_autofill() {
         var pc = document.getElementById(prefix + 'postcode');
         if (!pc) { return; }
         var cep = digits(pc.value);
-        if (cep.length !== 8) { return; }
+        if (cep.length !== 8 || cep === pc.dataset.gildaCepDone) { return; }
+        pc.dataset.gildaCepDone = cep;
+        var force = cep !== pc.dataset.gildaCepFields;
         fetch('https://viacep.com.br/ws/' + cep + '/json/')
             .then(function (r) { return r.json(); })
             .then(function (d) {
                 if (!d || d.erro) { return; }
-                fill(prefix + 'address_1', d.logradouro);
-                fill(prefix + 'neighborhood', d.bairro);
-                fill(prefix + 'city', d.localidade);
+                if (digits(pc.value) !== cep) { return; } // digitou outro CEP enquanto a resposta vinha
+                fill(prefix + 'address_1', d.logradouro, force);
+                fill(prefix + 'neighborhood', d.bairro, force);
+                fill(prefix + 'city', d.localidade, force);
                 setState(prefix, d.uf);
+                pc.dataset.gildaCepFields = cep;
                 var num = document.getElementById(prefix + 'number');
-                if (num && !num.value) { num.focus(); }
+                if (num && (force || !num.value)) { num.focus(); num.select(); }
             })
             .catch(function () {});
     }
@@ -440,6 +445,7 @@ function gilda_account_cep_autofill() {
             var pc = document.getElementById(prefix + 'postcode');
             if (pc && !pc.dataset.gildaCep) {
                 pc.dataset.gildaCep = '1';
+                pc.dataset.gildaCepFields = digits(pc.value); // CEP a que rua/bairro/cidade pertencem (o salvo, no início)
                 pc.addEventListener('blur', function () { lookup(prefix); });
                 pc.addEventListener('input', function () { if (digits(pc.value).length === 8) { lookup(prefix); } });
             }

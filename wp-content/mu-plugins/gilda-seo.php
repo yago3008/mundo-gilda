@@ -97,6 +97,16 @@ final class Gilda_SEO {
 			return $this->pack( $site . ' — ' . get_bloginfo( 'description' ), $desc, home_url( '/' ), $this->image( (int) get_option( 'page_on_front' ) ) );
 		}
 
+		// Livro (/capitulos/): um capítulo é compartilhado como /capitulos/#capitulo-N e o "#" não chega ao
+		// servidor. A prévia mostra o capítulo mais novo: foto principal e o começo do texto.
+		$chapter = is_page( 'capitulos' ) ? $this->latest_chapter() : null;
+		if ( $chapter ) {
+			$id   = get_queried_object_id();
+			$desc = $this->manual( $id )
+				?: $this->excerpt( sprintf( 'Capítulo %d — %s. %s', $chapter['number'], $chapter['name'], (string) ( $chapter['text'][0] ?? '' ) ) );
+			return $this->pack( get_the_title( $id ) . ' — ' . $site, $desc, get_permalink( $id ), $this->image( $id ) );
+		}
+
 		if ( function_exists( 'is_product' ) && is_product() ) {
 			$product = wc_get_product( get_queried_object_id() );
 			if ( ! $product ) {
@@ -140,12 +150,26 @@ final class Gilda_SEO {
 		return $post_id ? trim( (string) get_post_meta( (int) $post_id, self::META_KEY, true ) ) : '';
 	}
 
+	/**
+	 * Foto da prévia: a imagem destacada; sem ela, a foto principal do capítulo mais novo (a cara da
+	 * coleção atual); sem capítulo, o ícone do site.
+	 */
 	private function image( int $post_id ): string {
 		$url = $post_id ? get_the_post_thumbnail_url( $post_id, 'large' ) : '';
+		if ( ! $url ) {
+			$chapter = $this->latest_chapter();
+			$url     = $chapter && $chapter['main'] ? wp_get_attachment_image_url( (int) $chapter['main'], 'large' ) : '';
+		}
 		if ( ! $url && has_site_icon() ) {
 			$url = get_site_icon_url( 512 );
 		}
 		return (string) $url;
+	}
+
+	/** Capítulo publicado mais novo (painel das donas), ou null. */
+	private function latest_chapter(): ?array {
+		$chapters = function_exists( 'gilda_chapters' ) ? gilda_chapters() : array();
+		return $chapters ? end( $chapters ) : null;
 	}
 
 	/** Texto limpo, cortado em ~158 caracteres sem quebrar palavra. */
