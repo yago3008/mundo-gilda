@@ -20,7 +20,7 @@ add_action(
 		$map = array(
 			'/category/all-products' => '/loja/',
 			'/cart-page'             => '/carrinho/',
-			'/contact-1'             => '/produtos/',  // "PRODUTOS;" (carrossel; o catálogo com filtros fica em /loja/)
+			'/contact-1'             => '/loja/',  // "PRODUTOS;" do Wix. Direto para a loja: /produtos/ também leva para lá, mas com um 302 a mais.
 			'/contact'               => '/quem-cria/',
 			'/contact-2'             => '/capitulos/',
 		);

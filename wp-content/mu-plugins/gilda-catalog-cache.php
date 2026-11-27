@@ -105,6 +105,11 @@ add_action(
 		header( 'X-Gilda-Cache: MISS' );
 		// Só guarda o que um visitante sem sessão gerou (nada da fila de pixel/avisos de alguém).
 		$clean = ! preg_grep( '/^wp_woocommerce_session_/', array_keys( $_COOKIE ) );
+		// Nem de quem já aceitou marketing: a página sairia com o pixel <noscript> (gilda-meta-pixel.php)
+		// e seria servida a quem não aceitou.
+		if ( class_exists( 'Gilda_Consent' ) && Gilda_Consent::has( 'marketing' ) ) {
+			$clean = false;
+		}
 		if ( ! $clean ) {
 			return;
 		}
