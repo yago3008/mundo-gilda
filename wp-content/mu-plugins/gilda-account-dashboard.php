@@ -43,6 +43,7 @@ body.woocommerce-account .woocommerce-MyAccount-navigation {
 /* Duas colunas: menu à esquerda, conteúdo à direita */
 body.woocommerce-account .woocommerce {
 	align-items: start;
+	direction: ltr;
 	display: grid;
 	gap: clamp(28px, 4vw, 60px);
 	grid-template-columns: 250px minmax(0, 1fr);
@@ -54,6 +55,7 @@ body.woocommerce-account .woocommerce-MyAccount-navigation {
 	background: var(--gilda-acc-white);
 	border: 1px solid var(--gilda-acc-linen);
 	float: none !important;
+	grid-column: 1;
 	margin: 0;
 	padding: 8px;
 	width: auto !important;
@@ -100,6 +102,7 @@ body.woocommerce-account .woocommerce-MyAccount-navigation li.woocommerce-MyAcco
 body.woocommerce-account .woocommerce-MyAccount-content {
 	color: var(--gilda-acc-ink);
 	float: none !important;
+	grid-column: 2;
 	margin: 0;
 	width: auto !important;
 }
@@ -209,9 +212,41 @@ body.woocommerce-account .woocommerce-MyAccount-content .form-row { margin: 0 0 
 
 /* ----- Mobile: empilha menu acima do conteúdo ----- */
 @media (max-width: 782px) {
-	body.woocommerce-account .woocommerce { grid-template-columns: 1fr; gap: 24px; }
+	body.woocommerce-account .woocommerce { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+	body.woocommerce-account .woocommerce-MyAccount-navigation,
+	body.woocommerce-account .woocommerce-MyAccount-content { grid-column: 1; }
 }
 </style>
 	<?php
 }
 add_action( 'wp_head', 'gilda_account_dashboard_styles', 99 );
+
+/**
+ * Menu da conta: remove "Painel" e "Downloads".
+ *
+ * @param array $items Itens do menu de Minha conta.
+ * @return array
+ */
+function gilda_account_menu_items( $items ) {
+	unset( $items['dashboard'], $items['downloads'] );
+	return $items;
+}
+add_filter( 'woocommerce_account_menu_items', 'gilda_account_menu_items' );
+
+/**
+ * Página inicial da conta: abre em "Detalhes da conta" no lugar do painel.
+ * A raiz /minha-conta/ (sem endpoint) redireciona para o endpoint edit-account.
+ */
+function gilda_account_default_endpoint() {
+	if ( is_admin() || ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
+		return;
+	}
+	if ( function_exists( 'is_account_page' ) && is_account_page()
+		&& function_exists( 'is_wc_endpoint_url' ) && ! is_wc_endpoint_url()
+		&& is_user_logged_in()
+		&& function_exists( 'wc_get_account_endpoint_url' ) ) {
+		wp_safe_redirect( wc_get_account_endpoint_url( 'edit-account' ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'gilda_account_default_endpoint' );
