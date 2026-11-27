@@ -76,7 +76,7 @@ add_action(
 		$customer = new WC_Customer( $customer_id );
 		$customer->set_first_name( $first );
 		$customer->set_last_name( $last );
-		$customer->set_display_name( $name );
+		$customer->set_display_name( $first ); // nome de exibição = primeiro nome (gilda-account-details.php)
 		$customer->set_billing_first_name( $first );
 		$customer->set_billing_last_name( $last );
 		$customer->save();
