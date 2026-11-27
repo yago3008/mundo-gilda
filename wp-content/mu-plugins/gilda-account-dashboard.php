@@ -72,7 +72,7 @@ body.woocommerce-account .woocommerce-MyAccount-navigation li a {
 	display: block;
 	font: 500 12px/1.3 var(--gilda-acc-sans);
 	letter-spacing: 1.4px;
-	padding: 14px 18px;
+	padding: 19px 20px;
 	text-decoration: none;
 	text-transform: uppercase;
 	transition: color .18s ease, background .18s ease, border-color .18s ease, padding .18s ease;
