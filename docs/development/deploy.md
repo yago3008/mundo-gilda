@@ -147,6 +147,7 @@ Os scripts `scripts/backup.sh` e `scripts/restore.sh` fazem isso no Docker local
 7. Ligar o HTTPS e conferir os redirecionamentos 301 das URLs antigas do Wix (`/product-page/...`, `/category/all-products`, `/cart-page`).
 8. Search Console: enviar `https://www.mundogilda.com.br/wp-sitemap.xml`.
 9. Manter o Wix ativo (sem domínio) por alguns dias, para consulta, antes de cancelar.
+10. **TODO antes de abrir: contas de teste.** Apagar (ou nunca criar em produção) o usuário `admin` com senha `admin` e a conta de teste `dona` (perfil Dona da loja), usados só no ambiente local. Em produção: um administrador com nome que não seja `admin`, senha forte e única; as donas com contas próprias no perfil **Dona da loja** (Usuários → Adicionar novo). Conferir com `wp user list --fields=user_login,roles`.
 
 ## 9. Voltar atrás (rollback)
 
