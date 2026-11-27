@@ -2651,14 +2651,24 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	.gilda-palette__swatch::after { transition: none; }
 }
 
-/* Tamanho esgotado (ou inexistente) na cor escolhida: um X de canto a canto, texto apagado, mas clicável
-   (abre o "Avise-me"). gilda.js → initSizeButtons. Selecionado: X creme sobre o terracota. */
+/* Tamanho esgotado (ou inexistente) na cor escolhida: um ";" da marca, marrom e mais grosso, por cima
+   do tamanho apagado. Continua clicável (abre o "Avise-me"). gilda.js → initSizeButtons.
+   Selecionado (fundo terracota): o ";" fica creme. */
 .gilda-sizes .gilda-size.is-soldout span {
-	--gilda-x: var(--gilda-graphite);
-	background-image:
-		linear-gradient(to top right, transparent calc(50% - .75px), var(--gilda-x) calc(50% - .75px), var(--gilda-x) calc(50% + .75px), transparent calc(50% + .75px)),
-		linear-gradient(to bottom right, transparent calc(50% - .75px), var(--gilda-x) calc(50% - .75px), var(--gilda-x) calc(50% + .75px), transparent calc(50% + .75px));
-	color: color-mix(in srgb, currentColor 60%, transparent);
+	background-image: none;
+	color: color-mix(in srgb, currentColor 30%, transparent);
+	position: relative;
 	text-decoration: none;
 }
-.gilda-sizes .gilda-size.is-soldout input:checked + span { --gilda-x: var(--gilda-cream); color: color-mix(in srgb, var(--gilda-cream) 70%, transparent); }
+.gilda-sizes .gilda-size.is-soldout span::after {
+	color: var(--gilda-terracotta);
+	content: ";";
+	font: 700 34px/1 var(--gilda-display);
+	left: 50%;
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -54%);
+}
+.gilda-sizes .gilda-size.is-soldout input:checked + span { color: color-mix(in srgb, var(--gilda-cream) 60%, transparent); }
+.gilda-sizes .gilda-size.is-soldout input:checked + span::after { color: var(--gilda-cream); }
