@@ -363,3 +363,92 @@ function gilda_account_default_endpoint() {
 	}
 }
 add_action( 'template_redirect', 'gilda_account_default_endpoint' );
+
+/**
+ * Remove Nome e Sobrenome dos formularios de endereco (apenas em Minha conta;
+ * o checkout nao e afetado). Sem nome/sobrenome o endereco continua salvando.
+ */
+function gilda_account_address_remove_name( $fields ) {
+    if ( is_admin() ) {
+        return $fields;
+    }
+    if ( function_exists( 'is_account_page' ) && is_account_page()
+        && function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'edit-address' ) ) {
+        unset(
+            $fields['first_name'], $fields['last_name'],
+            $fields['shipping_first_name'], $fields['shipping_last_name'],
+            $fields['billing_first_name'], $fields['billing_last_name']
+        );
+    }
+    return $fields;
+}
+add_filter( 'woocommerce_shipping_fields', 'gilda_account_address_remove_name' );
+add_filter( 'woocommerce_billing_fields', 'gilda_account_address_remove_name' );
+add_filter( 'woocommerce_default_address_fields', 'gilda_account_address_remove_name' );
+
+/**
+ * Consulta o CEP (ViaCEP) e preenche rua, bairro, cidade e estado nos
+ * formularios de endereco de Minha conta. A consulta roda no navegador.
+ */
+function gilda_account_cep_autofill() {
+    if ( is_admin() ) {
+        return;
+    }
+    if ( ! function_exists( 'is_account_page' ) || ! is_account_page()
+        || ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'edit-address' ) ) {
+        return;
+    }
+    ?>
+<script>
+(function () {
+    function digits(s) { return (s || '').replace(/[^0-9]/g, ''); }
+    function fill(id, val) {
+        var el = document.getElementById(id);
+        if (el && val && !el.value) {
+            el.value = val;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+    function setState(prefix, uf) {
+        var el = document.getElementById(prefix + 'state');
+        if (!el || !uf) { return; }
+        uf = uf.toUpperCase();
+        if (window.jQuery) { window.jQuery(el).val(uf).trigger('change'); }
+        else { el.value = uf; el.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+    function lookup(prefix) {
+        var pc = document.getElementById(prefix + 'postcode');
+        if (!pc) { return; }
+        var cep = digits(pc.value);
+        if (cep.length !== 8) { return; }
+        fetch('https://viacep.com.br/ws/' + cep + '/json/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d || d.erro) { return; }
+                fill(prefix + 'address_1', d.logradouro);
+                fill(prefix + 'neighborhood', d.bairro);
+                fill(prefix + 'city', d.localidade);
+                setState(prefix, d.uf);
+                var num = document.getElementById(prefix + 'number');
+                if (num && !num.value) { num.focus(); }
+            })
+            .catch(function () {});
+    }
+    function bind() {
+        ['shipping_', 'billing_'].forEach(function (prefix) {
+            var pc = document.getElementById(prefix + 'postcode');
+            if (pc && !pc.dataset.gildaCep) {
+                pc.dataset.gildaCep = '1';
+                pc.addEventListener('blur', function () { lookup(prefix); });
+                pc.addEventListener('input', function () { if (digits(pc.value).length === 8) { lookup(prefix); } });
+            }
+        });
+    }
+    if (document.readyState !== 'loading') { bind(); }
+    else { document.addEventListener('DOMContentLoaded', bind); }
+})();
+</script>
+    <?php
+}
+add_action( 'wp_footer', 'gilda_account_cep_autofill', 99 );
