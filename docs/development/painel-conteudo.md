@@ -135,6 +135,8 @@ Nome · preço (promoção funciona, mas não há selo "Oferta" nos cards) · fo
 
 **Proposta:** cupons continuam no WooCommerce (Marketing → Cupons), com uma caixinha "Só na primeira compra". E um bloco **"Promoção em destaque"**: escolher o cupom, e a faixa e a fita do banner mostram código e percentual **lidos do cupom** (ex.: "{percentual} OFF na primeira compra com o cupom {código}"), com liga/desliga.
 
+**Feito:** caixinha "Só na primeira compra" na tela do cupom e "Cupons → Promoção em destaque" (`MU/gilda-painel/promocao.php`, `gilda_promo()`); a faixa (`T/inc/shortcodes.php`) e a fita do banner (`T/patterns/hero.php`) leem o cupom escolhido; sem cupom, não anunciam. Semente: primeiracompra.
+
 ---
 
 ## 7. Faixa de avisos (acima do cabeçalho) — hoje **fixo**

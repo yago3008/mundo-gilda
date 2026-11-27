@@ -36,9 +36,15 @@ export async function selectVariation(page: Page, variation: Variation): Promise
   for (const [attribute, slug] of Object.entries(variation.attributes)) {
     const select = page.locator(`form.variations_form select[name="${attribute}"]`);
     const label = ((await select.locator(`option[value="${slug}"]`).textContent()) || slug).trim();
-    const radio = page.locator('form.variations_form').getByRole('radio', { name: label, exact: true });
+    // Tamanho esgotado na cor escolhida é anunciado como "<tamanho> esgotado" (gilda.js).
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const name = new RegExp(`^${escaped}( esgotado)?$`);
+    const radio = page.locator('form.variations_form').getByRole('radio', { name });
     if (await radio.count()) {
-      await radio.first().check();
+      // O tema redesenha os botões a cada escolha: clica e confere o <select> escondido (a fonte da verdade).
+      // Clica no rótulo (como a cliente): no tamanho esgotado o quadrado com o ";" fica por cima do radio.
+      await radio.first().locator('xpath=ancestor::label[1]').click();
+      await expect(select).toHaveValue(slug);
     } else {
       await select.selectOption(slug);
     }

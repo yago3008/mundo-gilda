@@ -197,6 +197,11 @@ add_action(
 			array( 'Todas as peças', 'edit_products', 'edit.php?post_type=product', 'Peças' ),
 			array( 'Nova peça', 'edit_products', GILDA_PECA_PAGE, 'Nova peça' ),
 		);
+		// Cupons: a lista e a "Promoção em destaque" (promocao.php).
+		$submenu['edit.php?post_type=shop_coupon'] = array( // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+			array( 'Todos os cupons', 'edit_shop_coupons', 'edit.php?post_type=shop_coupon', 'Cupons' ),
+			array( 'Promoção em destaque', 'edit_shop_coupons', 'admin.php?page=' . GILDA_PROMO_PAGE, 'Promoção em destaque' ),
+		);
 		$submenu['edit.php?post_type=page'] = array( // phpcs:ignore WordPress.WP.GlobalVariablesOverride
 			array( 'Todas as páginas', 'edit_pages', 'edit.php?post_type=page', 'Páginas' ),
 		);

@@ -27,7 +27,8 @@ function gilda_shortcode_announcement() {
 	$messages  = apply_filters(
 		'gilda_announcement_messages',
 		array(
-			__( '10% OFF na primeira compra com o cupom primeiracompra', 'gilda' ),
+			// Cupom da "Promoção em destaque" do painel (código e desconto lidos do cupom; sem promoção, nada).
+			function_exists( 'gilda_promo_message' ) ? gilda_promo_message() : __( '10% OFF na primeira compra com o cupom primeiracompra', 'gilda' ),
 			__( 'Alfaiataria criativa — feito à mão em Curitiba/PR', 'gilda' ),
 			__( 'Novas peças a cada capítulo', 'gilda' ),
 			$instagram ? '@' . $instagram : '', // Dados da loja
