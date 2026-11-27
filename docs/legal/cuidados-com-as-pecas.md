@@ -28,4 +28,4 @@ Cada peça da GILDA; é feita à mão para durar muitos capítulos. Alguns cuida
 - Camisas e calças de alfaiataria ficam melhor em cabides.
 - Lenços podem ser guardados dobrados, longe da umidade.
 
-Ficou com alguma dúvida? Fale com a gente pelo WhatsApp (41) 99100-8303 ou pelo e-mail mundogilda@gmail.com.
+Ficou com alguma dúvida? Fale com a gente pelo WhatsApp [gilda_loja campo=whatsapp link=1] ou pelo e-mail [gilda_loja campo=email link=1].

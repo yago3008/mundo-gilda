@@ -38,3 +38,7 @@ docker compose run --rm wpcli wp eval-file /scripts/import-legal-pages.php --use
 ```
 
 Roda sozinho no `./scripts/setup.sh` e funciona como **semente**: cria a página que não existe e atualiza as que ainda estão em rascunho. Com `status: publicar` no cabeçalho do .md, a página é publicada na primeira vez. **Página publicada nunca é sobrescrita**: a partir daí as donas editam pelo painel e o .md fica só como texto de partida. Para publicar uma nova: preencher os [PREENCHER], apagar o aviso de RASCUNHO e acrescentar `status: publicar`. Ao publicar os termos, ligue a página em WooCommerce → Configurações → Avançado → "Termos e condições" (o script não faz isso para o checkout não linkar um rascunho).
+
+## Dados da loja dentro dos textos
+
+Telefone/WhatsApp, e-mail e Instagram não são escritos à mão nos textos: use `[gilda_loja campo=whatsapp link=1]`, `[gilda_loja campo=email link=1]`, `[gilda_loja campo=instagram link=1]` (outros campos: `telefone`, `razao_social`, `cnpj`, `endereco`, `cep`, `cidade`, `uf`; sem `link=1` sai só o texto). O valor vem da tela **Dados da loja** do painel, então mudou lá, muda em todas as páginas. As páginas que já estavam publicadas com os números escritos foram trocadas uma vez só (`gilda_store_migrate_text_pages()` em `wp-content/mu-plugins/gilda-painel/store-data.php`), mexendo apenas nesses textos exatos.

@@ -2650,3 +2650,15 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	.gilda-palette__swatch,
 	.gilda-palette__swatch::after { transition: none; }
 }
+
+/* Tamanho esgotado (ou inexistente) na cor escolhida: um X de canto a canto, texto apagado, mas clicável
+   (abre o "Avise-me"). gilda.js → initSizeButtons. Selecionado: X creme sobre o terracota. */
+.gilda-sizes .gilda-size.is-soldout span {
+	--gilda-x: var(--gilda-graphite);
+	background-image:
+		linear-gradient(to top right, transparent calc(50% - .75px), var(--gilda-x) calc(50% - .75px), var(--gilda-x) calc(50% + .75px), transparent calc(50% + .75px)),
+		linear-gradient(to bottom right, transparent calc(50% - .75px), var(--gilda-x) calc(50% - .75px), var(--gilda-x) calc(50% + .75px), transparent calc(50% + .75px));
+	color: color-mix(in srgb, currentColor 60%, transparent);
+	text-decoration: none;
+}
+.gilda-sizes .gilda-size.is-soldout input:checked + span { --gilda-x: var(--gilda-cream); color: color-mix(in srgb, var(--gilda-cream) 70%, transparent); }

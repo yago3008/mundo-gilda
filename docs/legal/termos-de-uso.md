@@ -16,8 +16,8 @@ Estes termos valem para quem navega ou compra no site **mundogilda.com.br**. Ao 
 
 **GILDA ALFAIATARIA LTDA**, CNPJ 45.822.638/0001-09, [PREENCHER: rua e número], Curitiba/PR, CEP 82015-384.
 
-- E-mail: [PREENCHER: confirmar; hoje o site mostra mundogilda@gmail.com]
-- WhatsApp: [PREENCHER: confirmar; hoje o site mostra (41) 99100-8303]
+- E-mail: [gilda_loja campo=email link=1]
+- WhatsApp: [gilda_loja campo=whatsapp link=1]
 - Atendimento: [PREENCHER: dias e horários]
 
 ## 2. Cadastro

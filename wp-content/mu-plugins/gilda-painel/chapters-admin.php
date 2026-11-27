@@ -1,10 +1,13 @@
 <?php
 /**
  * Tela de edição dos capítulos (sem o editor de blocos) e o campo "Capítulo" na peça.
+ * Visual: painel-proto/Capitulo.dc.html (cartões, "5 de 7 fotos · faltam 2", lista "Publicar" com o
+ * botão desligado até estar tudo certo, prévia do card da home).
  *
  * Regras do formulário:
  * - nome, pelo menos um parágrafo, foto principal e exatamente 6 fotos da abertura para publicar
- *   (decisão §16.2). Faltou algo: salva como rascunho e diz o que falta.
+ *   (decisão §16.2). O botão só liga quando está tudo certo; o servidor confere de novo e, se faltar
+ *   algo, salva como rascunho e diz o que falta.
  * - "Peças deste capítulo" grava o capítulo em cada peça (uma peça, um capítulo: marcar aqui tira a
  *   peça do capítulo anterior).
  *
@@ -19,57 +22,94 @@ add_action(
 	'add_meta_boxes_' . GILDA_CHAPTER_CPT,
 	static function () {
 		remove_meta_box( 'slugdiv', GILDA_CHAPTER_CPT, 'normal' );
+		remove_meta_box( 'submitdiv', GILDA_CHAPTER_CPT, 'side' );
 		add_meta_box( 'gilda-chapter-text', 'Textos', 'gilda_chapter_box_text', GILDA_CHAPTER_CPT, 'normal', 'high' );
-		add_meta_box( 'gilda-chapter-opening', 'Fotos da abertura (colagem que dá zoom)', 'gilda_chapter_box_opening', GILDA_CHAPTER_CPT, 'normal', 'high' );
-		add_meta_box( 'gilda-chapter-story', 'Fotos da narrativa', 'gilda_chapter_box_story', GILDA_CHAPTER_CPT, 'normal', 'default' );
-		add_meta_box( 'gilda-chapter-gallery', 'Galeria (Livro GILDA; e card da página inicial)', 'gilda_chapter_box_gallery', GILDA_CHAPTER_CPT, 'normal', 'default' );
+		add_meta_box( 'gilda-chapter-opening', 'Fotos da abertura', 'gilda_chapter_box_opening', GILDA_CHAPTER_CPT, 'normal', 'high' );
+		add_meta_box( 'gilda-chapter-photos', 'Fotos da história e da galeria', 'gilda_chapter_box_photos', GILDA_CHAPTER_CPT, 'normal', 'default' );
 		add_meta_box( 'gilda-chapter-products', 'Peças deste capítulo', 'gilda_chapter_box_products', GILDA_CHAPTER_CPT, 'normal', 'default' );
-		add_meta_box( 'gilda-chapter-status', 'No site', 'gilda_chapter_box_status', GILDA_CHAPTER_CPT, 'side', 'default' );
+		add_meta_box( 'gilda-chapter-status', 'Publicar', 'gilda_chapter_box_status', GILDA_CHAPTER_CPT, 'side', 'high' );
+		add_meta_box( 'gilda-chapter-preview', 'Assim fica o card na home', 'gilda_chapter_box_preview', GILDA_CHAPTER_CPT, 'side', 'default' );
+	}
+);
+
+// Ordem fixa das caixas (ninguém "perde" uma caixa arrastando ou fechando).
+add_filter( 'get_user_option_meta-box-order_' . GILDA_CHAPTER_CPT, '__return_empty_array' );
+add_filter( 'get_user_option_closedpostboxes_' . GILDA_CHAPTER_CPT, '__return_empty_array' );
+add_filter(
+	'admin_body_class',
+	static function ( $classes ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		return ( $screen && GILDA_CHAPTER_CPT === $screen->post_type && 'post' === $screen->base ) ? $classes . ' gilda-chapter-screen' : $classes;
 	}
 );
 
 add_filter(
 	'enter_title_here',
-	static fn( $text, $post ) => GILDA_CHAPTER_CPT === $post->post_type ? 'Nome do capítulo (ex.: Ritual Brasileiro)' : $text,
+	static fn( $text, $post ) => GILDA_CHAPTER_CPT === $post->post_type ? 'Ex.: Ritual Brasileiro' : $text,
 	10,
 	2
 );
 
-/** Número (automático) logo abaixo do nome. */
+/** Número que o capítulo tem (ou terá, se ainda não foi salvo). */
+function gilda_chapter_number_for( WP_Post $post ): int {
+	$number = (int) get_post_meta( $post->ID, '_gilda_numero', true );
+	if ( $number ) {
+		return $number;
+	}
+	global $wpdb;
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	return 1 + (int) $wpdb->get_var( $wpdb->prepare( "SELECT MAX( CAST( meta_value AS UNSIGNED ) ) FROM {$wpdb->postmeta} m JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE m.meta_key = '_gilda_numero' AND p.post_type = %s", GILDA_CHAPTER_CPT ) );
+}
+
+/** Cabeçalho: "← Capítulos", "novo capítulo;" e o número automático. */
 add_action(
-	'edit_form_after_title',
+	'edit_form_top',
 	static function ( $post ) {
 		if ( GILDA_CHAPTER_CPT !== $post->post_type ) {
 			return;
 		}
-		$number = (int) get_post_meta( $post->ID, '_gilda_numero', true );
-		if ( ! $number ) {
-			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$number = 1 + (int) $wpdb->get_var( $wpdb->prepare( "SELECT MAX( CAST( meta_value AS UNSIGNED ) ) FROM {$wpdb->postmeta} m JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE m.meta_key = '_gilda_numero' AND p.post_type = %s", GILDA_CHAPTER_CPT ) );
-			$label  = sprintf( 'Este será o <strong>CAPÍTULO %d</strong>. O número é dado sozinho, na ordem em que os capítulos são criados.', $number );
-		} else {
-			$label = sprintf( 'Este é o <strong>CAPÍTULO %1$d</strong> (no site: âncora <code>#capitulo-%1$d</code>, filtro da loja "Capítulo %1$d").', $number );
-		}
-		echo '<p class="gilda-chapter-number">' . wp_kses( $label, array( 'strong' => array(), 'code' => array() ) ) . '</p>';
+		$number = gilda_chapter_number_for( $post );
+		$is_new = ! get_post_meta( $post->ID, '_gilda_numero', true );
+		?>
+		<header class="gilda-page-head gilda-panel">
+			<a class="gilda-back" href="<?php echo esc_url( admin_url( 'edit.php?post_type=' . GILDA_CHAPTER_CPT ) ); ?>">← Capítulos</a>
+			<h1 class="gilda-display"><?php echo $is_new ? 'novo capítulo;' : esc_html( mb_strtolower( get_the_title( $post ) ) ) . ';'; ?></h1>
+			<p class="gilda-lead gilda-chapter-number">
+				<?php if ( $is_new ) : ?>
+					Ele entra no site como <strong>CAPÍTULO <?php echo (int) $number; ?></strong>. O número é automático.
+				<?php else : ?>
+					No site, ele é o <strong>CAPÍTULO <?php echo (int) $number; ?></strong> (âncora <code>#capitulo-<?php echo (int) $number; ?></code>, filtro da loja "Capítulo <?php echo (int) $number; ?>").
+				<?php endif; ?>
+			</p>
+		</header>
+		<?php
 		wp_nonce_field( 'gilda_chapter_save', 'gilda_chapter_nonce' );
 	}
 );
 
-/** CSS/JS só na tela do capítulo e da peça. */
+/** "Nome" como cartão, com rótulo. */
+add_action(
+	'edit_form_before_permalink',
+	static function ( $post ) {
+		if ( GILDA_CHAPTER_CPT === $post->post_type ) {
+			echo '<span class="gilda-title-label" aria-hidden="true">Nome do capítulo</span>';
+		}
+	}
+);
+
+/** CSS/JS só nas telas do capítulo. */
 add_action(
 	'admin_enqueue_scripts',
 	static function ( $hook ) {
 		$screen = get_current_screen();
-		if ( ! $screen || ! in_array( $hook, array( 'post.php', 'post-new.php', 'edit.php' ), true ) ) {
+		if ( ! $screen || GILDA_CHAPTER_CPT !== $screen->post_type || ! in_array( $hook, array( 'post.php', 'post-new.php', 'edit.php' ), true ) ) {
 			return;
 		}
-		if ( GILDA_CHAPTER_CPT === $screen->post_type ) {
-			wp_enqueue_style( 'gilda-painel-admin', GILDA_PAINEL_URL . 'assets/painel-admin.css', array(), GILDA_PAINEL_VERSION );
-			if ( 'edit.php' !== $hook ) {
-				wp_enqueue_media();
-				wp_enqueue_script( 'gilda-painel-media', GILDA_PAINEL_URL . 'assets/painel-media.js', array( 'jquery', 'jquery-ui-sortable' ), GILDA_PAINEL_VERSION, true );
-			}
+		gilda_painel_enqueue_ui();
+		wp_enqueue_style( 'gilda-chapter-edit', GILDA_PAINEL_URL . 'assets/chapter-edit.css', array( 'gilda-painel-ui' ), gilda_painel_ver( 'assets/chapter-edit.css' ) );
+		if ( 'edit.php' !== $hook ) {
+			wp_enqueue_media();
+			wp_enqueue_script( 'gilda-painel-media', GILDA_PAINEL_URL . 'assets/painel-media.js', array( 'jquery', 'jquery-ui-sortable' ), gilda_painel_ver( 'assets/painel-media.js' ), true );
 		}
 	}
 );
@@ -77,50 +117,70 @@ add_action(
 /**
  * Lista de fotos com seletor de mídia e arrastar para ordenar (assets/painel-media.js).
  *
- * @param string $name  Campo (sem []).
- * @param int[]  $ids   Fotos.
- * @param int    $max   Máximo (0 = sem limite).
- * @param array  $texts title, button, empty (textos do seletor).
+ * @param string $name Campo (sem []).
+ * @param int[]  $ids  Fotos.
+ * @param int    $max  Máximo (0 = sem limite; 1 = uma foto só).
+ * @param array  $opts title, button (textos do seletor); style (main|grid|strip|cover|logo); slots (uma
+ *                     vaga "+ Foto N" para cada foto que falta); add (rótulo da vaga); captions (legendas
+ *                     por posição); alt (campo de descrição); saved (false: a foto mostrada é só a de
+ *                     reserva e o campo vai vazio).
  */
-function gilda_photo_field( string $name, array $ids, int $max, array $texts ): void {
+function gilda_photo_field( string $name, array $ids, int $max, array $opts ): void {
 	$multiple = 1 !== $max;
 	$input    = $multiple ? $name . '[]' : $name;
+	$alt      = $opts['alt'] ?? true;
 	printf(
-		'<div class="gilda-photos%1$s" data-gilda-photos data-name="%2$s" data-max="%3$d" data-title="%4$s" data-button="%5$s" data-alt="1">',
+		'<div class="gilda-photos gilda-photos--%1$s%2$s" data-gilda-photos data-name="%3$s" data-max="%4$d" data-title="%5$s" data-button="%6$s" data-alt="%7$s" data-slots="%8$s" data-add="%9$s" data-captions="%10$s">',
+		esc_attr( $opts['style'] ?? 'strip' ),
 		$multiple ? '' : ' gilda-photos--single',
 		esc_attr( $input ),
 		(int) $max,
-		esc_attr( $texts['title'] ),
-		esc_attr( $texts['button'] )
+		esc_attr( $opts['title'] ),
+		esc_attr( $opts['button'] ),
+		$alt ? '1' : '0',
+		empty( $opts['slots'] ) ? '0' : '1',
+		esc_attr( $opts['add'] ?? ( $multiple ? '+ Adicionar' : '+ Escolher foto' ) ),
+		esc_attr( (string) wp_json_encode( $opts['captions'] ?? array() ) )
 	);
 	// Campo vazio antes da lista: sem foto nenhuma, o PHP ainda recebe o campo (e apaga o que havia).
 	printf( '<input type="hidden" name="%s" value="" />', esc_attr( $multiple ? $name . '_present' : $name ) );
 	echo '<ul class="gilda-photos__list">';
-	foreach ( $ids as $id ) {
-		gilda_photo_tile( $id, $input );
+	foreach ( array_values( $ids ) as $i => $id ) {
+		gilda_photo_tile( (int) $id, $input, $alt, (string) ( $opts['captions'][ $i ] ?? '' ), $opts['saved'] ?? true );
 	}
-	echo '</ul><p class="gilda-photos__bar">';
-	printf( '<button type="button" class="button gilda-photos__add">%s</button>', esc_html( $texts['add'] ?? ( $multiple ? 'Adicionar fotos' : ( $ids ? 'Trocar foto' : 'Escolher foto' ) ) ) );
-	if ( $max > 1 ) {
-		printf( ' <span class="gilda-photos__count" aria-live="polite"><strong>%1$d</strong> de %2$d</span>', count( $ids ), (int) $max );
+	echo '</ul>';
+	if ( ! $multiple ) {
+		echo '<button type="button" class="gilda-link gilda-photos__swap gilda-photos__add">Trocar foto</button>';
 	}
-	echo '</p></div>';
+	echo '</div>';
 }
 
 /**
- * Uma foto da lista (também usada como modelo no JavaScript).
+ * Uma foto da lista (o JavaScript monta a mesma marcação para as novas).
  *
- * @param int    $id    Foto.
- * @param string $input Nome do campo.
+ * @param int    $id      Foto.
+ * @param string $input   Nome do campo.
+ * @param bool   $alt     Mostrar o campo de descrição.
+ * @param string $caption Legenda (ex.: "Capa").
+ * @param bool   $saved   Valor no campo (false = vazio, foto de reserva).
  */
-function gilda_photo_tile( int $id, string $input ): void {
-	$alt = (string) get_post_meta( $id, '_wp_attachment_image_alt', true );
+function gilda_photo_tile( int $id, string $input, bool $alt = true, string $caption = '', bool $saved = true ): void {
+	$alt_html = '';
+	if ( $alt ) {
+		$alt_html = sprintf(
+			'<label class="gilda-photo__alt"><span>Descrição</span><input type="text" name="gilda_alt[%1$d]" value="%2$s" placeholder="o que aparece na foto" /></label>',
+			(int) $id,
+			esc_attr( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) )
+		);
+	}
 	printf(
-		'<li class="gilda-photo" data-id="%1$d"><img src="%2$s" alt="" /><input type="hidden" name="%3$s" value="%1$d" /><label class="gilda-photo__alt"><span>Descrição da foto</span><input type="text" name="gilda_alt[%1$d]" value="%4$s" placeholder="Ex.: modelo com a Camisa Grão marrom" /></label><button type="button" class="gilda-photo__remove" aria-label="Tirar esta foto">×</button></li>',
+		'<li class="gilda-photo" data-id="%1$d"><img src="%2$s" alt="" /><input type="hidden" name="%3$s" value="%4$s" /><span class="gilda-photo__cap">%5$s</span>%6$s<button type="button" class="gilda-photo__remove" aria-label="Tirar esta foto">×</button></li>',
 		(int) $id,
 		esc_url( (string) wp_get_attachment_image_url( $id, 'medium' ) ),
 		esc_attr( $input ),
-		esc_attr( $alt )
+		$saved ? (int) $id : '',
+		esc_html( $caption ),
+		$alt_html // phpcs:ignore WordPress.Security.EscapeOutput -- montado acima com esc_*.
 	);
 }
 
@@ -130,15 +190,15 @@ function gilda_chapter_box_text( WP_Post $post ): void {
 	if ( ! $paragraphs ) {
 		$paragraphs = array( '' );
 	}
-	echo '<p class="description">Cada parágrafo vira um passo da narrativa na página Capítulos (a foto troca a cada passo) e também aparece no Livro GILDA;. Arraste <span class="dashicons dashicons-move" aria-hidden="true"></span> para mudar a ordem.</p>';
+	echo '<p class="gilda-help">Cada parágrafo vira um passo da história na página Capítulos. Arraste para mudar a ordem. Para itálico só em uma parte, escreva entre asteriscos: <em>*assim*</em>.</p>';
 	echo '<ol class="gilda-paragraphs" data-gilda-paragraphs>';
-	foreach ( $paragraphs as $paragraph ) {
-		gilda_paragraph_row( (string) $paragraph );
+	foreach ( $paragraphs as $i => $paragraph ) {
+		gilda_paragraph_row( (string) $paragraph, $i + 1 );
 	}
 	echo '</ol>';
-	echo '<p><button type="button" class="button gilda-paragraphs__add">+ Adicionar parágrafo</button></p>';
+	echo '<button type="button" class="gilda-btn gilda-btn--dashed gilda-paragraphs__add">+ Adicionar parágrafo</button>';
 	echo '<template id="gilda-paragraph-template">';
-	gilda_paragraph_row( '' );
+	gilda_paragraph_row( '', 0 );
 	echo '</template>';
 }
 
@@ -147,20 +207,23 @@ function gilda_chapter_box_text( WP_Post $post ): void {
  * escrito entre asteriscos (*assim*).
  *
  * @param string $paragraph Texto guardado (com <em>).
+ * @param int    $n         Posição (o JavaScript renumera).
  */
-function gilda_paragraph_row( string $paragraph ): void {
+function gilda_paragraph_row( string $paragraph, int $n ): void {
 	$italic = (bool) preg_match( '~^<em>(.*)</em>$~s', trim( $paragraph ), $m ) && false === strpos( $m[1], '<em>' );
 	$text   = $italic ? $m[1] : $paragraph;
 	$text   = preg_replace( '~<em>(.*?)</em>~s', '*$1*', $text );
 	?>
-	<li class="gilda-paragraph">
-		<span class="gilda-paragraph__handle dashicons dashicons-move" title="Arraste para mudar a ordem" aria-hidden="true"></span>
-		<div class="gilda-paragraph__body">
-			<textarea name="gilda_textos[]" rows="3" aria-label="Parágrafo"><?php echo esc_textarea( $text ); ?></textarea>
-			<label class="gilda-paragraph__italic"><input type="checkbox" class="gilda-paragraph__italic-box" <?php checked( $italic ); ?> /> Parágrafo todo em itálico (frase de fechamento)</label>
+	<li class="gilda-paragraph<?php echo $italic ? ' is-italic' : ''; ?>">
+		<button type="button" class="gilda-paragraph__handle" aria-label="Arrastar parágrafo"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button>
+		<label class="gilda-paragraph__body"><span class="gilda-label gilda-paragraph__n">Parágrafo <?php echo (int) $n; ?></span>
+			<textarea name="gilda_textos[]" rows="3"><?php echo esc_textarea( $text ); ?></textarea>
+		</label>
+		<div class="gilda-paragraph__tools">
+			<label class="gilda-paragraph__italic"><input type="checkbox" class="gilda-paragraph__italic-box" <?php checked( $italic ); ?> /> Itálico</label>
 			<input type="hidden" name="gilda_textos_italico[]" value="<?php echo $italic ? '1' : '0'; ?>" />
+			<button type="button" class="gilda-btn gilda-btn--danger gilda-paragraph__remove">Remover</button>
 		</div>
-		<button type="button" class="gilda-paragraph__remove button-link" aria-label="Apagar este parágrafo">Apagar</button>
 	</li>
 	<?php
 }
@@ -171,32 +234,29 @@ function gilda_chapter_box_opening( WP_Post $post ): void {
 	$main    = ( $main && wp_attachment_is_image( $main ) ) ? array( $main ) : array();
 	$opening = gilda_chapter_photo_ids( $post->ID, '_gilda_fotos_abertura' );
 	?>
-	<p class="description">A abertura do capítulo é uma colagem de <strong>7 fotos</strong>: a principal fica no centro e cresce até ocupar a tela inteira, com "CAPÍTULO N;" e o nome por cima. As outras 6 ficam em volta. Para publicar, o capítulo precisa das 7.</p>
+	<div class="gilda-opening__head">
+		<p class="gilda-help">1 principal + 6 da colagem. No site, a colagem dá zoom até a principal ocupar a tela inteira: use uma foto grande, com 2.000 px ou mais. A ordem das 6 define a posição de cada uma.</p>
+		<span class="gilda-pill" role="status" data-gilda-opening-count></span>
+	</div>
 	<div class="gilda-opening">
 		<div class="gilda-opening__main">
-			<h4>Foto principal</h4>
-			<p class="description">Vira tela cheia: use a foto em alta (pelo menos 2560 px no lado maior). No computador ela aparece em paisagem, com foco um pouco acima do centro.</p>
-			<?php gilda_photo_field( 'gilda_foto_principal', $main, 1, array( 'title' => 'Foto principal do capítulo', 'button' => 'Usar esta foto' ) ); ?>
+			<?php gilda_photo_field( 'gilda_foto_principal', $main, 1, array( 'title' => 'Foto principal do capítulo', 'button' => 'Usar esta foto', 'style' => 'main', 'captions' => array( 'Principal' ), 'add' => '+ Foto principal' ) ); ?>
 		</div>
 		<div class="gilda-opening__others">
-			<h4>As outras 6 fotos da colagem</h4>
-			<p class="description">Exatamente 6, com pelo menos 1536 px. A ordem define a posição na colagem.</p>
-			<?php gilda_photo_field( 'gilda_fotos_abertura', $opening, GILDA_CHAPTER_OPENING, array( 'title' => 'Fotos da colagem (escolha 6)', 'button' => 'Usar estas fotos' ) ); ?>
+			<?php gilda_photo_field( 'gilda_fotos_abertura', $opening, GILDA_CHAPTER_OPENING, array( 'title' => 'Fotos da colagem (escolha 6)', 'button' => 'Usar estas fotos', 'style' => 'grid', 'slots' => true, 'add' => '+ Foto %d' ) ); ?>
 		</div>
 	</div>
 	<?php
 }
 
-/** Narrativa. */
-function gilda_chapter_box_story( WP_Post $post ): void {
-	echo '<p class="description">Fotos que trocam enquanto a pessoa lê os parágrafos (uma por parágrafo, na ordem). Fotos a mais que parágrafos não aparecem. Sem fotos aqui, a narrativa usa as da galeria.</p>';
-	gilda_photo_field( 'gilda_fotos_narrativa', gilda_chapter_photo_ids( $post->ID, '_gilda_fotos_narrativa' ), 0, array( 'title' => 'Fotos da narrativa', 'button' => 'Adicionar à narrativa' ) );
-}
-
-/** Galeria. */
-function gilda_chapter_box_gallery( WP_Post $post ): void {
-	echo '<p class="description">Galeria do capítulo no Livro GILDA; (recortada em retrato 3:4) e fotos que se revezam no card do capítulo na página inicial. A primeira é a capa do card. Pelo menos 768 px; retrato funciona melhor.</p>';
+/** História (narrativa) e galeria. */
+function gilda_chapter_box_photos( WP_Post $post ): void {
+	echo '<p class="gilda-help">As da história trocam junto com os parágrafos (uma por parágrafo fica melhor; sem fotos aqui, a história usa as da galeria). A galeria aparece no Livro GILDA; e no card da home: a primeira é a capa do card.</p>';
+	echo '<div id="gilda-chapter-story" class="gilda-photo-group"><span class="gilda-label">História</span>';
+	gilda_photo_field( 'gilda_fotos_narrativa', gilda_chapter_photo_ids( $post->ID, '_gilda_fotos_narrativa' ), 0, array( 'title' => 'Fotos da história', 'button' => 'Adicionar à história' ) );
+	echo '</div><div id="gilda-chapter-gallery" class="gilda-photo-group"><span class="gilda-label">Galeria</span>';
 	gilda_photo_field( 'gilda_fotos_galeria', gilda_chapter_photo_ids( $post->ID, '_gilda_fotos_galeria' ), 0, array( 'title' => 'Galeria do capítulo', 'button' => 'Adicionar à galeria' ) );
+	echo '</div>';
 }
 
 /** Peças: marcar aqui grava o capítulo na peça. */
@@ -210,50 +270,75 @@ function gilda_chapter_box_products( WP_Post $post ): void {
 			'order'       => 'ASC',
 		)
 	);
+	echo '<p class="gilda-help">Cada peça fica em um capítulo só. Marcar aqui tira a peça do capítulo anterior. Elas aparecem nos botões "peças disponíveis", no filtro da loja e na página de cada peça.</p>';
 	if ( ! $products ) {
-		echo '<p>Nenhuma peça cadastrada ainda.</p>';
+		echo '<p class="gilda-empty">Nenhuma peça cadastrada ainda.</p>';
 		return;
 	}
-	echo '<p class="description">Marque as peças que fazem parte deste capítulo. Elas aparecem nos botões "peças disponíveis", no filtro "Capítulo" da loja e na página de cada peça. Cada peça pertence a um capítulo só: marcar aqui tira a peça do capítulo em que ela estava.</p>';
 	echo '<input type="hidden" name="gilda_pecas_present" value="1" />';
 	echo '<ul class="gilda-products">';
 	foreach ( $products as $product ) {
 		$current = absint( get_post_meta( $product->ID, GILDA_PRODUCT_CHAPTER, true ) );
-		$note    = '';
-		if ( $current && $current !== $post->ID && get_post( $current ) && 'trash' !== get_post_status( $current ) ) {
+		$note    = 'sem capítulo';
+		if ( $current === $post->ID ) {
+			$note = 'neste capítulo';
+		} elseif ( $current && get_post( $current ) && 'trash' !== get_post_status( $current ) ) {
 			$note = sprintf( 'hoje no Capítulo %d', (int) get_post_meta( $current, '_gilda_numero', true ) );
 		}
 		if ( 'publish' !== $product->post_status ) {
-			$note = trim( $note . ' · peça fora do site', ' ·' );
+			$note .= ' · fora do site';
 		}
+		$thumb = get_the_post_thumbnail_url( $product, 'thumbnail' );
 		printf(
-			'<li><label><input type="checkbox" name="gilda_pecas[]" value="%1$d" %2$s /> %3$s</label>%4$s</li>',
+			'<li><label><input type="checkbox" name="gilda_pecas[]" value="%1$d" %2$s />%3$s<span class="gilda-products__name">%4$s</span><span class="gilda-products__note">%5$s</span></label></li>',
 			(int) $product->ID,
 			checked( $current, $post->ID, false ),
+			$thumb ? '<img src="' . esc_url( $thumb ) . '" alt="" />' : '<span class="gilda-products__ph" aria-hidden="true"></span>',
 			esc_html( get_the_title( $product ) ),
-			$note ? ' <span class="gilda-products__note">(' . esc_html( $note ) . ')</span>' : ''
+			esc_html( $note )
 		);
 	}
 	echo '</ul>';
 }
 
-/** Situação no site + "Tirar do site". */
+/** Publicar: situação, o que falta, Publicar capítulo; / Salvar rascunho / Tirar do site. */
 function gilda_chapter_box_status( WP_Post $post ): void {
-	$live = 'publish' === $post->post_status;
-	if ( $live ) {
-		echo '<p class="gilda-status gilda-status--live"><span class="dashicons dashicons-visibility" aria-hidden="true"></span> Publicado: aparece na página Capítulos, no Livro GILDA;, na página inicial e no filtro da loja.</p>';
-		echo '<p><button type="submit" name="gilda_unpublish" value="1" class="button">Tirar do site</button></p>';
-		echo '<p class="description">O capítulo vira rascunho e some do site; nada é apagado. Para voltar, clique em "Publicar".</p>';
-	} else {
-		echo '<p class="gilda-status"><span class="dashicons dashicons-hidden" aria-hidden="true"></span> Rascunho: ainda não aparece no site. Quando estiver pronto, clique em "Publicar".</p>';
-	}
+	$live     = 'publish' === $post->post_status;
 	$problems = gilda_chapter_missing( gilda_chapter_form_state( $post ) );
-	echo '<div class="gilda-checklist" data-gilda-checklist><p><strong>Para publicar:</strong></p><ul>';
-	foreach ( gilda_chapter_requirements() as $key => $label ) {
-		$ok = ! isset( $problems[ $key ] );
-		printf( '<li class="%1$s" data-req="%2$s">%3$s</li>', $ok ? 'is-ok' : 'is-missing', esc_attr( $key ), esc_html( $label ) );
-	}
-	echo '</ul></div>';
+	?>
+	<input type="hidden" name="original_post_status" value="<?php echo esc_attr( $post->post_status ); ?>" />
+	<input type="hidden" name="post_status" value="<?php echo $live ? 'publish' : 'draft'; ?>" />
+	<span class="gilda-publish__status">Situação: <strong><?php echo $live ? 'no site' : 'rascunho'; ?></strong></span>
+	<ul class="gilda-checklist" data-gilda-checklist>
+		<?php foreach ( gilda_chapter_requirements() as $key => $label ) : ?>
+			<li class="<?php echo isset( $problems[ $key ] ) ? 'is-missing' : 'is-ok'; ?>" data-req="<?php echo esc_attr( $key ); ?>" data-label="<?php echo esc_attr( $label ); ?>"><?php echo esc_html( $label ); ?></li>
+		<?php endforeach; ?>
+		<li class="is-optional" data-req="products" data-label="Peças escolhidas">Peças escolhidas</li>
+	</ul>
+	<?php if ( $live ) : ?>
+		<button type="submit" name="save" id="publish" value="Atualizar" class="gilda-btn gilda-btn--big" data-gilda-publish <?php disabled( (bool) $problems ); ?>>Salvar alterações;</button>
+		<button type="submit" name="gilda_unpublish" value="1" class="gilda-btn gilda-btn--ghost gilda-btn--block">Tirar do site</button>
+		<p class="gilda-publish__note">"Tirar do site" deixa o capítulo como rascunho: ele some do site e nada é apagado.</p>
+	<?php else : ?>
+		<button type="submit" name="publish" id="publish" value="Publicar" class="gilda-btn gilda-btn--big" data-gilda-publish <?php disabled( (bool) $problems ); ?>>Publicar capítulo;</button>
+		<button type="submit" name="save" id="save-post" value="Salvar rascunho" class="gilda-btn gilda-btn--ghost gilda-btn--block">Salvar rascunho</button>
+		<p class="gilda-publish__note">Ao publicar, o capítulo entra na página Capítulos, no Livro GILDA;, nos cards da home e no filtro da loja.</p>
+	<?php endif; ?>
+	<?php if ( current_user_can( 'delete_post', $post->ID ) && 'auto-draft' !== $post->post_status ) : ?>
+		<p class="gilda-publish__trash" id="delete-action"><a href="<?php echo esc_url( (string) get_delete_post_link( $post->ID ) ); ?>">Mover para a lixeira</a></p>
+	<?php endif; ?>
+	<?php
+}
+
+/** Prévia do card do capítulo na página inicial (1ª foto da galeria). */
+function gilda_chapter_box_preview( WP_Post $post ): void {
+	$gallery = gilda_chapter_photo_ids( $post->ID, '_gilda_fotos_galeria' );
+	$img     = $gallery ? (string) wp_get_attachment_image_url( $gallery[0], 'medium_large' ) : '';
+	printf(
+		'<div class="gilda-preview__card" data-gilda-card-preview>%1$s<span class="gilda-preview__title">CAPÍTULO %2$d</span></div>',
+		$img ? '<img src="' . esc_url( $img ) . '" alt="" />' : '<img alt="" hidden />',
+		(int) gilda_chapter_number_for( $post )
+	);
 }
 
 /* ---------- Validação e gravação ---------- */

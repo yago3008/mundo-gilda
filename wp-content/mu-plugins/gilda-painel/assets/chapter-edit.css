@@ -1,0 +1,77 @@
+/* Tela do capítulo (post.php do gilda_capitulo) com o visual de painel-proto/Capitulo.dc.html. */
+.gilda-chapter-screen .wrap > h1.wp-heading-inline,
+.gilda-chapter-screen .wrap > .page-title-action,
+.gilda-chapter-screen #edit-slug-box,
+.gilda-chapter-screen #title-prompt-text,
+.gilda-chapter-screen .postbox .handle-actions,
+.gilda-chapter-screen #screen-meta-links { display: none !important; }
+.gilda-chapter-screen .gilda-page-head { margin-top: 8px; max-width: none; }
+.gilda-chapter-screen .gilda-chapter-number code { background: var(--g-linen); font-size: 14px; }
+
+/* Duas colunas: principal + lateral de 320 px */
+@media (min-width: 851px) {
+	.gilda-chapter-screen #post-body.columns-2 { margin-right: 344px; }
+	.gilda-chapter-screen #post-body.columns-2 #postbox-container-1 { margin-right: -344px; width: 320px; }
+	.gilda-chapter-screen #postbox-container-1 { position: sticky; top: 24px; }
+}
+
+/* Cartões */
+.gilda-chapter-screen #titlediv,
+.gilda-chapter-screen .postbox {
+	background: #FFFFFF;
+	border: 1px solid var(--g-sand);
+	border-radius: 2px;
+	box-shadow: none;
+	box-sizing: border-box;
+	margin-bottom: 20px;
+}
+.gilda-chapter-screen .postbox-header { border-bottom: 0; display: block; }
+.gilda-chapter-screen #poststuff .postbox .postbox-header h2.hndle,
+.gilda-chapter-screen #titlediv::before {
+	color: var(--g-ink);
+	cursor: default;
+	font: 400 20px/1.2 var(--g-serif);
+	letter-spacing: .2em;
+	padding: 28px 28px 0;
+	text-transform: uppercase;
+}
+.gilda-chapter-screen #poststuff #side-sortables .postbox .postbox-header h2.hndle { padding: 24px 24px 0; }
+.gilda-chapter-screen #poststuff #gilda-chapter-preview .postbox-header h2.hndle { font: 500 11px var(--g-sans); letter-spacing: 2px; }
+.gilda-chapter-screen .postbox .inside { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 16px 28px 28px; }
+.gilda-chapter-screen #side-sortables .postbox .inside { padding: 16px 24px 24px; }
+.gilda-chapter-screen .postbox .inside > p.gilda-help { margin: 0; }
+
+/* Nome */
+.gilda-chapter-screen #titlediv { display: flex; flex-direction: column; gap: 8px; padding: 0 28px 28px; }
+.gilda-chapter-screen #titlediv::before { content: "Nome"; margin: 0 -28px 8px; }
+.gilda-chapter-screen .gilda-title-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; order: 1; text-transform: uppercase; }
+.gilda-chapter-screen #titlewrap { order: 2; }
+.gilda-chapter-screen #titlediv #title {
+	border: 1px solid var(--g-ink);
+	border-radius: 2px;
+	box-shadow: none;
+	color: var(--g-ink);
+	font: 400 18px var(--g-serif);
+	height: 48px;
+	margin: 0;
+	padding: 0 16px;
+}
+.gilda-chapter-screen #titlediv #title:focus { outline: 2px solid var(--g-terra); outline-offset: 2px; }
+
+/* Abertura */
+.gilda-opening__head { align-items: flex-start; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+.gilda-opening__head .gilda-help { margin: 0; max-width: 520px; }
+.gilda-photo-group { display: flex; flex-direction: column; gap: 10px; }
+
+/* Lateral */
+.gilda-chapter-screen #gilda-chapter-status .inside { gap: 16px; }
+.gilda-chapter-screen #gilda-chapter-status .gilda-publish__trash { margin: 0; }
+.gilda-chapter-screen .gilda-preview__card img[hidden] { display: none; }
+
+/* Lista de capítulos */
+.post-type-gilda_capitulo.edit-php .gilda-badge { border-radius: 2px; font-size: 12px; font-weight: 500; letter-spacing: 1px; padding: 6px 10px; text-transform: uppercase; }
+.post-type-gilda_capitulo.edit-php .gilda-badge--live { background: var(--g-ok-bg); color: var(--g-ok); }
+.post-type-gilda_capitulo.edit-php .gilda-badge:not(.gilda-badge--live) { background: var(--g-linen); color: var(--g-ink); }
+.post-type-gilda_capitulo.edit-php .column-gilda_numero { width: 48px; }
+.post-type-gilda_capitulo.edit-php .column-gilda_cover { width: 70px; }
+.post-type-gilda_capitulo.edit-php .column-gilda_cover img { border-radius: 2px; height: 72px !important; width: 54px !important; }

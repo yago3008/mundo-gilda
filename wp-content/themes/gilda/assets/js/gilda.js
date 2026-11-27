@@ -293,10 +293,37 @@
 		select.setAttribute( 'aria-hidden', 'true' );
 		select.tabIndex = -1;
 		select.after( group );
-		const render = () => {
-			group.innerHTML = Array.from( select.options ).filter( ( option ) => option.value ).map( ( option ) => `
-				<label class="gilda-size"><input type="radio" name="gilda_${ escapeHTML( select.name ) }" value="${ escapeHTML( option.value ) }"${ option.selected ? ' checked' : '' }${ option.disabled ? ' disabled' : '' } /><span>${ escapeHTML( option.textContent.trim() ) }</span></label>` ).join( '' );
+		// Tamanho esgotado (ou que não existe) na cor escolhida: já aparece riscado, mas continua clicável
+		// para a cliente poder pedir "Avise-me". Usa as variações que o WooCommerce põe no formulário.
+		const form = select.form;
+		let variations = [];
+		try {
+			variations = JSON.parse( form?.dataset.product_variations || '[]' ) || [];
+		} catch ( e ) {
+			variations = [];
+		}
+		const colorSelect = form && $( 'select[name*=cor], select[name*=color]', form );
+		const soldOut = ( size ) => {
+			if ( ! Array.isArray( variations ) || ! variations.length ) {
+				return false; // muitas variações: o WooCommerce não manda a lista; fica como antes
+			}
+			const color = colorSelect ? colorSelect.value : '';
+			return ! variations.some( ( v ) => {
+				const a = v.attributes || {};
+				const sizeOk = [ '', size ].includes( a[ select.name ] ?? '' );
+				const colorOk = ! colorSelect || ! color || [ '', color ].includes( a[ colorSelect.name ] ?? '' );
+				return sizeOk && colorOk && v.is_in_stock;
+			} );
 		};
+		const render = () => {
+			group.innerHTML = Array.from( select.options ).filter( ( option ) => option.value ).map( ( option ) => {
+				const out = soldOut( option.value );
+				const text = option.textContent.trim();
+				return `
+				<label class="gilda-size${ out ? ' is-soldout' : '' }"><input type="radio" name="gilda_${ escapeHTML( select.name ) }" value="${ escapeHTML( option.value ) }"${ option.selected ? ' checked' : '' }${ option.disabled ? ' disabled' : '' }${ out ? ` aria-label="${ escapeHTML( text ) } esgotado"` : '' } /><span>${ escapeHTML( text ) }</span></label>`;
+			} ).join( '' );
+		};
+		colorSelect?.addEventListener( 'change', render );
 		group.addEventListener( 'change', ( event ) => {
 			if ( event.target.matches( 'input[type="radio"]' ) ) {
 				select.value = event.target.value;

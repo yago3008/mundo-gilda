@@ -1,0 +1,15 @@
+/* Tela "Nova peça" (painel-proto/Peca.dc.html). Componentes em painel.css. */
+.gilda-peca .gilda-label textarea { margin-top: 0; }
+.gilda-peca .gilda-help--plain { font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.gilda-peca .gilda-preview__img--empty { display: block; }
+.gilda-peca .gilda-preview__img[hidden], .gilda-peca .gilda-preview__img--empty[hidden] { display: none; }
+.gilda-peca .gilda-photos--cover .gilda-photo-slot button { min-height: 100%; }
+.gilda-peca .gilda-ship input { max-width: 100%; }
+.gilda-peca .gilda-newcolor .gilda-label { flex: 1 1 180px; }
+.gilda-peca .gilda-newcolor .gilda-label:has(input[type="color"]) { flex: 0 0 auto; }
+.gilda-peca .gilda-newcolor .gilda-btn { height: 48px; }
+.gilda-peca button.gilda-link { background: none; border: 0; color: var(--g-terra); cursor: pointer; padding: 0; }
+.gilda-peca .gilda-stock td { vertical-align: top; }
+.gilda-peca .gilda-stock input.gilda-sku { border: 1px solid var(--g-sand); border-radius: 2px; color: var(--g-graphite); display: block; font: 400 11px var(--g-sans); letter-spacing: .5px; margin-top: 4px; min-height: 26px; padding: 0 4px; width: 132px; }
+.gilda-peca .gilda-stock input[type="number"] { width: 132px; }
+.gilda-peca .gilda-input--sku { font-family: var(--g-sans) !important; letter-spacing: 1px !important; text-transform: uppercase !important; }

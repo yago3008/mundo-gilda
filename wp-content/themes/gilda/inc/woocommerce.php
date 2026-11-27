@@ -293,3 +293,20 @@ function gilda_related_products_args( $args ) {
 	return $args;
 }
 add_filter( 'woocommerce_output_related_products_args', 'gilda_related_products_args' );
+
+/**
+ * "você também vai gostar" (templates/single-product.html, grupo .gilda-related) some inteiro quando
+ * não há peças relacionadas (ex.: a única peça de uma categoria nova), em vez de mostrar o título sobre
+ * um espaço vazio.
+ *
+ * @param string $content HTML do bloco.
+ * @param array  $block   Bloco.
+ * @return string
+ */
+function gilda_hide_empty_related( $content, $block ) {
+	if ( false === strpos( (string) ( $block['attrs']['className'] ?? '' ), 'gilda-related' ) ) {
+		return $content;
+	}
+	return false === strpos( (string) $content, 'wc-block-product ' ) ? '' : $content;
+}
+add_filter( 'render_block_core/group', 'gilda_hide_empty_related', 10, 2 );

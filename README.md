@@ -13,7 +13,7 @@ Requisitos: Docker Desktop e Git Bash (Windows) ou qualquer shell bash (Linux/ma
 Esse comando sobe os containers, instala o WordPress em pt_BR, instala os plugins (versões fixas), configura a loja e importa os produtos. Pode rodar de novo sempre que quiser (por exemplo, depois de um `git pull`):
 
 - **A parte técnica é reaplicada sempre:** plugins, tema, moeda, checkout brasileiro, frete PAC/SEDEX, URLs e atributos.
-- **O conteúdo é só semente:** peças, cupom `primeiracompra`, endereço da loja, remetente dos e-mails, avisos de privacidade, slogan, fotos do site, capítulos e páginas legais só são criados quando ainda não existem. O que as donas editarem no painel (preço, estoque, cupom, textos, fotos, capítulos, uma peça apagada) **nunca é desfeito** por uma nova execução.
+- **O conteúdo é só semente:** peças, cupom `primeiracompra`, endereço da loja, remetente dos e-mails, avisos de privacidade, slogan, fotos do site, capítulos, SKUs e páginas legais só são criados quando ainda não existem. O que as donas editarem no painel (preço, estoque, cupom, textos, fotos, capítulos, uma peça apagada) **nunca é desfeito** por uma nova execução.
 
 | Opção | O que faz |
 |---|---|
@@ -124,6 +124,7 @@ scripts/
   import-products.php       # importa data/products.json para o WooCommerce
   import-legal-pages.php    # páginas legais de docs/legal/ (privacidade publicada, resto em rascunho); roda no setup.sh
   import-chapters.php       # semente dos 3 primeiros capítulos (fotos por ID, peças ligadas); roda no setup.sh
+  import-skus.php           # semente dos SKUs (CAT-NOME-COR-TAM) das peças sem SKU; nunca troca um existente; roda no setup.sh
   export-wix-products.mjs   # lê a loja Wix e gera data/products.json
 data/products.json          # produtos exportados do Wix
 wp-content/mu-plugins/      # nosso código que roda sempre
@@ -139,7 +140,7 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
   gilda-stock-alerts.php (+ pasta) # "avise-me quando chegar": formulário, lista de espera, e-mail de volta ao estoque
   gilda-low-stock.php             # "Restam só N" (últimas unidades)
-  gilda-painel.php (+ pasta)      # painel das donas: perfil "Dona da loja", Dados da loja, Capítulos (guia: docs/painel-gilda.md)
+  gilda-painel.php (+ pasta)      # painel das donas: login da marca, perfil "Dona da loja" com visual GILDA;, Início, Dados da loja, Capítulos, Nova peça (guia: docs/painel-gilda.md)
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
 scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)
 scripts/restore.sh          # restaura um backup

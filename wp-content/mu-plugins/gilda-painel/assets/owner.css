@@ -1,0 +1,247 @@
+/* wp-admin com a cara da GILDA; — só para a Dona da loja (body.gilda-owner). Ver admin-skin.php. */
+
+/* Fundo, fonte e área de conteúdo */
+body.gilda-owner,
+body.gilda-owner #wpwrap,
+body.gilda-owner #wpcontent,
+body.gilda-owner #wpbody-content { background: var(--g-cream); color: var(--g-ink); font-family: var(--g-sans); }
+body.gilda-owner #wpbody-content { padding-bottom: 64px; }
+body.gilda-owner #wpcontent { padding-left: clamp(20px, 4vw, 64px); padding-right: clamp(20px, 4vw, 64px); }
+body.gilda-owner .wrap { margin: 40px 0 0; }
+body.gilda-owner #wpfooter { display: none; }
+
+/* Sem a barra de cima no computador (no celular ela traz o botão do menu) */
+@media screen and (min-width: 783px) {
+	html.wp-toolbar:has(body.gilda-owner) { padding-top: 0; }
+	body.gilda-owner #wpadminbar { display: none; }
+	body.gilda-owner #adminmenuwrap { top: 0 !important; }
+}
+
+/* Menu terracota, 248 px */
+@media screen and (min-width: 783px) {
+	body.gilda-owner #adminmenuback,
+	body.gilda-owner #adminmenuwrap,
+	body.gilda-owner #adminmenu { width: 248px; }
+	body.gilda-owner #wpcontent,
+	body.gilda-owner #wpfooter { margin-left: 248px; }
+	/* nunca "recolhido" */
+	body.gilda-owner.folded #adminmenuback,
+	body.gilda-owner.folded #adminmenuwrap,
+	body.gilda-owner.folded #adminmenu,
+	body.gilda-owner.auto-fold #adminmenuback,
+	body.gilda-owner.auto-fold #adminmenuwrap,
+	body.gilda-owner.auto-fold #adminmenu { width: 248px; }
+	body.gilda-owner.folded #wpcontent,
+	body.gilda-owner.auto-fold #wpcontent { margin-left: 248px; }
+	body.gilda-owner.folded #adminmenu .wp-menu-name,
+	body.gilda-owner.auto-fold #adminmenu .wp-menu-name { position: static; }
+	body.gilda-owner.folded #adminmenu .wp-submenu,
+	body.gilda-owner.auto-fold #adminmenu .wp-submenu { left: auto; }
+	body.gilda-owner.folded #adminmenu .wp-has-current-submenu .wp-submenu,
+	body.gilda-owner.auto-fold #adminmenu .wp-has-current-submenu .wp-submenu { display: block; position: static; }
+}
+body.gilda-owner #adminmenuback,
+body.gilda-owner #adminmenuwrap { background: var(--g-terra); }
+@media screen and (min-width: 783px) {
+	body.gilda-owner #adminmenuwrap { box-sizing: border-box; display: flex; flex-direction: column; min-height: 100vh; padding: 32px 20px 120px; }
+	body.gilda-owner #adminmenuwrap::before { color: var(--g-cream); content: "GILDA;"; font: 400 30px/1 var(--g-serif); margin-bottom: 28px; padding: 0 12px; }
+}
+body.gilda-owner #adminmenu { background: transparent; margin: 0; }
+body.gilda-owner #collapse-menu,
+body.gilda-owner #adminmenu .wp-menu-separator { display: none; }
+body.gilda-owner #adminmenu > li.menu-top { margin-bottom: 2px; }
+body.gilda-owner #adminmenu a.menu-top,
+body.gilda-owner #adminmenu li.menu-top > a {
+	align-items: center;
+	border-radius: 2px;
+	color: var(--g-cream);
+	display: flex;
+	font: 500 13px var(--g-sans);
+	gap: 12px;
+	letter-spacing: 1.5px;
+	min-height: 0;
+	padding: 12px;
+	text-transform: uppercase;
+}
+body.gilda-owner #adminmenu li.menu-top:hover > a,
+body.gilda-owner #adminmenu li.opensub > a.menu-top,
+body.gilda-owner #adminmenu li > a.menu-top:focus { background: rgb(78 26 8 / 60%); color: var(--g-cream); }
+body.gilda-owner #adminmenu > li.wp-has-current-submenu > a.wp-has-current-submenu,
+body.gilda-owner #adminmenu > li.menu-top.current > a.menu-top { background: var(--g-terra-900); color: var(--g-cream); }
+/* Sem a setinha branca do item atual nem o cabeçalho azul do submenu (esquemas de cor do WordPress) */
+body.gilda-owner ul#adminmenu a.menu-top::after,
+body.gilda-owner ul#adminmenu a.wp-has-current-submenu::after,
+body.gilda-owner ul#adminmenu > li.current > a.current::after,
+body.gilda-owner #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
+body.gilda-owner #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after { border: 0 !important; content: none !important; display: none !important; }
+body.gilda-owner #adminmenu li::after,
+body.gilda-owner #adminmenu li:hover::after { border: 0 !important; content: none !important; display: none !important; }
+body.gilda-owner #adminmenu li.menu-top,
+body.gilda-owner #adminmenu li.menu-top:hover,
+body.gilda-owner #adminmenu li.menu-top:focus-within,
+body.gilda-owner #adminmenu li.opensub { background: transparent !important; }
+body.gilda-owner #adminmenu .wp-submenu-head,
+body.gilda-owner #adminmenu .wp-submenu .wp-submenu-head { display: none !important; }
+body.gilda-owner #adminmenu .wp-menu-name { color: inherit; flex: 1; padding: 0; display: flex; align-items: center; gap: 8px; }
+body.gilda-owner #adminmenu .awaiting-mod,
+body.gilda-owner #adminmenu .update-plugins {
+	align-items: center;
+	background: var(--g-cream);
+	border-radius: 11px;
+	color: var(--g-terra);
+	display: inline-flex;
+	font: 500 12px var(--g-sans);
+	height: 22px;
+	justify-content: center;
+	letter-spacing: 0;
+	margin-left: auto;
+	min-width: 22px;
+	padding: 0 6px;
+}
+/* Ícones de traço (protótipo), pintados com a cor do texto */
+body.gilda-owner #adminmenu div.wp-menu-image { background: none !important; float: none; flex: none; height: 18px; width: 18px; }
+body.gilda-owner #adminmenu div.wp-menu-image::before { content: none; }
+body.gilda-owner #adminmenu li.gilda-ico div.wp-menu-image { background-color: currentColor !important; -webkit-mask: var(--ico) center / 18px 18px no-repeat; mask: var(--ico) center / 18px 18px no-repeat; }
+body.gilda-owner #adminmenu li.gilda-ico div.wp-menu-image img { display: none; }
+body.gilda-owner #adminmenu li.gilda-ico--inicio { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--pedidos { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M5 7h14l-1.5 12h-11zM9 7a3 3 0 0 1 6 0'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--pecas { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M8 3l-5 4 3 3 2-1v12h8V9l2 1 3-3-5-4c-1 2-2.5 3-4 3S9 5 8 3z'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--capitulos { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v14'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--catalogo { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Ccircle cx='8' cy='8' r='3'/%3E%3Ccircle cx='16' cy='16' r='3'/%3E%3Ccircle cx='16' cy='8' r='3'/%3E%3Ccircle cx='8' cy='16' r='3'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--cupons { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M3 9V6h18v3a3 3 0 0 0 0 6v3H3v-3a3 3 0 0 0 0-6zM10 6v12' stroke-dasharray='2 2'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--dados { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M4 10l1.5-5h13L20 10M4 10h16v10H4zM9 20v-5h6v5'/%3E%3C/svg%3E"); }
+body.gilda-owner #adminmenu li.gilda-ico--paginas { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7'/%3E%3C/svg%3E"); }
+
+/* Submenu: só o do item atual, dentro do menu, sem caixinha nem a barra azul de "passar o mouse".
+   Os outros itens não abrem submenu flutuante: o clique leva à 1ª tela e o submenu aparece aqui. */
+body.gilda-owner #adminmenu .wp-submenu,
+body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu,
+body.gilda-owner #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
+body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu.sub-open {
+	background: transparent !important;
+	border: 0;
+	box-shadow: none;
+	left: auto;
+	margin: 0;
+	padding: 4px 0 8px 42px;
+	position: static;
+	top: auto;
+	width: auto;
+}
+body.gilda-owner #adminmenu li.wp-not-current-submenu .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu.opensub .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu:hover .wp-submenu,
+body.gilda-owner #adminmenu li.wp-not-current-submenu:focus-within .wp-submenu { display: none !important; }
+body.gilda-owner #adminmenu .wp-has-current-submenu .wp-submenu { display: block !important; }
+body.gilda-owner #adminmenu .wp-submenu li,
+body.gilda-owner #adminmenu .wp-submenu li.current { background: transparent !important; border: 0; margin: 0; padding: 0; }
+body.gilda-owner #adminmenu .wp-submenu a,
+body.gilda-owner #adminmenu .wp-submenu a:hover,
+body.gilda-owner #adminmenu .wp-submenu a:focus,
+body.gilda-owner #adminmenu .wp-submenu li.current a,
+body.gilda-owner #adminmenu .wp-submenu li.current a:hover {
+	background: transparent !important;
+	border: 0;
+	box-shadow: none !important;
+	color: rgb(247 245 233 / 80%);
+	display: block;
+	font: 400 14px var(--g-sans);
+	letter-spacing: 0;
+	padding: 6px 12px;
+	text-transform: none;
+}
+body.gilda-owner #adminmenu .wp-submenu a:hover,
+body.gilda-owner #adminmenu .wp-submenu a:focus,
+body.gilda-owner #adminmenu .wp-submenu li.current a { color: var(--g-cream); }
+body.gilda-owner #adminmenu .wp-submenu li.current a { font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+body.gilda-owner #adminmenu .wp-submenu a:focus-visible { outline: 2px solid var(--g-cream); outline-offset: -2px; }
+body.gilda-owner #adminmenu li.menu-top > a,
+body.gilda-owner #adminmenu li.menu-top > a:hover,
+body.gilda-owner #adminmenu li.menu-top > a:focus { box-shadow: none !important; }
+body.gilda-owner #adminmenu li.menu-top > a:focus-visible { outline: 2px solid var(--g-cream); outline-offset: -2px; }
+
+.gilda-menu-foot { color: var(--g-cream); display: flex; flex-direction: column; font-size: 14px; gap: 14px; padding: 20px 12px; }
+@media screen and (min-width: 783px) {
+	.gilda-menu-foot { bottom: 32px; left: 32px; padding: 0; position: absolute; right: 32px; }
+}
+@media screen and (max-width: 782px) {
+	body.gilda-owner #adminmenu li.menu-top > a { padding: 14px 16px; }
+	body.gilda-owner #adminmenu div.wp-menu-image { margin: 0; position: static; }
+}
+/* (o WordPress põe este bloco dentro do <ul id="adminmenu">) */
+#adminmenu .gilda-menu-foot a { color: var(--g-cream); display: inline; font: 400 14px var(--g-sans); letter-spacing: 0; padding: 0; text-decoration: underline; text-transform: none; }
+.gilda-menu-foot span { display: block; }
+.gilda-menu-foot a { color: var(--g-cream); text-underline-offset: 4px; }
+.gilda-menu-foot a:hover, .gilda-menu-foot a:focus { color: #FFFFFF; }
+.gilda-menu-foot span { opacity: .85; }
+
+/* Telas do WordPress (listas, pedidos, cupons, páginas): títulos e botões no tom da marca */
+body.gilda-owner .wrap h1.wp-heading-inline,
+body.gilda-owner .wrap > h1 { color: var(--g-ink); font: italic 300 40px/1.1 var(--g-serif); margin-right: 12px; }
+body.gilda-owner .page-title-action,
+body.gilda-owner .wrap .add-new-h2 { background: var(--g-terra); border: 1px solid var(--g-terra); border-radius: 2px; color: var(--g-cream) !important; font: 500 12px var(--g-sans); letter-spacing: 1.5px; padding: 8px 16px; text-transform: uppercase; top: -6px; }
+body.gilda-owner .page-title-action:hover { background: var(--g-terra-900); border-color: var(--g-terra-900); }
+body.gilda-owner .button-primary,
+body.gilda-owner .wp-core-ui .button-primary { background: var(--g-terra); border-color: var(--g-terra); border-radius: 2px; color: var(--g-cream); }
+body.gilda-owner .button-primary:hover,
+body.gilda-owner .wp-core-ui .button-primary:hover { background: var(--g-terra-900); border-color: var(--g-terra-900); }
+body.gilda-owner .wp-core-ui .button:not(.button-primary):not(.gilda-btn) { border-color: var(--g-terra); border-radius: 2px; color: var(--g-terra); }
+/* Links das telas do WordPress (sem passar por cima dos botões e cartões do painel) */
+:where(body.gilda-owner #wpbody-content) a { color: var(--g-terra); }
+:where(body.gilda-owner #wpbody-content) a:hover { color: var(--g-terra-900); }
+body.gilda-owner .wp-list-table,
+body.gilda-owner .postbox,
+body.gilda-owner .stuffbox,
+body.gilda-owner .woocommerce-layout__activity-panel-tabs { border-color: var(--g-sand); }
+body.gilda-owner .wp-list-table { box-shadow: none; }
+body.gilda-owner .striped > tbody > :nth-child(odd) { background: #FCFBF6; }
+body.gilda-owner .subsubsub a .count, body.gilda-owner .subsubsub a.current .count { color: var(--g-graphite); }
+body.gilda-owner input[type="checkbox"]:checked::before { filter: hue-rotate(0); }
+body.gilda-owner input[type="checkbox"], body.gilda-owner input[type="radio"] { accent-color: var(--g-terra); }
+
+/* Telas do WooCommerce: tira o cabeçalho com "Atividades" e a barra de ajuda */
+body.gilda-owner .woocommerce-layout__header { background: var(--g-cream); box-shadow: none; position: static; width: auto; }
+body.gilda-owner .woocommerce-layout__header-wrapper { min-height: 0; }
+body.gilda-owner .woocommerce-layout__activity-panel,
+body.gilda-owner #screen-meta-links,
+body.gilda-owner .woocommerce-store-alerts,
+body.gilda-owner .woocommerce-layout__notice-list-hide { display: none !important; }
+body.gilda-owner.woocommerce-embed-page #wpbody { margin-top: 0; padding-top: 0; }
+body.gilda-owner .woocommerce-layout__header-heading { font: italic 300 32px var(--g-serif); }
+
+/* Lista de peças */
+body.gilda-owner.post-type-product .page-title-action[href*="product_importer"],
+body.gilda-owner.post-type-product .page-title-action[href*="product_exporter"] { display: none; }
+body.gilda-owner .wp-list-table .column-gilda_capitulo { width: 110px; }
+body.gilda-owner .wp-list-table .column-thumb img { border-radius: 2px; }
+
+/* Celular (até 782 px): a barra de cima continua (é ela que abre o menu), nas cores da GILDA; */
+@media screen and (max-width: 782px) {
+	body.gilda-owner #wpadminbar { background: var(--g-terra); font-family: var(--g-sans); }
+	body.gilda-owner #wpadminbar .ab-item,
+	body.gilda-owner #wpadminbar a.ab-item,
+	body.gilda-owner #wpadminbar .ab-item::before,
+	body.gilda-owner #wpadminbar .ab-icon::before,
+	body.gilda-owner #wpadminbar #wp-admin-bar-menu-toggle .ab-icon::before { color: var(--g-cream) !important; }
+	body.gilda-owner #wpadminbar .ab-top-menu > li:hover > .ab-item,
+	body.gilda-owner #wpadminbar .ab-top-menu > li.hover > .ab-item,
+	body.gilda-owner #wpadminbar .ab-top-menu > li > .ab-item:focus,
+	body.gilda-owner #wpadminbar li#wp-admin-bar-menu-toggle.hover .ab-item,
+	body.gilda-owner.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle a { background: var(--g-terra-900) !important; }
+	body.gilda-owner #wpadminbar .ab-sub-wrapper,
+	body.gilda-owner #wpadminbar .ab-submenu { background: var(--g-terra-900); }
+	body.gilda-owner #wpadminbar .ab-submenu .ab-item { font: 400 15px var(--g-sans); }
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account.with-avatar #wp-admin-bar-user-actions > li { margin-left: 16px; }
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account .display-name,
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account .username { color: var(--g-cream); }
+	body.gilda-owner #wpadminbar #wp-admin-bar-search,
+	body.gilda-owner #wpadminbar #wp-admin-bar-new-content,
+	body.gilda-owner #wpadminbar #wp-admin-bar-wp-logo,
+	body.gilda-owner #wpadminbar #wp-admin-bar-command-palette { display: none !important; }
+	/* Menu aberto: terracota, rótulos em Jost */
+	body.gilda-owner #adminmenuback,
+	body.gilda-owner #adminmenuwrap,
+	body.gilda-owner #adminmenu { background: var(--g-terra); }
+	body.gilda-owner #adminmenu .wp-submenu { background: transparent !important; }
+	body.gilda-owner .gilda-menu-foot { padding: 20px 16px 28px; }
+}

@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { test, expect, type Browser, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Browser, type Page } from '@playwright/test';
 import { AdminApi } from '../helpers/admin';
 import { strongPassword, uniqueEmail } from '../helpers/env';
+import { loginAsOwner as login, pickPhotos } from '../helpers/painel';
 
 /**
  * Painel das donas (docs/painel-gilda.md): uma conta "Dona da loja" cria o próximo capítulo com fotos,
@@ -53,34 +54,7 @@ test.afterAll(async ({ browser }) => {
   }
 });
 
-async function loginAsOwner(page: Page) {
-  await page.goto('/wp-login.php', { waitUntil: 'load' });
-  // O wp-login foca e seleciona o campo de usuário ~200 ms depois de carregar: confere os dois campos.
-  await expect(async () => {
-    await page.locator('#user_login').fill(owner.username);
-    await page.locator('#user_pass').fill(owner.password);
-    await expect(page.locator('#user_login')).toHaveValue(owner.username, { timeout: 500 });
-    await expect(page.locator('#user_pass')).toHaveValue(owner.password, { timeout: 500 });
-  }).toPass({ timeout: 10_000 });
-  await page.locator('#wp-submit').click();
-  await page.waitForURL(/page=gilda-painel/);
-}
-
-/** Abre o seletor de mídia da lista e escolhe as fotos pelo ID. */
-async function pickPhotos(page: Page, box: Locator, ids: number[]) {
-  await box.locator('.gilda-photos__add').click();
-  const modal = page.locator('.media-modal').filter({ visible: true });
-  await expect(modal).toBeVisible();
-  const browseTab = modal.getByRole('tab', { name: /Biblioteca de mídia|Media Library/ });
-  if (await browseTab.isVisible()) await browseTab.click();
-  for (const id of ids) {
-    const item = modal.locator(`li.attachment[data-id="${id}"]`);
-    await expect(item).toBeVisible();
-    await item.click();
-  }
-  await modal.locator('.media-button-select').click();
-  await expect(modal).toBeHidden();
-}
+const loginAsOwner = (page: Page) => login(page, owner);
 
 async function deleteChapterForever(browser: Browser, id: number) {
   const context = await browser.newContext();
@@ -113,13 +87,13 @@ async function visitor(browser: Browser) {
 test('a dona vê só o menu do painel e não abre as telas técnicas', async ({ page }) => {
   await loginAsOwner(page);
   const menu = page.locator('#adminmenu > li.menu-top .wp-menu-name');
-  const labels = (await menu.allInnerTexts()).map((t) => t.replace(/\s*\d+\s*$/, '').trim());
+  const labels = (await menu.allTextContents()).map((t) => t.replace(/\s*\d+\s*$/, '').trim());
   expect(labels).toEqual([
-    'Painel GILDA;',
+    'Início',
     'Pedidos',
     'Peças',
     'Capítulos',
-    'Categorias, Cores e Tamanhos',
+    'Categorias e cores',
     'Cupons',
     'Dados da loja',
     'Páginas',
@@ -165,22 +139,24 @@ test('a dona cria o próximo capítulo e ele aparece em todo o site; tirado do s
   const [main, ...others] = created.media;
   await pickPhotos(page, page.locator('.gilda-opening__main [data-gilda-photos]'), [main]);
   await page.locator(`.gilda-opening__main .gilda-photo[data-id="${main}"] .gilda-photo__alt input`).fill(mainAlt);
-  // Só 5 das 6: o painel não deixa publicar.
+  // Só 5 das 6: o botão de publicar fica desligado e a lista diz o que falta.
   await pickPhotos(page, page.locator('.gilda-opening__others [data-gilda-photos]'), others.slice(0, 5));
-  await expect(page.locator('.gilda-opening__others .gilda-photos__count strong')).toHaveText('5');
+  await expect(page.locator('[data-gilda-opening-count]')).toHaveText('6 de 7 fotos · faltam 1');
+  await expect(page.locator('#publish')).toBeDisabled();
+  await expect(page.locator('[data-gilda-checklist] [data-req="opening"]')).toHaveText('7 fotos da abertura (faltam 1)');
   await pickPhotos(page, page.locator('#gilda-chapter-story [data-gilda-photos]'), [others[0], others[1]]);
   await pickPhotos(page, page.locator('#gilda-chapter-gallery [data-gilda-photos]'), [others[2], others[3]]);
+  await expect(page.locator('[data-gilda-card-preview] img')).toBeVisible();
   await page.locator('.gilda-products label', { hasText: productName }).locator('input').check();
 
-  await page.locator('#publish').click();
-  await expect(page.locator('.gilda-notice-incomplete')).toContainText('Falta');
-  await expect(page.locator('.gilda-notice-incomplete')).toContainText('1 foto');
+  // Rascunho primeiro (dá o ID para a limpeza), depois completa a colagem e publica.
+  await page.locator('#save-post').click();
+  await expect(page.locator('.gilda-publish__status')).toContainText('rascunho');
   created.chapterId = Number(new URL(page.url()).searchParams.get('post'));
   expect(created.chapterId).toBeGreaterThan(0);
-
-  // Completa a colagem e publica.
   await pickPhotos(page, page.locator('.gilda-opening__others [data-gilda-photos]'), [others[5]]);
-  await expect(page.locator('.gilda-opening__others .gilda-photos__count strong')).toHaveText('6');
+  await expect(page.locator('[data-gilda-opening-count]')).toHaveText('7 de 7 fotos · pronto');
+  await expect(page.locator('#publish')).toBeEnabled();
   await page.locator('#publish').click();
   await expect(page.locator('#message')).toContainText('publicado');
 
@@ -234,13 +210,18 @@ test('a dona cria o próximo capítulo e ele aparece em todo o site; tirado do s
   await v.close();
 });
 
-test('a dona edita os Dados da loja e o rodapé acompanha', async ({ page, browser }) => {
+test('a dona edita os Dados da loja e o rodapé, a faixa e os textos das páginas acompanham', async ({ page, browser }) => {
   await loginAsOwner(page);
   await page.goto('/wp-admin/admin.php?page=gilda-dados-da-loja');
   const instagram = page.locator('#gilda-store-instagram');
-  const original = await instagram.inputValue();
+  const whatsapp = page.locator('#gilda-store-whatsapp');
+  const email = page.locator('#gilda-store-email');
+  const original = { instagram: await instagram.inputValue(), whatsapp: await whatsapp.inputValue(), email: await email.inputValue() };
+  const testEmail = `contato-${stamp}@mundogilda.test`;
   try {
     await instagram.fill(`@gilda_teste_${stamp}`);
+    await whatsapp.fill('41988887777');
+    await email.fill(testEmail);
     await page.getByRole('button', { name: 'Salvar dados da loja' }).click();
     await expect(page.locator('.notice-success')).toBeVisible();
 
@@ -250,10 +231,24 @@ test('a dona edita os Dados da loja e o rodapé acompanha', async ({ page, brows
     await expect(footer.getByRole('link', { name: `@gilda_teste_${stamp}` })).toHaveAttribute('href', `https://www.instagram.com/gilda_teste_${stamp}/`);
     await expect(v.page.locator('.gilda-footer__copyright')).toContainText(`© ${new Date().getFullYear()}`);
     await expect(v.page.locator('.gilda-marquee__track > .gilda-marquee__item', { hasText: `@gilda_teste_${stamp}` })).toHaveCount(1);
+
+    // Textos das páginas ([gilda_loja …] em vez do número e do e-mail escritos à mão).
+    await v.page.goto('/duvidas-frequentes/');
+    // (as respostas ficam em <details> fechados: procura pelo endereço do link, não pelo que está visível)
+    const text = v.page.locator('main');
+    await expect(text.locator('details a[href="https://wa.me/5541988887777"]')).toHaveText('(41) 98888-7777');
+    await expect(text.locator(`details a[href="mailto:${testEmail}"]`)).toHaveText(testEmail);
+    await expect(text.locator(`details a[href="https://www.instagram.com/gilda_teste_${stamp}/"]`)).toHaveText(`@gilda_teste_${stamp}`);
+    expect(await text.innerHTML()).not.toContain('99100-8303');
+    await v.page.goto('/politica-de-privacidade/');
+    expect(await v.page.locator('main').innerHTML()).toContain(testEmail);
+    expect(await v.page.locator('main').innerHTML()).not.toContain('mundogilda@gmail.com');
     await v.close();
   } finally {
     await page.goto('/wp-admin/admin.php?page=gilda-dados-da-loja');
-    await page.locator('#gilda-store-instagram').fill(original);
+    await page.locator('#gilda-store-instagram').fill(original.instagram);
+    await page.locator('#gilda-store-whatsapp').fill(original.whatsapp);
+    await page.locator('#gilda-store-email').fill(original.email);
     await page.getByRole('button', { name: 'Salvar dados da loja' }).click();
     await expect(page.locator('.notice-success')).toBeVisible();
   }
