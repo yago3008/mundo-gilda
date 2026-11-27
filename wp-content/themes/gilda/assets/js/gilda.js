@@ -594,10 +594,158 @@
 		paint();
 	}
 
+	/**
+	 * Caixa de seleção personalizada (filtro de capítulo): botão + lista no visual da GILDA;.
+	 * O <select> continua no formulário (escondido): é ele que vai no filtro e no "change".
+	 * Teclado: setas, Home/End, Enter/Espaço escolhem, Esc fecha. Leitores de tela: listbox/option.
+	 */
+	function initCustomSelect( select ) {
+		if ( ! select || select.dataset.gildaSelect ) {
+			return;
+		}
+		select.dataset.gildaSelect = '1';
+		const uid = `${ select.id || 'gilda-dropdown' }-ui`;
+		const wrap = document.createElement( 'div' );
+		wrap.className = 'gilda-dropdown';
+		const button = document.createElement( 'button' );
+		button.type = 'button';
+		button.className = 'gilda-dropdown__button';
+		button.id = `${ uid }-button`;
+		button.setAttribute( 'aria-haspopup', 'listbox' );
+		button.setAttribute( 'aria-expanded', 'false' );
+		button.setAttribute( 'aria-controls', `${ uid }-list` );
+		const list = document.createElement( 'ul' );
+		list.className = 'gilda-dropdown__list';
+		list.id = `${ uid }-list`;
+		list.setAttribute( 'role', 'listbox' );
+		list.tabIndex = -1;
+		list.hidden = true;
+		const label = select.id ? document.querySelector( `label[for="${ select.id }"]` ) : null;
+		if ( label ) {
+			label.id = label.id || `${ uid }-label`;
+			label.setAttribute( 'for', button.id );
+			list.setAttribute( 'aria-labelledby', label.id );
+			button.setAttribute( 'aria-labelledby', `${ label.id } ${ button.id }` );
+		}
+
+		// "Capítulo 2 — Nome": número em cima, nome embaixo (no botão, numa linha só).
+		const parts = ( text ) => {
+			const i = text.indexOf( ' — ' );
+			return i > 0 ? [ text.slice( 0, i ), text.slice( i + 3 ) ] : [ text, '' ];
+		};
+		const options = Array.from( select.options ).map( ( opt, index ) => {
+			const li = document.createElement( 'li' );
+			li.className = 'gilda-dropdown__option';
+			li.id = `${ uid }-opt-${ index }`;
+			li.setAttribute( 'role', 'option' );
+			li.dataset.value = opt.value;
+			const [ kicker, name ] = parts( opt.textContent.trim() );
+			li.innerHTML = name
+				? `<span class="gilda-dropdown__kicker">${ escapeHTML( kicker ) }</span><span class="gilda-dropdown__name">${ escapeHTML( name ) }</span>`
+				: `<span class="gilda-dropdown__name">${ escapeHTML( kicker ) }</span>`;
+			list.appendChild( li );
+			return li;
+		} );
+
+		const render = () => {
+			const opt = select.options[ select.selectedIndex ] || select.options[ 0 ];
+			const [ kicker, name ] = parts( opt ? opt.textContent.trim() : '' );
+			button.innerHTML = `<span class="gilda-dropdown__value">${ name ? `<span class="gilda-dropdown__kicker">${ escapeHTML( kicker ) }</span> ${ escapeHTML( name ) }` : escapeHTML( kicker ) }</span><svg class="gilda-dropdown__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+			button.classList.toggle( 'is-placeholder', ! select.value );
+			options.forEach( ( li, i ) => li.setAttribute( 'aria-selected', i === select.selectedIndex ? 'true' : 'false' ) );
+		};
+		let active = 0;
+		const setActive = ( i ) => {
+			active = Math.max( 0, Math.min( options.length - 1, i ) );
+			options.forEach( ( li, k ) => li.classList.toggle( 'is-active', k === active ) );
+			list.setAttribute( 'aria-activedescendant', options[ active ].id );
+			options[ active ].scrollIntoView( { block: 'nearest' } );
+		};
+		const open = () => {
+			if ( ! list.hidden ) {
+				return;
+			}
+			list.hidden = false;
+			wrap.classList.add( 'is-open' );
+			button.setAttribute( 'aria-expanded', 'true' );
+			setActive( Math.max( 0, select.selectedIndex ) );
+			list.focus( { preventScroll: true } );
+		};
+		const close = ( focusButton = true ) => {
+			if ( list.hidden ) {
+				return;
+			}
+			list.hidden = true;
+			wrap.classList.remove( 'is-open' );
+			button.setAttribute( 'aria-expanded', 'false' );
+			if ( focusButton ) {
+				button.focus( { preventScroll: true } );
+			}
+		};
+		const choose = ( i ) => {
+			if ( select.selectedIndex !== i ) {
+				select.selectedIndex = i;
+				select.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+			}
+			render();
+			close();
+		};
+
+		button.addEventListener( 'click', () => ( list.hidden ? open() : close() ) );
+		button.addEventListener( 'keydown', ( e ) => {
+			if ( [ 'ArrowDown', 'ArrowUp', 'Enter', ' ' ].includes( e.key ) ) {
+				e.preventDefault();
+				open();
+			}
+		} );
+		list.addEventListener( 'keydown', ( e ) => {
+			const keys = { ArrowDown: active + 1, ArrowUp: active - 1, Home: 0, End: options.length - 1, PageDown: active + 5, PageUp: active - 5 };
+			if ( e.key in keys ) {
+				e.preventDefault();
+				setActive( keys[ e.key ] );
+			} else if ( 'Enter' === e.key || ' ' === e.key ) {
+				e.preventDefault();
+				choose( active );
+			} else if ( 'Escape' === e.key ) {
+				e.preventDefault();
+				e.stopPropagation(); // não fecha a gaveta de filtros do celular junto
+				close();
+			} else if ( 'Tab' === e.key ) {
+				close( false );
+			}
+		} );
+		list.addEventListener( 'mousemove', ( e ) => {
+			const li = e.target.closest( '.gilda-dropdown__option' );
+			if ( li ) {
+				setActive( options.indexOf( li ) );
+			}
+		} );
+		list.addEventListener( 'click', ( e ) => {
+			const li = e.target.closest( '.gilda-dropdown__option' );
+			if ( li ) {
+				choose( options.indexOf( li ) );
+			}
+		} );
+		document.addEventListener( 'pointerdown', ( e ) => {
+			if ( ! wrap.contains( e.target ) ) {
+				close( false );
+			}
+		} );
+		select.addEventListener( 'change', render );
+
+		select.classList.add( 'gilda-dropdown__native' );
+		select.tabIndex = -1;
+		select.setAttribute( 'aria-hidden', 'true' );
+		select.before( wrap );
+		wrap.append( button, list, select );
+		render();
+	}
+
 	function initFilters( aside ) {
 		const form = $( 'form', aside );
 		const results = $( '.gilda-shop-results' );
 		$$( '.gilda-range', aside ).forEach( initRange );
+		$$( 'select.gilda-filter-chapter', aside ).forEach( initCustomSelect );
 
 		// Mobile bottom sheet.
 		const toggle = document.createElement( 'button' );
