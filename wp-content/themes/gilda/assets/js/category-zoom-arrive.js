@@ -40,7 +40,7 @@
 	svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
 	svg.innerHTML = `<defs><mask id="gilda-czoom-in" maskUnits="userSpaceOnUse" x="0" y="0" width="${vw}" height="${vh}">`
 		+ `<rect width="${vw}" height="${vh}" fill="#fff"></rect><g class="gilda-czoom__zoom"><text fill="#000" text-anchor="middle"></text></g>`
-		+ `</mask></defs><rect class="gilda-czoom__cover" width="${vw}" height="${vh}" mask="url(#gilda-czoom-in)"></rect>`;
+		+ `</mask></defs><rect class="gilda-czoom__cover" width="${vw}" height="${vh}" mask="url(#gilda-czoom-in)"></rect><g class="gilda-czoom__solid"></g>`;
 	const zoom = svg.querySelector('.gilda-czoom__zoom');
 	const word = svg.querySelector('text');
 	word.textContent = s.text;
@@ -53,6 +53,16 @@
 	word.setAttribute('font-size', size);
 	word.setAttribute('x', pos.x);
 	word.setAttribute('y', pos.y);
+	// Login/cadastro: as letras chegam sólidas (creme, iguais às da tela anterior) e vão ficando
+	// transparentes enquanto o ";" cresce, revelando a página (sem corte seco no fim).
+	const solidLayer = svg.querySelector('.gilda-czoom__solid');
+	let solidWord = null;
+	if (s.solid) {
+		solidWord = word.cloneNode(true);
+		solidWord.removeAttribute('fill');
+		solidWord.classList.add('gilda-czoom__solid-word');
+		solidLayer.appendChild(solidWord);
+	}
 	overlay.appendChild(svg);
 	document.body.appendChild(overlay);
 
@@ -62,11 +72,15 @@
 	try {
 		if (document.fonts && !document.fonts.check(fontSpec)) {
 			word.style.visibility = 'hidden';
+			if (solidWord) solidWord.style.visibility = 'hidden';
 			fontReady = document.fonts.load(fontSpec).catch(() => {});
 		}
 	} catch (e) { /* segue com a fonte que tiver */ }
 	// O nome volta assim que a fonte chega (não espera o resto da página).
-	Promise.race([fontReady, new Promise((r) => setTimeout(r, 1500))]).then(() => { word.style.visibility = ''; });
+	Promise.race([fontReady, new Promise((r) => setTimeout(r, 1500))]).then(() => {
+		word.style.visibility = '';
+		if (solidWord) solidWord.style.visibility = '';
+	});
 
 	const domReady = document.readyState === 'loading'
 		? new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }))
@@ -104,6 +118,10 @@
 		const px = lerp(origin.x, center.x, slide);
 		const py = lerp(origin.y, center.y, slide);
 		zoom.setAttribute('transform', `translate(${px} ${py}) scale(${sc}) translate(${-origin.x} ${-origin.y})`);
+		if (solidWord) {
+			solidLayer.setAttribute('transform', zoom.getAttribute('transform'));
+			solidLayer.style.opacity = 1 - smooth(clamp((p - 0.3) / 0.4));
+		}
 	};
 	dive(0);
 	// A letra já cobre a tela toda quando o círculo inscrito (raio r, o ponto mais grosso) passa da metade
@@ -125,6 +143,7 @@
 	const painted = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 	Promise.race([Promise.all([fontReady, parsed]).then(painted), timeout(1500)]).then(() => {
 		word.style.visibility = '';
+		if (solidWord) solidWord.style.visibility = '';
 		let started = 0;
 		const frame = (now) => {
 			if (!started) started = now;

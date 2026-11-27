@@ -1241,7 +1241,10 @@
 		};
 
 		const swap = ( c ) => {
-			if ( c.busy ) {
+			// Pausa enquanto a pessoa está em cima do card (mouse ou teclado) ou o zoom do card está abrindo:
+			// quem vai clicar vê uma foto parada, e o zoom (category-zoom.js) começa dela, sem pular.
+			const card = c.base.closest( '.gilda-chapter-card' );
+			if ( c.busy || ( card && card.matches( ':hover, :focus-visible' ) ) || document.querySelector( '.gilda-czoom' ) ) {
 				return;
 			}
 			c.busy = true;

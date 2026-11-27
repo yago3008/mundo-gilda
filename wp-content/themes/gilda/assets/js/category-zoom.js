@@ -1,6 +1,7 @@
 /*
- * Cards de categoria (pattern gilda/categories): ao clicar, a tela "entra" no nome do card
- * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai no catálogo.
+ * Cards de categoria (pattern gilda/categories) e de capítulo (vitrine da home): ao clicar, a tela "entra"
+ * no nome do card (CAMISAS, CAPÍTULO 1…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai
+ * no catálogo.
  *
  * 1. abertura (aqui): o card vira marrom com o nome vazado (a foto do card some das letras logo no
  *    começo e elas mostram o próprio catálogo, carregado num iframe por baixo desde que o mouse/dedo
@@ -21,7 +22,24 @@
 	const force = /[?&]anima=1\b/.test(window.location.search);
 	if (!force && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	const AUTH_FORMS = 'form.woocommerce-form-login, form.woocommerce-form-register';
-	if (!document.querySelector(`.gilda-category a[href], ${AUTH_FORMS}`)) return;
+	// Cards que abrem com o zoom: tipos de roupa (pattern gilda/categories: o link é o nome) e capítulos
+	// (vitrine de capítulos da home: o card inteiro é o link, o nome é o título dentro dele).
+	const CARD_LINKS = '.gilda-category a[href], a.gilda-chapter-card[href]';
+	if (!document.querySelector(`${CARD_LINKS}, ${AUTH_FORMS}`)) return;
+
+	/** Link, card, nome e foto (a que está na tela) de um card clicável, ou null. */
+	const cardParts = (el) => {
+		const link = el && el.closest && el.closest(CARD_LINKS);
+		if (!link) return null;
+		if (link.matches('.gilda-chapter-card')) {
+			// a vitrine troca as fotos sozinha (crossfade): usa a que está mais visível agora
+			const imgs = Array.from(link.querySelectorAll('.gilda-chapter-card__image'));
+			const img = imgs.reduce((best, el) => (!best || parseFloat(getComputedStyle(el).opacity) > parseFloat(getComputedStyle(best).opacity) ? el : best), null);
+			return { link, card: link, label: link.querySelector('.gilda-chapter-card__title') || link, img };
+		}
+		const card = link.closest('.gilda-category');
+		return { link, card, label: link, img: card && card.querySelector('img') };
+	};
 
 	const NS = 'http://www.w3.org/2000/svg';
 	const OPEN_MS = 650;
@@ -67,14 +85,14 @@
 		const io = new IntersectionObserver((entries) => {
 			if (!entries.some((en) => en.isIntersecting)) return;
 			io.disconnect();
-			document.querySelectorAll('.gilda-category a[href]').forEach((a) => {
+			document.querySelectorAll(CARD_LINKS).forEach((a) => {
 				if (a.origin === window.location.origin) {
 					fetchPage(a.href);
 					prefetch(a.href);
 				}
 			});
 		}, { rootMargin: '200px 0px' });
-		document.querySelectorAll('.gilda-category').forEach((card) => io.observe(card));
+		document.querySelectorAll('.gilda-category, .gilda-chapter-card').forEach((card) => io.observe(card));
 	}
 
 	const loadPreview = (href) => {
@@ -205,6 +223,8 @@
 	 */
 	function play(label, opts) {
 		const { card = null, img = null, page = null, zoomInto = 'middle', requireLogin = false, go } = opts;
+		// Sem card (login/cadastro): letras sólidas (creme), sem a página aparecendo por dentro.
+		const solid = opts.solid ?? !card;
 		const text = (label.textContent || '').trim();
 		if (!text || (card && !img)) return false;
 
@@ -247,7 +267,7 @@
 		const id = `gilda-czoom-${Date.now()}`;
 		svg.innerHTML = `<defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${vw}" height="${vh}">`
 			+ `<rect width="${vw}" height="${vh}" fill="#fff"></rect><g class="gilda-czoom__zoom"><text fill="#000" text-anchor="middle"></text></g>`
-			+ `</mask></defs><rect class="gilda-czoom__cover" mask="url(#${id})"></rect>`;
+			+ `</mask></defs><rect class="gilda-czoom__cover" mask="url(#${id})"></rect><g class="gilda-czoom__solid"></g>`;
 		const zoom = svg.querySelector('.gilda-czoom__zoom');
 		const word = svg.querySelector('text');
 		const cover = svg.querySelector('.gilda-czoom__cover');
@@ -284,6 +304,13 @@
 		word.setAttribute('font-size', size);
 		word.setAttribute('x', center.x);
 		word.setAttribute('y', center.y + size * 0.35); // linha de base ≈ centro + metade da altura das maiúsculas (= baseline abaixo)
+		const solidLayer = svg.querySelector('.gilda-czoom__solid');
+		if (solid) {
+			const solidWord = word.cloneNode(true);
+			solidWord.removeAttribute('fill');
+			solidWord.classList.add('gilda-czoom__solid-word');
+			solidLayer.appendChild(solidWord);
+		}
 
 		// ---- por onde o zoom entra: a letra mais grossa entre as do meio (ou o ";" do GILDA;)
 		let origin = { x: center.x, y: center.y }, radius = size * 0.08;
@@ -340,6 +367,10 @@
 			const cy = lerp(labelCenter.y, center.y, t);
 			const s = lerp(startScale, 1, t);
 			zoom.setAttribute('transform', `translate(${cx} ${cy}) scale(${s}) translate(${-center.x} ${-center.y})`);
+			if (solid) {
+				solidLayer.setAttribute('transform', zoom.getAttribute('transform'));
+				solidLayer.style.opacity = cover.style.opacity;
+			}
 			// A foto do card some logo no começo: as letras passam a mostrar o catálogo (iframe por baixo),
 			// iguais às do mergulho que continua lá (category-zoom-arrive.js).
 			// Começa a sumir quando o marrom já cobriu o card (senão o catálogo aparece "fantasma" no card todo).
@@ -360,6 +391,7 @@
 					x: center.x, y: baseline,
 					origin, maxScale,
 					requireLogin,
+					solid,
 				}));
 			} catch (e) { /* sem sessionStorage: o catálogo abre sem o mergulho */ }
 		};
@@ -401,16 +433,16 @@
 
 	// Mouse chegando no card, toque começando ou foco pelo teclado: já busca o catálogo e monta ele por baixo.
 	const warm = (e) => {
-		const link = e.target.closest && e.target.closest('.gilda-category a[href]');
-		if (!link) return;
+		const parts = cardParts(e.target);
+		if (!parts) return;
+		const { link, label, img } = parts;
 		prefetch(link.href);
 		loadPreview(link.href);
-		const card = link.closest('.gilda-category');
-		predecode(card && card.querySelector('img'));
+		predecode(img);
 		// e já mede por onde o zoom vai entrar (o clique começa a animar na hora)
-		const text = (link.textContent || '').trim();
+		const text = (label.textContent || '').trim();
 		if (text && !overlay) {
-			const st = getComputedStyle(link);
+			const st = getComputedStyle(label);
 			const n = text.length, mid = Math.floor(n / 2);
 			const run = () => [mid - 1, mid, mid + 1].forEach((i) => { const ch = text.charAt(i); if (ch && ch.trim()) thickestPoint(ch, st, 120); });
 			(window.requestIdleCallback || ((f) => setTimeout(f, 1)))(run);
@@ -421,16 +453,16 @@
 	document.addEventListener('focusin', warm);
 
 	document.addEventListener('click', (e) => {
-		const link = e.target.closest && e.target.closest('.gilda-category a[href]');
-		if (!link) return;
+		const parts = cardParts(e.target);
+		if (!parts) return;
+		const { link } = parts;
 		if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 		if (link.target && link.target !== '_self') return;
 		if (overlay) { e.preventDefault(); return; } // já está animando
 		prefetch(link.href);
 		let ok = false;
 		try {
-			const card = link.closest('.gilda-category');
-			ok = play(link, { card, img: card && card.querySelector('img'), page: loadPreview(link.href), go: () => window.location.assign(link.href) });
+			ok = play(parts.label, { card: parts.card, img: parts.img, page: loadPreview(link.href), go: () => window.location.assign(link.href) });
 		} catch (err) {
 			cleanup();
 		}
@@ -496,6 +528,8 @@
 
 		if (doc.body && doc.body.classList.contains('logged-in')) {
 			const next = res.url || window.location.href;
+			// já busca a página da conta enquanto o "GILDA;" cresce (já logado): o mergulho não espera o servidor
+			prefetch(next);
 			let ok = false;
 			try {
 				ok = play(brand, { zoomInto: 'last', requireLogin: true, go: () => window.location.assign(next) });

@@ -1127,6 +1127,8 @@ select.gilda-select,
 .gilda-czoom__svg { display: block; height: 100%; inset: 0; position: absolute; width: 100%; }
 /* Marrom da marca: as letras vazadas (página creme por baixo) aparecem sempre, sem sumir no fundo. */
 .gilda-czoom__cover { fill: var(--gilda-terracotta); }
+/* login/cadastro: "GILDA;" em creme sólido por cima do marrom (assets/js/category-zoom*.js) */
+.gilda-czoom__solid-word { fill: var(--gilda-cream); }
 
 .gilda-chapter-showcase {
 	background: var(--gilda-white);
