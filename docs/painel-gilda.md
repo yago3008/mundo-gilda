@@ -167,6 +167,22 @@ Em **Categorias e cores → Categorias**, cada categoria tem **Envio padrão**: 
 
 Clique em **Salvar dados da loja**. O site já mostra as informações novas.
 
+O logo, o WhatsApp, o e-mail, o Instagram, a razão social e o CNPJ também vão no **rodapé de todos os e-mails** da loja.
+
+## E-mails
+
+**E-mails** mostra tudo o que o site manda por e-mail, separado em **Para a cliente** (pedido confirmado, envio pelos Correios, reembolso, avise-me, boas-vindas, senha…) e **Para vocês** (novo pedido, pedido cancelado, pagamento não aprovado).
+
+- Clique em um e-mail para mudar o **assunto**, o **título** (o texto grande no topo) e o **texto**. Nos e-mails de pedido, o resumo (peças, valores, endereço) entra sozinho; o texto é o recado de vocês.
+- **Prévia:** à direita, com um pedido de exemplo, muda enquanto você digita.
+- **Enviar teste para mim** manda o e-mail para o seu endereço, com o que está na tela (mesmo sem salvar).
+- Os códigos entre chaves, como `{order_number}` (número do pedido) e `{site_title}` (nome da loja), são trocados na hora do envio. Dá para usá-los nos textos.
+- Campo vazio = volta ao texto padrão. **Voltar aos textos padrão** desfaz tudo daquele e-mail.
+- Dá para **desligar** um e-mail (desmarque "Ligado"). Os de **senha** ficam sempre ligados: sem eles a cliente não consegue entrar na conta.
+- Nos e-mails **para vocês**, o campo **Quem recebe** aceita mais de um endereço, separado por vírgula.
+
+O visual (logo, cores, letras, rodapé) é o mesmo em todos e segue os Dados da loja.
+
 ## Se algo der errado
 
 - **Uma foto não aparece no capítulo**: confira se ela está na lista certa (abertura, narrativa ou galeria) e se o capítulo foi atualizado.

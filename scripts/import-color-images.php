@@ -19,7 +19,7 @@ if ( ! function_exists( 'gilda_color_gallery_set' ) ) {
 	return;
 }
 
-$file = '/data/product-color-images.json';
+$file = rtrim( getenv( 'GILDA_DATA_DIR' ) ?: '/data', '/' ) . '/product-color-images.json'; // produção: GILDA_DATA_DIR
 if ( ! is_readable( $file ) ) {
 	WP_CLI::log( '  (sem data/product-color-images.json)' );
 	return;
