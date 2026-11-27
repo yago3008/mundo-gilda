@@ -12,12 +12,16 @@
 
 $gilda_shop = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/loja/' );
 $gilda_mark = gilda_image( 'hero_mark' );
+// Cupom anunciado (painel → Cupons → Promoção em destaque). Sem o painel: o cupom de sempre.
+$gilda_promo = function_exists( 'gilda_promo' ) ? gilda_promo() : array( 'code' => 'primeiracompra', 'label' => '10%', 'first' => true );
 
 ob_start();
 ?>
+<?php if ( $gilda_promo ) : // "Promoção em destaque" do painel; sem cupom escolhido, sem fita ?>
 <!-- wp:paragraph {"className":"gilda-hero__ribbon","backgroundColor":"terracotta","textColor":"cream","fontFamily":"serif","style":{"spacing":{"padding":{"top":"16px","bottom":"16px","left":"var:preset|spacing|50","right":"64px"}},"typography":{"fontSize":"21px","lineHeight":"1.35","letterSpacing":"0.02em"}}} -->
-<p class="gilda-hero__ribbon has-cream-color has-terracotta-background-color has-text-color has-background has-serif-font-family" style="padding-top:16px;padding-right:64px;padding-bottom:16px;padding-left:var(--wp--preset--spacing--50);font-size:21px;letter-spacing:0.02em;line-height:1.35"><?php echo esc_html__( 'Use o cupom para 10% off na sua primeira compra pelo site:', 'gilda' ); ?> <strong>primeiracompra</strong></p>
+<p class="gilda-hero__ribbon has-cream-color has-terracotta-background-color has-text-color has-background has-serif-font-family" style="padding-top:16px;padding-right:64px;padding-bottom:16px;padding-left:var(--wp--preset--spacing--50);font-size:21px;letter-spacing:0.02em;line-height:1.35"><?php echo esc_html( sprintf( /* translators: 1: desconto, 2: " na sua primeira compra" ou vazio */ __( 'Use o cupom para %1$s off%2$s pelo site:', 'gilda' ), $gilda_promo['label'], $gilda_promo['first'] ? __( ' na sua primeira compra', 'gilda' ) : '' ) ); ?> <strong><?php echo esc_html( $gilda_promo['code'] ); ?></strong></p>
 <!-- /wp:paragraph -->
+<?php endif; ?>
 
 <?php if ( $gilda_mark ) : ?>
 <?php echo gilda_image_block( $gilda_mark, 'medium', array( 'className' => 'gilda-hero__mark gilda-decorative' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>

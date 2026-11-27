@@ -142,6 +142,29 @@ export class AdminApi {
     );
   }
 
+  /** Pedido completo (itens com SKU e atributos). */
+  async order(id: number) {
+    return this.call<{
+      id: number;
+      number: string;
+      status: string;
+      total: string;
+      line_items: { name: string; sku: string; product_id: number; variation_id: number; total: string; quantity: number; meta_data: { key: string; display_key: string; display_value: string }[] }[];
+    }>('GET', `/wc/v3/orders/${id}`);
+  }
+
+  async createCoupon(data: Record<string, unknown>) {
+    return this.call<{ id: number; code: string }>('POST', '/wc/v3/coupons', data);
+  }
+
+  async deleteCoupon(id: number) {
+    await this.call('DELETE', `/wc/v3/coupons/${id}?force=true`);
+  }
+
+  async couponsByCode(code: string) {
+    return this.call<{ id: number; code: string; meta_data: { key: string; value: string }[] }[]>('GET', `/wc/v3/coupons?code=${encodeURIComponent(code)}`);
+  }
+
   async products() {
     return this.call<{ id: number; name: string; sku: string; type: string }[]>('GET', '/wc/v3/products?per_page=100&status=any');
   }

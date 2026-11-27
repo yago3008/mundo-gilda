@@ -29,3 +29,42 @@ export async function pickPhotos(page: Page, box: Locator, ids: number[]) {
   await modal.locator('.media-button-select').click();
   await expect(modal).toBeHidden();
 }
+
+export interface PieceInput {
+  name: string;
+  price: string; // "199,90"
+  category: string; // rótulo, ex.: "Camisas"
+  chapter?: string; // rótulo, ex.: "Capítulo 1 — Borboleta 88"
+  photos: number[];
+  colors?: string[]; // nomes existentes, ex.: ["Marrom", "Preto"]
+  sizes?: string[]; // ex.: ["P", "M"]
+  stock: Record<string, number>; // "Marrom P" (ou "Estoque" para peça simples) → quantidade
+}
+
+/** Cadastra uma peça pela tela "Nova peça" (dona logada) e devolve o ID do produto. */
+export async function createPiece(page: Page, piece: PieceInput): Promise<number> {
+  await page.goto('/wp-admin/admin.php?page=gilda-peca');
+  await page.locator('#gilda-peca-name').fill(piece.name);
+  await page.locator('#gilda-peca-price').fill(piece.price);
+  await page.locator('#gilda-peca-category').selectOption({ label: piece.category });
+  await page.locator('#gilda-peca-chapter').selectOption({ label: piece.chapter ?? 'Sem capítulo' });
+  await pickPhotos(page, page.locator('.gilda-photos--cover'), piece.photos);
+  for (const color of piece.colors ?? []) {
+    await page.locator('[data-gilda-colors] label', { hasText: new RegExp(`^${color}$`) }).click();
+  }
+  for (const size of piece.sizes ?? []) {
+    await page.locator('[data-gilda-sizes] label', { hasText: new RegExp(`^${size}$`) }).click();
+  }
+  for (const [label, qty] of Object.entries(piece.stock)) {
+    await page.getByLabel(label, { exact: true }).fill(String(qty));
+  }
+  await page.locator('#gilda-peca-publish').click();
+  await expect(page.locator('.gilda-notice--ok')).toContainText('Peça publicada');
+  return Number(new URL(page.url()).searchParams.get('product'));
+}
+
+/** Roda a fila de tarefas do WordPress (WP-Cron → Action Scheduler) como um visitante faria. */
+export async function runCron(page: Page): Promise<void> {
+  // Sem parâmetro: o wp-cron.php pega a trava e roda o que estiver vencido (inclui a fila do WooCommerce).
+  await page.request.get('/wp-cron.php').catch(() => undefined);
+}

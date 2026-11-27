@@ -140,6 +140,8 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
   gilda-stock-alerts.php (+ pasta) # "avise-me quando chegar": formulário, lista de espera, e-mail de volta ao estoque
   gilda-low-stock.php             # "Restam só N" (últimas unidades)
+  gilda-shipping-cache.php        # peso/medidas mudaram: cotações de frete guardadas (página e carrinho) deixam de valer
+  gilda-local-loopback.php        # só no Docker local: WP-Cron e fila do WooCommerce conseguem chamar o próprio site
   gilda-painel.php (+ pasta)      # painel das donas: login da marca, perfil "Dona da loja" com visual GILDA;, Início, Dados da loja, Capítulos, Nova peça (guia: docs/painel-gilda.md)
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
 scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)

@@ -28,7 +28,7 @@ Sua conta tem o perfil **Dona da loja**. O menu, em terracota, mostra só:
 | **Peças** | Todas as peças e **Nova peça**. |
 | **Capítulos** | Os capítulos do Livro GILDA; (ver abaixo). |
 | **Categorias e cores** | Categorias das peças (camisas, calças…), as cores e os tamanhos. |
-| **Cupons** | Cupons de desconto. |
+| **Cupons** | Cupons de desconto e a **Promoção em destaque** (qual cupom o site anuncia). |
 | **Dados da loja** | Razão social, CNPJ, endereço, telefone, WhatsApp, e-mail, Instagram e logo. |
 | **Páginas** | Política de privacidade, trocas e devoluções, cuidados com as peças, dúvidas frequentes. |
 
@@ -131,6 +131,25 @@ Uma peça com promoção ou com preços diferentes por tamanho abre a tela compl
 ### O capítulo de cada peça
 
 O campo **Capítulo** da peça e a lista **Peças deste capítulo** da tela do capítulo são a mesma informação, então tanto faz por onde mudar. A lista de peças mostra a coluna **Capítulo**.
+
+## Cupons
+
+### Criar um cupom
+
+**Cupons → Todos os cupons → Adicionar novo cupom**:
+1. Escreva o **código**, que é o que a cliente digita (ex.: `natal15`).
+2. Escolha o **tipo de desconto**: porcentagem ou valor fixo.
+3. Preencha o **valor do cupom** (ex.: 15).
+4. Se quiser, marque **Só na primeira compra**. Assim o cupom vale apenas para quem nunca comprou na loja; o site confere pela conta e pelo e-mail.
+
+Nas outras abas dá para pôr data de validade e limite de usos. Clique em **Publicar**.
+
+### Promoção em destaque
+
+Em **Cupons → Promoção em destaque**, escolha qual cupom o site anuncia, ou **Nenhum**. A faixa de avisos do topo e a fita do banner da página inicial mostram o código e o desconto lidos do próprio cupom, por exemplo "15% OFF na primeira compra com o cupom natal15".
+- Mudou o desconto no cupom? A faixa e o banner acompanham sozinhos.
+- Cupom vencido ou com o limite de usos atingido deixa de ser anunciado sozinho.
+- Com **Nenhum**, a faixa e o banner ficam sem mensagem de cupom.
 
 ## Categorias: peso e embalagem padrão
 
