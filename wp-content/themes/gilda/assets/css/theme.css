@@ -1137,10 +1137,16 @@ select.gilda-select,
 .gilda-chapter-showcase__grid {
 	display: grid;
 	gap: clamp(18px, 3.5vw, 48px);
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	/* uma coluna por capítulo, até 5 (patterns/shop-section.php) */
+	grid-template-columns: repeat(var(--gilda-chapter-cards, 3), minmax(0, 1fr));
 	margin-inline: auto;
 	max-width: 1170px;
 }
+@media (min-width: 721px) and (max-width: 1100px) {
+	.gilda-chapter-showcase__grid[data-count="4"],
+	.gilda-chapter-showcase__grid[data-count="5"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.gilda-chapter-showcase__grid[data-count="5"] .gilda-chapter-card__title { font-size: clamp(16px, 1.6vw, 24px); }
 .gilda-chapter-card {
 	aspect-ratio: 3 / 4;
 	background: var(--gilda-linen);
@@ -1189,6 +1195,10 @@ select.gilda-select,
 .gilda-decorative { pointer-events: none; user-select: none; }
 
 .gilda-chapter-gallery.wp-block-gallery img { aspect-ratio: 3 / 4; object-fit: cover; }
+
+/* "Esta peça é do Capítulo N — Nome" (página da peça, [gilda_product_chapter]) */
+.gilda-pdp-chapter { font: italic 400 17px/1.4 var(--gilda-serif); margin: 4px 0 18px; }
+.gilda-pdp-chapter a { color: var(--gilda-terracotta); text-decoration: underline; text-underline-offset: 3px; }
 
 .wp-lightbox-overlay .scrim { background-color: rgba(36, 26, 22, .92) !important; }
 .wp-lightbox-overlay .close-button { color: var(--gilda-cream); }

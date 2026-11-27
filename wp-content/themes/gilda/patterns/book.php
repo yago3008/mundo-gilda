@@ -4,7 +4,7 @@
  * Slug: gilda/book
  * Categories: gilda-pages
  * Keywords: livro, capítulos, borboleta 88, ritual brasileiro
- * Description: "LIVRO GILDA;" com 3 capítulos: galeria com lightbox, narrativa e links "peças disponíveis" (tasks 9.1–9.4). Textos e fotos do site atual.
+ * Description: "LIVRO GILDA;" com os capítulos publicados no painel: galeria com lightbox, narrativa e links "peças disponíveis" (tasks 9.1–9.4).
  * Inserter: no
  *
  * @package gilda
@@ -43,7 +43,7 @@ $gilda_gallery = static function ( $ids ) {
 <!-- /wp:column -->
 
 <!-- wp:column {"width":"55%"} -->
-<div class="wp-block-column" style="flex-basis:55%"><?php echo $gilda_gallery( (array) gilda_image( $gilda_chapter['key'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+<div class="wp-block-column" style="flex-basis:55%"><?php echo $gilda_gallery( $gilda_chapter['gallery'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 
 <!-- wp:buttons {"layout":{"type":"flex","orientation":"vertical"},"style":{"spacing":{"blockGap":"0"}}} -->
 <div class="wp-block-buttons"><?php foreach ( $gilda_chapter['links'] as $gilda_link ) : ?><!-- wp:button {"className":"is-style-editorial-link"} -->

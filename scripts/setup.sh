@@ -2,7 +2,7 @@
 # Sobe e configura o WordPress/WooCommerce do zero (ou atualiza um existente).
 # Pode rodar quantas vezes quiser. Uso: ./scripts/setup.sh   (rode da raiz do projeto ou de qualquer lugar)
 #
-# Conteúdo é SEMENTE: peças, cupom, endereço da loja, fotos do site e páginas só são criados quando
+# Conteúdo é SEMENTE: peças, cupom, endereço da loja, fotos do site, capítulos e páginas só são criados quando
 # ainda não existem. O que as donas editarem no painel nunca é desfeito por uma nova execução.
 # Parte técnica (plugins, tema, moeda, checkout, frete, URLs) é reaplicada sempre.
 #   IMPORT_IMAGES=1          baixa as fotos dos produtos do Wix (só peças novas ou sem foto)
@@ -81,6 +81,10 @@ if [ -n "${SITE_IMAGES:-}" ]; then
   echo "==> Fotos do site"
   wp eval-file /scripts/import-site-images.php
 fi
+
+# Capítulos (tipo de conteúdo do painel): cria os 3 primeiros com as fotos acima e liga as peças. Semente.
+echo "==> Capítulos"
+wp eval-file /scripts/import-chapters.php
 
 echo
 echo "Pronto!"
