@@ -265,3 +265,161 @@ function gilda_store_screen(): void {
 	</div>
 	<?php
 }
+
+/* ---------- Dados da loja dentro dos textos das páginas ---------- */
+
+/**
+ * Telefone brasileiro para mostrar: (41) 99100-8303.
+ *
+ * @param string $value Como foi digitado.
+ * @return string
+ */
+function gilda_store_format_phone( string $value ): string {
+	$digits = gilda_store_digits( $value );
+	if ( 13 === strlen( $digits ) || 12 === strlen( $digits ) ) {
+		$digits = substr( $digits, 2 ); // tira o 55
+	}
+	if ( 11 === strlen( $digits ) ) {
+		return sprintf( '(%s) %s-%s', substr( $digits, 0, 2 ), substr( $digits, 2, 5 ), substr( $digits, 7 ) );
+	}
+	if ( 10 === strlen( $digits ) ) {
+		return sprintf( '(%s) %s-%s', substr( $digits, 0, 2 ), substr( $digits, 2, 4 ), substr( $digits, 6 ) );
+	}
+	return trim( $value );
+}
+
+/**
+ * [gilda_loja campo=whatsapp link=1] — um dado da tela "Dados da loja" no meio de um texto
+ * (políticas, dúvidas, cuidados). Mudou no painel, muda em todas as páginas.
+ * Campos: whatsapp, telefone, email, instagram, razao_social, cnpj, endereco, cep, cidade, uf.
+ * link=1 vira link (WhatsApp, ligar, e-mail, Instagram).
+ *
+ * @param array|string $atts Atributos.
+ * @return string
+ */
+function gilda_store_shortcode( $atts ): string {
+	$atts  = shortcode_atts( array( 'campo' => '', 'link' => '0' ), (array) $atts, 'gilda_loja' );
+	$field = sanitize_key( $atts['campo'] );
+	$link  = in_array( (string) $atts['link'], array( '1', 'sim', 'true' ), true );
+	switch ( $field ) {
+		case 'whatsapp':
+			$text = gilda_store_format_phone( (string) gilda_store( 'whatsapp' ) );
+			$url  = gilda_store_whatsapp_url();
+			break;
+		case 'telefone':
+			$text = gilda_store_format_phone( (string) gilda_store( 'telefone' ) );
+			$url  = gilda_store_phone_url();
+			break;
+		case 'email':
+			$text = (string) gilda_store( 'email' );
+			$url  = $text ? 'mailto:' . $text : '';
+			break;
+		case 'instagram':
+			$handle = gilda_store_instagram_handle( (string) gilda_store( 'instagram' ) );
+			$text   = $handle ? '@' . $handle : '';
+			$url    = gilda_store_instagram_url();
+			break;
+		default:
+			$fields = gilda_store_fields();
+			if ( ! isset( $fields[ $field ] ) || 'image' === ( $fields[ $field ]['type'] ?? '' ) ) {
+				return '';
+			}
+			$text = (string) gilda_store( $field );
+			$url  = '';
+	}
+	if ( '' === $text ) {
+		return '';
+	}
+	if ( $link && $url ) {
+		$external = str_starts_with( $url, 'http' );
+		return sprintf(
+			'<a href="%1$s"%2$s>%3$s</a>',
+			esc_url( $url, array( 'http', 'https', 'mailto', 'tel' ) ),
+			$external ? ' target="_blank" rel="noopener"' : '',
+			esc_html( $text )
+		);
+	}
+	return esc_html( $text );
+}
+add_shortcode( 'gilda_loja', 'gilda_store_shortcode' );
+
+/** Páginas que usam os dados da loja no texto (docs/legal/*.md). */
+function gilda_store_text_pages(): array {
+	return array( 'politica-de-privacidade', 'cuidados-com-as-pecas', 'duvidas-frequentes', 'termos-de-uso', 'trocas-e-devolucoes' );
+}
+
+/**
+ * Uma vez só: nas páginas que já foram criadas (e publicadas) com o telefone, o e-mail e o Instagram
+ * escritos à mão, troca SÓ esses textos exatos pelo [gilda_loja …]. O resto do que as donas escreveram
+ * não é tocado; um texto que já é link vira o dado sem link (não cria link dentro de link).
+ *
+ * @return int Páginas alteradas.
+ */
+function gilda_store_migrate_text_pages(): int {
+	$changed = 0;
+	foreach ( gilda_store_text_pages() as $slug ) {
+		$page = get_page_by_path( $slug );
+		if ( ! $page ) {
+			continue;
+		}
+		$content = gilda_store_replace_literals( (string) $page->post_content );
+		if ( $content !== $page->post_content ) {
+			wp_update_post( array( 'ID' => $page->ID, 'post_content' => $content ) );
+			++$changed;
+		}
+	}
+	return $changed;
+}
+
+/**
+ * Troca os textos fixos antigos (fora de atributos HTML) pelos shortcodes.
+ *
+ * @param string $html Conteúdo da página.
+ * @return string
+ */
+function gilda_store_replace_literals( string $html ): string {
+	// O link do Instagram inteiro, como o import do .md gerou.
+	$html = preg_replace(
+		'~<a href="https://www\.instagram\.com/gildapontoevirgula/?">@gildapontoevirgula</a>~',
+		'[gilda_loja campo=instagram link=1]',
+		$html
+	);
+	$literals = array(
+		'(41) 99100-8303'      => 'whatsapp',
+		'(41) 991008303'       => 'whatsapp',
+		'41 99100-8303'        => 'whatsapp',
+		'mundogilda@gmail.com' => 'email',
+	);
+	$parts  = preg_split( '~(<[^>]+>)~', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+	$in_a   = 0;
+	foreach ( $parts as $i => $part ) {
+		if ( '' === $part ) {
+			continue;
+		}
+		if ( '<' === $part[0] ) {
+			if ( preg_match( '~^<a\b~i', $part ) ) {
+				++$in_a;
+			} elseif ( preg_match( '~^</a>~i', $part ) ) {
+				$in_a = max( 0, $in_a - 1 );
+			}
+			continue; // nunca mexe dentro de uma tag (href="mailto:…" etc.)
+		}
+		foreach ( $literals as $literal => $field ) {
+			$part = str_replace( $literal, '[gilda_loja campo=' . $field . ( $in_a ? '' : ' link=1' ) . ']', $part );
+		}
+		$parts[ $i ] = $part;
+	}
+	return implode( '', $parts );
+}
+
+add_action(
+	'init',
+	static function () {
+		if ( get_option( 'gilda_store_text_pages_v1' ) ) {
+			return;
+		}
+		update_option( 'gilda_store_text_pages_v1', gmdate( 'c' ), false );
+		gilda_store_migrate_text_pages();
+	},
+	30
+);

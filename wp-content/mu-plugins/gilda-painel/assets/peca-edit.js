@@ -166,16 +166,21 @@
 	} );
 	$form.on( 'change', '#gilda-peca-category', function () {
 		var $opt = $( this ).find( ':selected' );
-		var values = ( config.defaults || {} )[ $opt.data( 'slug' ) ] || ( config.defaults || {} )[ '' ];
+		var defaults = config.defaults || {};
+		var own = defaults[ $opt.data( 'slug' ) ];
+		var values = own || defaults[ '' ];
 		if ( touched || ! values ) {
 			return;
 		}
 		$form.find( '[data-gilda-ship]' ).each( function () {
 			$( this ).val( String( values[ $( this ).data( 'gilda-ship' ) ] ).replace( '.', ',' ) );
 		} );
-		if ( $opt.val() !== '0' ) {
-			$form.find( '[data-gilda-ship-help]' ).text( 'Já vem preenchido pela categoria (' + $opt.text() + '). Ajuste se a embalagem for diferente: o frete é calculado com isso.' );
-		}
+		var help = $opt.val() === '0'
+			? 'Escolha a categoria: peso e medidas vêm preenchidos com o padrão dela.'
+			: own
+				? 'Já vem preenchido pela categoria (' + $opt.text() + '). Ajuste se a embalagem for diferente: o frete é calculado com isso.'
+				: 'A categoria ' + $opt.text() + ' ainda não tem peso e medidas padrão: estes são genéricos, ajuste para a embalagem desta peça. (O padrão da categoria se define em Categorias e cores.)';
+		$form.find( '[data-gilda-ship-help]' ).text( help );
 	} );
 
 	/* Prévia do card */

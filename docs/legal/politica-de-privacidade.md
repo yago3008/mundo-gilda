@@ -17,8 +17,8 @@ A controladora dos dados é a **GILDA ALFAIATARIA LTDA**, CNPJ 45.822.638/0001-0
 
 Para qualquer assunto sobre privacidade, fale com a gente:
 
-- E-mail: mundogilda@gmail.com
-- WhatsApp: (41) 99100-8303
+- E-mail: [gilda_loja campo=email link=1]
+- WhatsApp: [gilda_loja campo=whatsapp link=1]
 
 Esses contatos são o nosso canal de atendimento para qualquer pedido ou dúvida sobre os seus dados.
 
@@ -105,7 +105,7 @@ Pela LGPD (art. 18) você pode, a qualquer momento e de graça:
 - retirar o consentimento (por exemplo, dos cookies de marketing);
 - se opor a um tratamento feito com base em legítimo interesse.
 
-Para exercer esses direitos, escreva para mundogilda@gmail.com. Podemos pedir uma confirmação de identidade para proteger seus dados. Respondemos em até 15 dias. Alguns dados precisam ser mantidos mesmo após o pedido de exclusão, quando a lei obriga (por exemplo, notas fiscais).
+Para exercer esses direitos, escreva para [gilda_loja campo=email link=1]. Podemos pedir uma confirmação de identidade para proteger seus dados. Respondemos em até 15 dias. Alguns dados precisam ser mantidos mesmo após o pedido de exclusão, quando a lei obriga (por exemplo, notas fiscais).
 
 Se achar que seus direitos não foram respeitados, você também pode reclamar à ANPD (www.gov.br/anpd).
 

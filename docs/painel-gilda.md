@@ -111,7 +111,7 @@ Na tela do capítulo, clique em **Tirar do site** (na caixa Publicar). Ele vira 
   - **Depois de salvo, o código não muda**, nem se a peça mudar de nome ou de categoria. Só muda se você apagar e escrever outro no campo.
   - Os códigos não se repetem. Se um já existe em outra peça, o painel avisa e mantém o anterior.
   - Eles são a chave da peça no catálogo do Instagram/Facebook e, no futuro, no sistema de gestão (ERP). Evite trocar à toa.
-- **Envio:** peso e medidas da embalagem já vêm preenchidos pela categoria. Ajuste se a embalagem for diferente: o frete é calculado com isso.
+- **Envio:** peso e medidas da embalagem já vêm preenchidos com o padrão da categoria. Ajuste se a embalagem for diferente: o frete é calculado com isso. Se a categoria ainda não tem padrão, o painel avisa e traz medidas genéricas para você ajustar.
 - **Publicar:**
   - Marque **Destaque na página inicial** para a peça entrar nos destaques da home.
   - **Publicar peça;** coloca a peça na loja. Para publicar, ela precisa de preço, categoria e pelo menos uma foto. Se faltar algo, o painel salva como rascunho e diz o que falta.
@@ -132,6 +132,10 @@ Uma peça com promoção ou com preços diferentes por tamanho abre a tela compl
 
 O campo **Capítulo** da peça e a lista **Peças deste capítulo** da tela do capítulo são a mesma informação, então tanto faz por onde mudar. A lista de peças mostra a coluna **Capítulo**.
 
+## Categorias: peso e embalagem padrão
+
+Em **Categorias e cores → Categorias**, cada categoria tem **Envio padrão**: peso (kg), comprimento, largura e altura da embalagem (cm). A tela **Nova peça** já traz esses valores quando você escolhe a categoria. Ao criar uma categoria nova (por exemplo, Vestidos), preencha esse campo para as peças dela já virem com o envio certo.
+
 ## Dados da loja
 
 **Dados da loja**: razão social, CNPJ, endereço, CEP, cidade, estado, telefone, WhatsApp, e-mail, Instagram e logo.
@@ -140,6 +144,7 @@ O campo **Capítulo** da peça e a lista **Peças deste capítulo** da tela do c
 - O **telefone** aparece do jeito que você escrever. O link de ligar e o do WhatsApp são montados sozinhos a partir dos números.
 - No **Instagram**, escreva só o nome do perfil (ou cole o link do perfil).
 - O **ano do rodapé** ("© 2026") muda sozinho na virada do ano.
+- O WhatsApp, o e-mail e o Instagram também aparecem dentro dos textos de **Dúvidas frequentes**, **Cuidados com as peças**, **Política de privacidade**, **Termos** e **Trocas**: mudou aqui, muda lá também. Se for editar esses textos, deixe os códigos `[gilda_loja campo=…]` onde estão; eles são o lugar onde o dado aparece.
 
 Clique em **Salvar dados da loja**. O site já mostra as informações novas.
 

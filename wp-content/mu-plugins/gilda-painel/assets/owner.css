@@ -214,3 +214,34 @@ body.gilda-owner.post-type-product .page-title-action[href*="product_importer"],
 body.gilda-owner.post-type-product .page-title-action[href*="product_exporter"] { display: none; }
 body.gilda-owner .wp-list-table .column-gilda_capitulo { width: 110px; }
 body.gilda-owner .wp-list-table .column-thumb img { border-radius: 2px; }
+
+/* Celular (até 782 px): a barra de cima continua (é ela que abre o menu), nas cores da GILDA; */
+@media screen and (max-width: 782px) {
+	body.gilda-owner #wpadminbar { background: var(--g-terra); font-family: var(--g-sans); }
+	body.gilda-owner #wpadminbar .ab-item,
+	body.gilda-owner #wpadminbar a.ab-item,
+	body.gilda-owner #wpadminbar .ab-item::before,
+	body.gilda-owner #wpadminbar .ab-icon::before,
+	body.gilda-owner #wpadminbar #wp-admin-bar-menu-toggle .ab-icon::before { color: var(--g-cream) !important; }
+	body.gilda-owner #wpadminbar .ab-top-menu > li:hover > .ab-item,
+	body.gilda-owner #wpadminbar .ab-top-menu > li.hover > .ab-item,
+	body.gilda-owner #wpadminbar .ab-top-menu > li > .ab-item:focus,
+	body.gilda-owner #wpadminbar li#wp-admin-bar-menu-toggle.hover .ab-item,
+	body.gilda-owner.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle a { background: var(--g-terra-900) !important; }
+	body.gilda-owner #wpadminbar .ab-sub-wrapper,
+	body.gilda-owner #wpadminbar .ab-submenu { background: var(--g-terra-900); }
+	body.gilda-owner #wpadminbar .ab-submenu .ab-item { font: 400 15px var(--g-sans); }
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account.with-avatar #wp-admin-bar-user-actions > li { margin-left: 16px; }
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account .display-name,
+	body.gilda-owner #wpadminbar #wp-admin-bar-my-account .username { color: var(--g-cream); }
+	body.gilda-owner #wpadminbar #wp-admin-bar-search,
+	body.gilda-owner #wpadminbar #wp-admin-bar-new-content,
+	body.gilda-owner #wpadminbar #wp-admin-bar-wp-logo,
+	body.gilda-owner #wpadminbar #wp-admin-bar-command-palette { display: none !important; }
+	/* Menu aberto: terracota, rótulos em Jost */
+	body.gilda-owner #adminmenuback,
+	body.gilda-owner #adminmenuwrap,
+	body.gilda-owner #adminmenu { background: var(--g-terra); }
+	body.gilda-owner #adminmenu .wp-submenu { background: transparent !important; }
+	body.gilda-owner .gilda-menu-foot { padding: 20px 16px 28px; }
+}

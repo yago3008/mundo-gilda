@@ -28,4 +28,4 @@ Cartão de crédito (Visa e Mastercard) e Pix.
 
 ### Como falo com a GILDA;?
 
-Pelo WhatsApp (41) 99100-8303, pelo e-mail mundogilda@gmail.com ou pelo Instagram [@gildapontoevirgula](https://www.instagram.com/gildapontoevirgula/).
+Pelo WhatsApp [gilda_loja campo=whatsapp link=1], pelo e-mail [gilda_loja campo=email link=1] ou pelo Instagram [gilda_loja campo=instagram link=1].

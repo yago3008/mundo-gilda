@@ -168,6 +168,15 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
   await expect(swatches).toHaveCount(2);
   await expect(swatches.filter({ hasText: 'Marrom' }).locator('.gilda-swatch')).toHaveAttribute('style', /--swatch:\s*#b4522d/i);
   await expect(swatches.filter({ hasText: newColor.name }).locator('.gilda-swatch')).toHaveAttribute('style', new RegExp(`--swatch:\\s*${newColor.hex}`, 'i'));
+  // Marrom G tem estoque 0: escolhida a cor, o G já aparece esgotado (e continua clicável para o Avise-me).
+  await swatches.filter({ hasText: 'Marrom' }).locator('input').check({ force: true });
+  const sizeG = v.page.locator('.gilda-sizes .gilda-size', { hasText: /^G$/ });
+  await expect(sizeG).toHaveClass(/is-soldout/);
+  await expect(sizeG.locator('input')).toHaveAttribute('aria-label', 'G esgotado');
+  await expect(sizeG.locator('input')).toBeEnabled();
+  await expect(v.page.locator('.gilda-sizes .gilda-size', { hasText: /^M$/ })).not.toHaveClass(/is-soldout/);
+  await swatches.filter({ hasText: newColor.name }).locator('input').check({ force: true });
+  await expect(sizeG).not.toHaveClass(/is-soldout/);
   await v.close();
 
   // Editar o estoque de uma combinação mantém o ID da variação.

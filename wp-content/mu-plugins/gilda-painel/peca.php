@@ -20,15 +20,22 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/** Peso (kg) e embalagem (C × L × A cm) padrão por categoria (os mesmos do import). */
+/** Peso e embalagem genéricos, para categoria sem padrão definido. */
+const GILDA_PECA_GENERIC_SHIPPING = array( 0.30, 30, 25, 5 );
+
+/**
+ * Peso (kg) e embalagem (C × L × A cm) padrão de cada categoria (categorias.php), por slug.
+ * Categoria sem padrão: null ('' = genérico).
+ *
+ * @return array<string,float[]|null>
+ */
 function gilda_peca_shipping_defaults(): array {
-	return array(
-		'camisas'  => array( 0.35, 30, 25, 5 ),
-		'calcas'   => array( 0.55, 35, 28, 6 ),
-		'bermudas' => array( 0.40, 30, 25, 5 ),
-		'lencos'   => array( 0.10, 20, 15, 2 ),
-		''         => array( 0.30, 30, 25, 5 ),
-	);
+	$out   = array( '' => GILDA_PECA_GENERIC_SHIPPING );
+	$terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => false ) );
+	foreach ( is_wp_error( $terms ) ? array() : $terms as $term ) {
+		$out[ $term->slug ] = gilda_category_shipping( (int) $term->term_id );
+	}
+	return $out;
 }
 
 /** Endereço da tela (nova peça, ou editar uma). */
@@ -540,7 +547,7 @@ function gilda_peca_screen(): void {
 	$defaults  = gilda_peca_shipping_defaults();
 	$ship      = $product
 		? array( $product->get_weight(), $product->get_length(), $product->get_width(), $product->get_height() )
-		: ( $defaults[ $cat_slug ] ?? $defaults[''] );
+		: ( $defaults[ $cat_slug ] ?? $defaults[''] ) ?? $defaults[''];
 
 	$info   = get_transient( 'gilda_peca_info_' . get_current_user_id() );
 	delete_transient( 'gilda_peca_info_' . get_current_user_id() );
@@ -669,7 +676,7 @@ function gilda_peca_screen(): void {
 				<section class="gilda-card gilda-ship" aria-labelledby="p-envio">
 					<div class="gilda-card__intro">
 						<h2 id="p-envio" class="gilda-h2">Envio</h2>
-						<span data-gilda-ship-help><?php echo $product ? 'Peso e medidas da embalagem: o frete é calculado com isso.' : 'Já vem preenchido pela categoria. Ajuste se a embalagem for diferente: o frete é calculado com isso.'; ?></span>
+						<span data-gilda-ship-help><?php echo $product ? 'Peso e medidas da embalagem: o frete é calculado com isso.' : 'Escolha a categoria: peso e medidas vêm preenchidos com o padrão dela. Ajuste se a embalagem for diferente: o frete é calculado com isso.'; ?></span>
 					</div>
 					<div class="gilda-grid-4">
 						<label class="gilda-label">Peso (kg)<input type="text" name="weight" inputmode="decimal" class="gilda-input" data-gilda-ship="0" value="<?php echo esc_attr( gilda_peca_num( $ship[0] ) ); ?>" /></label>

@@ -281,7 +281,7 @@ add_action(
 		if ( ! gilda_is_owner() ) {
 			return;
 		}
-		foreach ( array( 'wp-logo', 'comments', 'new-post', 'new-media', 'new-user', 'updates', 'customize', 'site-editor', 'edit-site' ) as $node ) {
+		foreach ( array( 'wp-logo', 'comments', 'new-content', 'new-post', 'new-media', 'new-user', 'updates', 'customize', 'site-editor', 'edit-site', 'search', 'command-palette', 'woocommerce-site-visibility-badge' ) as $node ) {
 			$bar->remove_node( $node );
 		}
 		$bar->add_node(

@@ -2193,3 +2193,6 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	grid-column: 2;
 	grid-row: 1;
 }
+
+/* Tamanho esgotado na cor escolhida: riscado e apagado, mas clicável (abre o "Avise-me"). gilda.js → initSizeButtons */
+.gilda-sizes .gilda-size.is-soldout span { opacity: .45; text-decoration: line-through; text-decoration-thickness: 1px; }

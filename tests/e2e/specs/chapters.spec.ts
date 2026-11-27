@@ -210,13 +210,18 @@ test('a dona cria o próximo capítulo e ele aparece em todo o site; tirado do s
   await v.close();
 });
 
-test('a dona edita os Dados da loja e o rodapé acompanha', async ({ page, browser }) => {
+test('a dona edita os Dados da loja e o rodapé, a faixa e os textos das páginas acompanham', async ({ page, browser }) => {
   await loginAsOwner(page);
   await page.goto('/wp-admin/admin.php?page=gilda-dados-da-loja');
   const instagram = page.locator('#gilda-store-instagram');
-  const original = await instagram.inputValue();
+  const whatsapp = page.locator('#gilda-store-whatsapp');
+  const email = page.locator('#gilda-store-email');
+  const original = { instagram: await instagram.inputValue(), whatsapp: await whatsapp.inputValue(), email: await email.inputValue() };
+  const testEmail = `contato-${stamp}@mundogilda.test`;
   try {
     await instagram.fill(`@gilda_teste_${stamp}`);
+    await whatsapp.fill('41988887777');
+    await email.fill(testEmail);
     await page.getByRole('button', { name: 'Salvar dados da loja' }).click();
     await expect(page.locator('.notice-success')).toBeVisible();
 
@@ -226,10 +231,23 @@ test('a dona edita os Dados da loja e o rodapé acompanha', async ({ page, brows
     await expect(footer.getByRole('link', { name: `@gilda_teste_${stamp}` })).toHaveAttribute('href', `https://www.instagram.com/gilda_teste_${stamp}/`);
     await expect(v.page.locator('.gilda-footer__copyright')).toContainText(`© ${new Date().getFullYear()}`);
     await expect(v.page.locator('.gilda-marquee__track > .gilda-marquee__item', { hasText: `@gilda_teste_${stamp}` })).toHaveCount(1);
+
+    // Textos das páginas ([gilda_loja …] em vez do número e do e-mail escritos à mão).
+    await v.page.goto('/duvidas-frequentes/');
+    const text = v.page.getByRole('main');
+    await expect(text.getByRole('link', { name: '(41) 98888-7777' })).toHaveAttribute('href', 'https://wa.me/5541988887777');
+    await expect(text.getByRole('link', { name: testEmail })).toHaveAttribute('href', `mailto:${testEmail}`);
+    await expect(text.getByRole('link', { name: `@gilda_teste_${stamp}` })).toHaveCount(1);
+    await expect(text).not.toContainText('99100-8303');
+    await v.page.goto('/politica-de-privacidade/');
+    await expect(v.page.getByRole('main')).toContainText(testEmail);
+    await expect(v.page.getByRole('main')).not.toContainText('mundogilda@gmail.com');
     await v.close();
   } finally {
     await page.goto('/wp-admin/admin.php?page=gilda-dados-da-loja');
-    await page.locator('#gilda-store-instagram').fill(original);
+    await page.locator('#gilda-store-instagram').fill(original.instagram);
+    await page.locator('#gilda-store-whatsapp').fill(original.whatsapp);
+    await page.locator('#gilda-store-email').fill(original.email);
     await page.getByRole('button', { name: 'Salvar dados da loja' }).click();
     await expect(page.locator('.notice-success')).toBeVisible();
   }
