@@ -171,7 +171,7 @@ function gilda_category_zoom_hold() {
 		return;
 	}
 	?>
-<script id="gilda-category-zoom-hold">(()=>{try{const s=JSON.parse(sessionStorage.getItem('gilda-czoom')||'null');if(!s||!s.text||Date.now()-s.t>10000)return;const l=document.createElement('link');l.rel='expect';l.href='#gilda-czoom-parsed';l.setAttribute('blocking','render');document.head.appendChild(l);if(document.fonts&&s.font){document.fonts.load(`${s.font.style} ${s.font.weight} ${Math.round(s.size)}px ${s.font.family}`).catch(()=>{});}}catch(e){}})();</script>
+<script id="gilda-category-zoom-hold">(()=>{try{const s=JSON.parse(sessionStorage.getItem('gilda-czoom')||'null');if(!s||(!s.text&&!s.hold)||Date.now()-s.t>10000)return;const l=document.createElement('link');l.rel='expect';l.href='#gilda-czoom-parsed';l.setAttribute('blocking','render');document.head.appendChild(l);if(document.fonts&&s.font){document.fonts.load(`${s.font.style} ${s.font.weight} ${Math.round(s.size)}px ${s.font.family}`).catch(()=>{});}}catch(e){}})();</script>
 	<?php
 }
 add_action( 'wp_head', 'gilda_category_zoom_hold', 1 );

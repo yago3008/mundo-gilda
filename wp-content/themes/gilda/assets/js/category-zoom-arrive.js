@@ -2,6 +2,7 @@
  * Segunda metade da transição dos cards de categoria (a primeira é assets/js/category-zoom.js).
  * Impresso inline logo no começo do <body> (inc/setup.php), para a tela marrom com o nome vazado
  * já sair na primeira pintura do catálogo. Depois o zoom entra numa letra e revela a página.
+ * Quando o mergulho inteiro já rodou na home ({hold: true}), aqui só se carregam as fotos de uma vez.
  * No <head>, gilda_category_zoom_hold() segura a pintura até a página chegar inteira e adianta a fonte.
  */
 (() => {
@@ -12,7 +13,40 @@
 	} catch (e) {
 		return;
 	}
-	if (!s || !s.text || Date.now() - s.t > 10000) return;
+	if (!s || (!s.text && !s.hold) || Date.now() - s.t > 10000) return;
+
+	const domReady = document.readyState === 'loading'
+		? new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }))
+		: Promise.resolve();
+
+	// As fotos do catálogo são "lazy" (só carregam depois da primeira pintura); aqui elas aparecem pelas
+	// letras desde o começo, então carregam já (a abertura na home deixou elas no cache).
+	const eager = (img) => {
+		// decoding=sync: a primeira pintura já sai com a foto (senão as letras ficam creme por uns quadros)
+		img.setAttribute('decoding', 'sync');
+		if (img.getAttribute('loading') !== 'lazy') return;
+		img.setAttribute('loading', 'eager');
+		const sizes = img.getAttribute('sizes');
+		if (sizes) img.setAttribute('sizes', sizes.replace(/^\s*auto\s*,\s*/, ''));
+	};
+	try {
+		document.querySelectorAll('img').forEach(eager);
+		const mo = new MutationObserver((list) => {
+			for (const m of list) {
+				for (const n of m.addedNodes) {
+					if (n.nodeType !== 1) continue;
+					if (n.tagName === 'IMG') eager(n);
+					else n.querySelectorAll('img').forEach(eager);
+				}
+			}
+		});
+		mo.observe(document.documentElement, { childList: true, subtree: true });
+		domReady.then(() => mo.disconnect());
+	} catch (e) { /* segue com o lazy */ }
+
+	// O mergulho já aconteceu na home (o catálogo estava montado por trás das letras e ocupou a tela):
+	// aqui só chega a página real, igual à que estava na tela. Nada de overlay.
+	if (s.hold) return;
 	if (!s.force && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	// Login/cadastro: só mergulha se deu certo (a página seguinte já está logada).
 	if (s.requireLogin && !(document.body && document.body.classList.contains('logged-in'))) return;
@@ -82,34 +116,7 @@
 		if (solidWord) solidWord.style.visibility = '';
 	});
 
-	const domReady = document.readyState === 'loading'
-		? new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }))
-		: Promise.resolve();
 
-	// As fotos do catálogo são "lazy" (só carregam depois da primeira pintura); aqui elas aparecem pelas
-	// letras desde o começo, então carregam já (a abertura na home deixou elas no cache).
-	const eager = (img) => {
-		// decoding=sync: a primeira pintura já sai com a foto (senão as letras ficam creme por uns quadros)
-		img.setAttribute('decoding', 'sync');
-		if (img.getAttribute('loading') !== 'lazy') return;
-		img.setAttribute('loading', 'eager');
-		const sizes = img.getAttribute('sizes');
-		if (sizes) img.setAttribute('sizes', sizes.replace(/^\s*auto\s*,\s*/, ''));
-	};
-	try {
-		document.querySelectorAll('img').forEach(eager);
-		const mo = new MutationObserver((list) => {
-			for (const m of list) {
-				for (const n of m.addedNodes) {
-					if (n.nodeType !== 1) continue;
-					if (n.tagName === 'IMG') eager(n);
-					else n.querySelectorAll('img').forEach(eager);
-				}
-			}
-		});
-		mo.observe(document.documentElement, { childList: true, subtree: true });
-		domReady.then(() => mo.disconnect());
-	} catch (e) { /* segue com o lazy */ }
 	const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
 
 	const dive = (p) => {

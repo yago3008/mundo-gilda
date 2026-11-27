@@ -396,6 +396,43 @@
 			} catch (e) { /* sem sessionStorage: o catálogo abre sem o mergulho */ }
 		};
 
+		/*
+		 * Mergulho aqui mesmo, sem trocar de página no meio: o catálogo (iframe) já está atrás das letras
+		 * ocupando a tela. Quando a letra cobre tudo, o que se vê é o catálogo; só então a página real
+		 * carrega por baixo (igual à do iframe), sem nada se mexendo. Antes, a troca de página acontecia
+		 * entre a abertura e o mergulho e a tela "atualizava"/parava no meio da animação.
+		 */
+		const DIVE_MS = 1200;
+		const diveHere = () => {
+			if (!page || !overlay) return false;
+			page.frame.style.clipPath = 'none';
+			const pEnd = clamp(Math.sqrt(Math.log(Math.max(1.0001, (Math.hypot(vw, vh) * 0.56) / radius)) / Math.log(maxScale)), 0.5, 1);
+			let t0 = 0, left = false;
+			const arrive = () => {
+				if (left) return;
+				left = true;
+				if (overlay) overlay.style.opacity = '0'; // some, mas continua segurando os cliques até a página trocar
+				try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), hold: true })); } catch (e) { /* segue */ }
+				go();
+			};
+			const step = (now) => {
+				if (left || !overlay) return;
+				if (!t0) t0 = now;
+				const p = clamp((now - t0) / DIVE_MS);
+				const q = Math.min(p, pEnd);
+				const sc = Math.pow(maxScale, q * q);
+				const slide = smooth(q);
+				const px = lerp(origin.x, center.x, slide);
+				const py = lerp(origin.y, center.y, slide);
+				zoom.setAttribute('transform', `translate(${px} ${py}) scale(${sc}) translate(${-origin.x} ${-origin.y})`);
+				if (p < pEnd) requestAnimationFrame(step);
+				else arrive();
+			};
+			requestAnimationFrame(step);
+			setTimeout(arrive, DIVE_MS + 1500); // aba em segundo plano (sem requestAnimationFrame)
+			return true;
+		};
+
 		open(0);
 		let started = 0, finished = false;
 		const finish = () => {
@@ -403,6 +440,7 @@
 			finished = true;
 			open(1);
 			const leave = () => {
+				if (page && page.ready && diveHere()) return;
 				handOff();
 				go();
 			};
