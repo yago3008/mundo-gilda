@@ -75,7 +75,7 @@ function gilda_catalog_cache_key(): ?string {
 	$path = strtok( (string) ( $_SERVER['REQUEST_URI'] ?? '/' ), '?' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	// O HTML aponta para os arquivos do tema: um deploy novo do tema também invalida.
 	$theme = '';
-	foreach ( array( 'assets/js/gilda.js', 'assets/css/theme.css' ) as $file ) {
+	foreach ( array( 'assets/js/gilda.js', 'assets/css/theme.css', 'assets/js/category-zoom-arrive.js', 'inc/setup.php' ) as $file ) {
 		$theme .= (string) @filemtime( get_theme_file_path( $file ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 	}
 	$version = (string) get_option( GILDA_CATALOG_CACHE_VERSION_OPTION, '1' );
