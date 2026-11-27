@@ -72,6 +72,54 @@ export class AdminApi {
     await this.call('DELETE', `/wc/v3/customers/${id}?force=true&reassign=0`);
   }
 
+  /** Conta do painel com um perfil (ex.: gilda_dona, "Dona da loja"). */
+  async createUser(data: { username: string; email: string; password: string; role: string; firstName?: string }) {
+    return this.call<{ id: number }>('POST', '/wp/v2/users', {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      roles: [data.role],
+      first_name: data.firstName ?? '',
+    });
+  }
+
+  async deleteUser(id: number) {
+    await this.call('DELETE', `/wp/v2/users/${id}?force=true&reassign=1`);
+  }
+
+  /** Envia uma imagem para a biblioteca de mídia. */
+  async uploadImage(filePath: string, alt = ''): Promise<{ id: number }> {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const name = `e2e-${Date.now().toString(36)}-${path.basename(filePath)}`;
+    const ext = path.extname(filePath).slice(1).toLowerCase();
+    const mimeType = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
+    const res = await this.ctx.fetch('/wp-json/wp/v2/media', {
+      method: 'POST',
+      headers: { 'X-WP-Nonce': this.nonce },
+      multipart: { file: { name, mimeType, buffer: fs.readFileSync(filePath) }, alt_text: alt },
+    });
+    if (!res.ok()) throw new Error(`Upload ${name}: HTTP ${res.status()} ${(await res.text()).slice(0, 300)}`);
+    return (await res.json()) as { id: number };
+  }
+
+  async deleteMedia(id: number) {
+    await this.call('DELETE', `/wp/v2/media/${id}?force=true`);
+  }
+
+  async createProduct(data: { name: string; price: string }) {
+    return this.call<{ id: number; permalink: string; name: string }>('POST', '/wc/v3/products', {
+      name: data.name,
+      type: 'simple',
+      status: 'publish',
+      regular_price: data.price,
+    });
+  }
+
+  async deleteProduct(id: number) {
+    await this.call('DELETE', `/wc/v3/products/${id}?force=true`);
+  }
+
   /** Apaga pedidos e contas criados com estes e-mails. */
   async cleanup(emails: string[]) {
     for (const email of emails) {
