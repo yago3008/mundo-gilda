@@ -68,7 +68,10 @@
 			if (!entries.some((en) => en.isIntersecting)) return;
 			io.disconnect();
 			document.querySelectorAll('.gilda-category a[href]').forEach((a) => {
-				if (a.origin === window.location.origin) fetchPage(a.href);
+				if (a.origin === window.location.origin) {
+					fetchPage(a.href);
+					prefetch(a.href);
+				}
 			});
 		}, { rootMargin: '200px 0px' });
 		document.querySelectorAll('.gilda-category').forEach((card) => io.observe(card));
@@ -114,11 +117,21 @@
 		return p;
 	};
 
-	// Adianta o carregamento do catálogo quando a pessoa chega perto do card.
+	// Adianta o carregamento do catálogo quando a pessoa chega perto do card. Com Speculation Rules
+	// (Chrome/Edge), a navegação usa a resposta já buscada: o clique não espera o servidor (antes eram
+	// ~0,5 s parados no fim da abertura). Sem suporte, fica o <link rel=prefetch> comum.
 	const prefetched = new Set();
+	const canSpeculate = !!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules'));
 	const prefetch = (href) => {
 		if (prefetched.has(href)) return;
 		prefetched.add(href);
+		if (canSpeculate) {
+			const rules = document.createElement('script');
+			rules.type = 'speculationrules';
+			rules.textContent = JSON.stringify({ prefetch: [{ source: 'list', urls: [href] }] });
+			document.head.appendChild(rules);
+			return;
+		}
 		const link = document.createElement('link');
 		link.rel = 'prefetch';
 		link.href = href;
@@ -129,7 +142,25 @@
 	 * Ponto mais "grosso" de uma letra (o mais longe da borda), relativo à posição da caneta
 	 * (início da letra, na linha de base). O zoom entra por ali sem cair num vão da letra.
 	 */
+	// Cópia da foto do card já decodificada (no mouse em cima): o clique não espera decodificar.
+	const decodedPics = new Map();
+	const predecode = (img) => {
+		const src = img && (img.currentSrc || img.src);
+		if (!src || decodedPics.has(src)) return;
+		const pic = new Image();
+		pic.decoding = 'sync';
+		pic.src = src;
+		decodedPics.set(src, pic);
+		if (pic.decode) pic.decode().catch(() => {});
+	};
+
+	const thickCache = new Map();
 	function thickestPoint(char, style, size) {
+		const key = `${char}|${style.fontStyle}|${style.fontWeight}|${style.fontFamily}|${size}`;
+		if (!thickCache.has(key)) thickCache.set(key, measureThickest(char, style, size));
+		return thickCache.get(key);
+	}
+	function measureThickest(char, style, size) {
 		const canvas = document.createElement('canvas');
 		const pad = Math.ceil(size * 0.4);
 		canvas.width = Math.ceil(size * 1.6) + pad * 2;
@@ -196,10 +227,11 @@
 		// Sem card (login), as letras mostram a própria página por baixo.
 		const photo = document.createElement('div');
 		photo.className = 'gilda-czoom__photo';
-		const pic = document.createElement('img');
+		const src = img ? img.currentSrc || img.src : '';
+		const pic = (src && decodedPics.get(src)) || document.createElement('img');
 		const shade = document.createElement('div');
 		if (img) {
-			pic.src = img.currentSrc || img.src;
+			if (pic.src !== src) pic.src = src;
 			pic.alt = '';
 			pic.style.objectPosition = getComputedStyle(img).objectPosition;
 			photo.appendChild(pic);
@@ -280,8 +312,19 @@
 		const labelCenter = { x: labelBox.left + labelBox.width / 2, y: labelBox.top + labelBox.height / 2 };
 		const startScale = labelSize / size;
 
-		const setBox = (b) => {
-			Object.assign(photo.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
+		// A foto não muda de tamanho de verdade (cada tamanho novo obrigava o navegador a decodificar a imagem
+		// de novo, 30-50 ms por quadro: era a travada no começo). Ela fica no tamanho do card e só cresce por
+		// transform; a camada da foto ocupa a tela e é recortada (clip-path) no retângulo que cresce.
+		const from = { x: cardBox.left, y: cardBox.top, w: cardBox.width, h: cardBox.height };
+		const to = { x: 0, y: 0, w: vw, h: vh };
+		Object.assign(photo.style, { left: '0px', top: '0px', width: `${vw}px`, height: `${vh}px` });
+		Object.assign(pic.style, { left: `${from.x}px`, top: `${from.y}px`, width: `${from.w}px`, height: `${from.h}px` });
+		const setBox = (b, t) => {
+			photo.style.clipPath = `inset(${b.y}px ${vw - b.x - b.w}px ${vh - b.y - b.h}px ${b.x}px)`;
+			const k = Math.max(b.w / from.w, b.h / from.h) * lerp(1, 1.2, t);
+			const dx = b.x + b.w / 2 - (from.x + from.w / 2);
+			const dy = b.y + b.h / 2 - (from.y + from.h / 2);
+			pic.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
 			cover.setAttribute('x', b.x);
 			cover.setAttribute('y', b.y);
 			cover.setAttribute('width', b.w);
@@ -289,18 +332,14 @@
 			if (page) page.frame.style.clipPath = `inset(${b.y}px ${fw - b.x - b.w}px ${vh - b.y - b.h}px ${b.x}px)`;
 		};
 
-		const from = { x: cardBox.left, y: cardBox.top, w: cardBox.width, h: cardBox.height };
-		const to = { x: 0, y: 0, w: vw, h: vh };
-
 		const open = (p) => {
 			const t = easeInOut(p);
-			setBox({ x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t), w: lerp(from.w, to.w, t), h: lerp(from.h, to.h, t) });
+			setBox({ x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t), w: lerp(from.w, to.w, t), h: lerp(from.h, to.h, t) }, t);
 			cover.style.opacity = smooth(clamp(p / 0.35));
 			const cx = lerp(labelCenter.x, center.x, t);
 			const cy = lerp(labelCenter.y, center.y, t);
 			const s = lerp(startScale, 1, t);
 			zoom.setAttribute('transform', `translate(${cx} ${cy}) scale(${s}) translate(${-center.x} ${-center.y})`);
-			pic.style.transform = `scale(${lerp(1, 1.2, t)})`;
 			// A foto do card some logo no começo: as letras passam a mostrar o catálogo (iframe por baixo),
 			// iguais às do mergulho que continua lá (category-zoom-arrive.js).
 			// Começa a sumir quando o marrom já cobriu o card (senão o catálogo aparece "fantasma" no card todo).
@@ -366,6 +405,16 @@
 		if (!link) return;
 		prefetch(link.href);
 		loadPreview(link.href);
+		const card = link.closest('.gilda-category');
+		predecode(card && card.querySelector('img'));
+		// e já mede por onde o zoom vai entrar (o clique começa a animar na hora)
+		const text = (link.textContent || '').trim();
+		if (text && !overlay) {
+			const st = getComputedStyle(link);
+			const n = text.length, mid = Math.floor(n / 2);
+			const run = () => [mid - 1, mid, mid + 1].forEach((i) => { const ch = text.charAt(i); if (ch && ch.trim()) thickestPoint(ch, st, 120); });
+			(window.requestIdleCallback || ((f) => setTimeout(f, 1)))(run);
+		}
 	};
 	document.addEventListener('pointerover', warm);
 	document.addEventListener('pointerdown', warm);

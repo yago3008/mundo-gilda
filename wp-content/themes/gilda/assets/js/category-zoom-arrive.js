@@ -112,7 +112,18 @@
 	const r = (Math.hypot(vw, vh) * 0.7) / s.maxScale;
 	const pEnd = clamp(Math.sqrt(Math.log(Math.max(1.0001, (Math.hypot(vw, vh) * 0.56) / r)) / Math.log(s.maxScale)), 0.5, 1);
 
-	Promise.race([Promise.all([fontReady, domReady]), timeout(1500)]).then(() => {
+	// O gilda.js marca <html class="js"> no fim do carregamento; como o mergulho começa antes, marca já
+	// (senão o layout que depende dela, como os filtros no celular, mudaria no meio do mergulho).
+	document.documentElement.classList.add('js');
+
+	// Começa logo depois do primeiro quadro da página (não espera os scripts do fim: era mais uma pausa
+	// parada). O <head> segura a pintura até o HTML chegar inteiro (readyState "interactive"); dois
+	// requestAnimationFrame garantem que esse primeiro quadro, igual ao último da home, já foi mostrado.
+	const parsed = document.readyState === 'loading'
+		? new Promise((r) => document.addEventListener('readystatechange', r, { once: true }))
+		: Promise.resolve();
+	const painted = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+	Promise.race([Promise.all([fontReady, parsed]).then(painted), timeout(1500)]).then(() => {
 		word.style.visibility = '';
 		let started = 0;
 		const frame = (now) => {
@@ -125,10 +136,10 @@
 				overlay.remove();
 			}
 		};
-		// um respiro curto: a página por baixo termina de montar antes do mergulho
-		setTimeout(() => requestAnimationFrame(frame), 150);
+		// começa no próximo quadro: a página já chegou inteira (o <head> segurou a pintura até ela chegar)
+		requestAnimationFrame(frame);
 		// aba em segundo plano (sem requestAnimationFrame): não deixa a tela marrom presa
-		setTimeout(() => overlay.remove(), 150 + DIVE_MS + 1500);
+		setTimeout(() => overlay.remove(), DIVE_MS + 1500);
 	});
 
 	// Voltar/avançar pelo navegador não pode reaparecer com a tela marrom.

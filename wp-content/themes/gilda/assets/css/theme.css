@@ -1122,7 +1122,7 @@ select.gilda-select,
 /* Catálogo do card, carregado por baixo (sem scripts) para aparecer pelas letras já na abertura. */
 .gilda-czoom__page { border: 0; height: 100vh; left: 0; opacity: 0; pointer-events: none; position: fixed; top: 0; width: 100vw; z-index: 99999; }
 .gilda-czoom__page.is-playing { opacity: 1; }
-.gilda-czoom__photo img { display: block; height: 100%; max-width: none; object-fit: cover; transform-origin: center; width: 100%; }
+.gilda-czoom__photo img { display: block; max-width: none; object-fit: cover; position: absolute; transform-origin: center; will-change: transform, opacity; }
 .gilda-czoom__shade { inset: 0; position: absolute; }
 .gilda-czoom__svg { display: block; height: 100%; inset: 0; position: absolute; width: 100%; }
 /* Marrom da marca: as letras vazadas (página creme por baixo) aparecem sempre, sem sumir no fundo. */
