@@ -3062,3 +3062,103 @@ body.tax-product_tag main > .wp-block-query-title::after {
 @media (min-width: 1024px) {
 	.woocommerce-checkout .gilda-checkout-step-actions.is-last-step .gilda-checkout-continue { display: none; }
 }
+
+/* ---------- Conta → "Ver pedido": topo com a situação, e o resto em cartões ----------
+ * Marcação: template do WooCommerce + ganchos em inc/order-confirmation.php (topo, cartão do rastreio, marca no total). */
+.gilda-view-order .woocommerce-MyAccount-content { display: flex; flex-direction: column; gap: 22px; }
+.gilda-view-order .woocommerce-MyAccount-content > * { margin: 0 !important; }
+.gilda-view-order .woocommerce-MyAccount-content > .woocommerce-notices-wrapper:empty { display: none; }
+/* A frase "O pedido #… foi realizado em…" repete o topo. */
+.gilda-view-order .woocommerce-MyAccount-content > p:has(> mark.order-number) { display: none; }
+/* Topo antes das "Atualizações do pedido" (o WooCommerce as imprime antes do gancho). */
+.gilda-view-order__hero { border-bottom: 1px solid var(--gilda-sand); order: -1; padding-bottom: clamp(24px, 3vw, 34px); }
+.gilda-view-order__hero > * { margin: 0; }
+.gilda-view-order__hero .gilda-thanks__eyebrow { margin-bottom: 14px; }
+.gilda-view-order__title { color: var(--gilda-ink); font: italic 300 clamp(42px, 5.4vw, 66px)/.95 var(--gilda-display) !important; letter-spacing: -.02em; margin: 0 0 14px !important; text-transform: lowercase; }
+.gilda-view-order__title::after { content: none !important; }
+.gilda-view-order__title span { color: var(--gilda-terracotta); font-style: normal; font-weight: 400; margin-left: .03em; }
+.gilda-view-order__lead { color: var(--gilda-ink-soft); font: 300 clamp(17px, 1.7vw, 20px)/1.45 var(--gilda-display); margin-bottom: clamp(24px, 3vw, 32px) !important; max-width: 46ch; }
+.gilda-view-order__hero .gilda-thanks__steps { margin-bottom: clamp(24px, 3vw, 32px); }
+.gilda-view-order__facts { display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.gilda-view-order__facts div { display: flex; flex-direction: column; gap: 5px; }
+.gilda-view-order__facts dt { color: var(--gilda-graphite); font: 500 10.5px/1 var(--gilda-sans); letter-spacing: .18em; text-transform: uppercase; }
+.gilda-view-order__facts dd { color: var(--gilda-ink); font: 400 20px/1.2 var(--gilda-display); margin: 0; }
+.gilda-view-order__facts dd .woocommerce-Price-amount { color: var(--gilda-terracotta); }
+
+/* Cartões: rastreio, atualizações, peças, endereços, informações adicionais. */
+.gilda-view-order__card,
+.gilda-view-order .woocommerce-OrderUpdates,
+.gilda-view-order .woocommerce-order-details,
+.gilda-view-order .woocommerce-customer-details .woocommerce-column,
+.gilda-view-order .woocommerce-customer-details > address,
+.gilda-view-order .woocommerce-MyAccount-content > section:not(.woocommerce-order-details):not(.woocommerce-customer-details):not(.gilda-view-order__card),
+.gilda-view-order .woocommerce-customer-details > :is(section, div):not(.woocommerce-columns) { background: var(--gilda-white); border: 1px solid var(--gilda-sand); border-radius: 0; box-sizing: border-box; padding: clamp(20px, 2.4vw, 28px) !important; }
+.gilda-view-order .woocommerce-MyAccount-content h2,
+.gilda-view-order .woocommerce-MyAccount-content h3 { color: var(--gilda-ink); font: 400 clamp(21px, 2vw, 25px)/1.2 var(--gilda-display) !important; letter-spacing: 0; margin: 0 0 16px !important; text-transform: none; }
+.gilda-view-order .woocommerce-MyAccount-content h2.gilda-view-order__title { font: italic 300 clamp(42px, 5.4vw, 66px)/.95 var(--gilda-display) !important; margin: 0 0 14px !important; text-transform: lowercase; }
+
+/* Rastreio (plugin dos Correios). Sem código ainda, o botão genérico do site dos Correios não ajuda: some. */
+.gilda-view-order__track .infixs-caref-order-tracking-history,
+.gilda-view-order__track .infixs-caref-order-tracking-box { background: none; border: 0; margin: 0; padding: 0; }
+.gilda-view-order__track .infixs-caref-order-tracking-info { color: var(--gilda-ink-soft); font: 400 15px/1.6 var(--gilda-sans); }
+.gilda-view-order__track .infixs-caref-order-tracking-info p { margin: 0; }
+.gilda-view-order__track .infixs-caref-order-tracking-info p + a.button { display: none; }
+.gilda-view-order__track .infixs-caref-order-tracking-info strong { color: var(--gilda-ink); }
+.gilda-view-order__track .infixs-caref-order-tracking-icon svg path { fill: var(--gilda-terracotta); }
+.gilda-view-order__track .infixs-caref-order-tracking-event-title { color: var(--gilda-ink); font-weight: 500; }
+.gilda-view-order__track .infixs-caref-date { color: var(--gilda-taupe); font-size: 13px; }
+.gilda-view-order__track .infixs-caref-order-tracking-tab.active { border-color: var(--gilda-terracotta); color: var(--gilda-terracotta); }
+
+/* Atualizações do pedido (notas para a cliente). */
+.gilda-view-order .woocommerce-OrderUpdates { list-style: none; }
+.gilda-view-order .woocommerce-OrderUpdate + .woocommerce-OrderUpdate { border-top: 1px solid var(--gilda-linen); margin-top: 14px; padding-top: 14px; }
+.gilda-view-order .woocommerce-OrderUpdate-meta { color: var(--gilda-taupe); font: 500 11px/1.4 var(--gilda-sans); letter-spacing: .12em; margin: 0 0 6px; text-transform: uppercase; }
+.gilda-view-order .woocommerce-OrderUpdate-description p { color: var(--gilda-ink); font: 400 15px/1.6 var(--gilda-sans); margin: 0; }
+
+/* Peças e totais. */
+.gilda-view-order .woocommerce-table--order-details { background: none; border: 0 !important; border-collapse: collapse; margin: 0; width: 100%; }
+.gilda-view-order .woocommerce-table--order-details th,
+.gilda-view-order .woocommerce-table--order-details td { background: none !important; border: 0 !important; border-bottom: 1px solid var(--gilda-linen) !important; color: var(--gilda-ink); font: 400 15px/1.45 var(--gilda-sans); padding: 14px 0 !important; text-align: left; text-transform: none; vertical-align: top; }
+.gilda-view-order .woocommerce-table--order-details :is(th, td):last-child { padding-left: 16px !important; text-align: right; }
+.gilda-view-order .woocommerce-table--order-details thead th { color: var(--gilda-graphite); font: 500 11px/1 var(--gilda-sans); letter-spacing: .16em; padding-top: 0 !important; text-transform: uppercase; }
+.gilda-view-order .woocommerce-table--order-details tbody td.product-name a { color: var(--gilda-ink); font: 400 18px/1.35 var(--gilda-display); text-decoration: none; }
+.gilda-view-order .woocommerce-table--order-details tbody td.product-name a:hover { color: var(--gilda-terracotta); text-decoration: underline; text-underline-offset: 3px; }
+.gilda-view-order .woocommerce-table--order-details tbody .product-quantity { color: var(--gilda-ink-soft); font-weight: 400; }
+.gilda-view-order .woocommerce-table--order-details tbody .wc-item-meta { color: var(--gilda-ink-soft); font-size: 13px; list-style: none; margin: 6px 0 0; padding: 0; }
+.gilda-view-order .woocommerce-table--order-details tbody .wc-item-meta p { display: inline; margin: 0; }
+.gilda-view-order .woocommerce-table--order-details tfoot th { color: var(--gilda-ink-soft) !important; font: 400 15px/1.45 var(--gilda-sans) !important; letter-spacing: 0 !important; text-transform: none !important; }
+.gilda-view-order .woocommerce-table--order-details tfoot small,
+.gilda-view-order .woocommerce-table--order-details tfoot .shipped_via { color: var(--gilda-ink-soft); font-size: 13px; }
+.gilda-view-order .woocommerce-table--order-details tfoot tr:last-child :is(th, td) { border-bottom: 0 !important; padding-bottom: 0 !important; }
+.gilda-view-order .woocommerce-table--order-details tfoot tr:has(.gilda-order-total) :is(th, td) { color: var(--gilda-ink) !important; font: 400 24px/1.2 var(--gilda-display) !important; padding-block: 18px !important; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-table--order-details tr:last-child :is(th, td) { border-bottom: 0 !important; padding-bottom: 0 !important; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-table--order-details tbody th { color: var(--gilda-graphite); font: 500 11px/1.9 var(--gilda-sans); letter-spacing: .14em; text-transform: uppercase; width: 1%; white-space: nowrap; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-table--order-details tbody td { text-align: left; }
+.gilda-view-order .woocommerce-table--order-details tfoot tr:has(.gilda-order-total) .woocommerce-Price-amount { color: var(--gilda-terracotta); }
+.gilda-view-order .woocommerce-table--order-details .order-actions-button { align-items: center; background: var(--gilda-terracotta); border: 1px solid var(--gilda-terracotta); color: var(--gilda-cream); display: inline-flex; font: 500 12px/1 var(--gilda-sans); justify-content: center; letter-spacing: .14em; margin: 0 0 6px 8px; min-height: 42px; padding: 0 18px; text-decoration: none; text-transform: uppercase; }
+.gilda-view-order .woocommerce-table--order-details .order-actions-button.cancel { background: transparent; color: var(--gilda-terracotta); }
+.gilda-view-order .woocommerce-order-details .order-again { margin: 18px 0 0; }
+
+/* Endereços lado a lado, sem os ícones e a moldura arredondada padrão. */
+.gilda-view-order .woocommerce-customer-details { display: flex; flex-direction: column; gap: 22px; }
+.gilda-view-order .woocommerce-customer-details > * { margin: 0 !important; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-columns { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 0; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-columns::before,
+.gilda-view-order .woocommerce-customer-details .woocommerce-columns::after { content: none; }
+.gilda-view-order .woocommerce-customer-details .woocommerce-column { float: none; margin: 0; max-width: none; width: auto; }
+.gilda-view-order .woocommerce-customer-details address { border: 0 !important; border-radius: 0 !important; color: var(--gilda-ink-soft); font: 400 15px/1.75 var(--gilda-sans); font-style: normal; margin: 0; overflow-wrap: anywhere; padding: 0 !important; }
+.gilda-view-order .woocommerce-customer-details address p { margin: 0 !important; padding: 0 !important; }
+.gilda-view-order .woocommerce-customer-details address p::before { content: none !important; }
+.gilda-view-order .woocommerce-customer-details address .woocommerce-customer-details--email { margin-top: 8px !important; }
+
+/* Informações adicionais (CPF etc.). */
+.gilda-view-order .woocommerce-MyAccount-content :is(table, dl):not(.woocommerce-table--order-details):not(.gilda-view-order__facts) { border: 0; border-collapse: collapse; margin: 0; width: auto; }
+.gilda-view-order .woocommerce-MyAccount-content table:not(.woocommerce-table--order-details) :is(th, td) { background: none; border: 0; padding: 4px 24px 4px 0; text-align: left; }
+.gilda-view-order .woocommerce-MyAccount-content table:not(.woocommerce-table--order-details) th { color: var(--gilda-graphite); font: 500 11px/1.9 var(--gilda-sans); letter-spacing: .14em; text-transform: uppercase; }
+.gilda-view-order .woocommerce-MyAccount-content table:not(.woocommerce-table--order-details) td { color: var(--gilda-ink); font: 400 15px/1.5 var(--gilda-sans); }
+
+@media (max-width: 600px) {
+	.gilda-view-order__facts { gap: 12px 28px; }
+	.gilda-view-order .woocommerce-table--order-details tbody td.product-name a { font-size: 16px; }
+	.gilda-view-order .woocommerce-table--order-details .order-actions-button { margin: 0 0 6px; width: 100%; }
+}

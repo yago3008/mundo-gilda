@@ -32,6 +32,45 @@ function gilda_confirmation_compact( string $html ): string {
 }
 
 /**
+ * Etapas do pedido (recebido → pagamento → preparação → enviado), ou '' para pedido falho/cancelado/reembolsado.
+ * Usado no "Pedido recebido" e no "Ver pedido" da conta.
+ */
+function gilda_order_steps_html( WC_Order $order ): string {
+	if ( $order->has_status( array( 'failed', 'cancelled', 'refunded' ) ) ) {
+		return '';
+	}
+	$paid  = $order->is_paid();
+	$done  = $order->has_status( 'completed' );
+	$steps = array(
+		array( __( 'Pedido recebido', 'gilda' ), true ),
+		array( $paid ? __( 'Pagamento aprovado', 'gilda' ) : __( 'Aguardando pagamento', 'gilda' ), $paid ),
+		array( __( 'Em preparação', 'gilda' ), $done ),
+		array( __( 'Enviado', 'gilda' ), $done ),
+	);
+	// A etapa atual é a primeira que ainda não terminou.
+	$current = count( $steps ) - 1;
+	foreach ( $steps as $i => $step ) {
+		if ( ! $step[1] ) {
+			$current = $i;
+			break;
+		}
+	}
+	ob_start();
+	?>
+	<ol class="gilda-thanks__steps" aria-label="<?php esc_attr_e( 'Andamento do pedido', 'gilda' ); ?>">
+		<?php foreach ( $steps as $i => $step ) : ?>
+			<?php $state = $step[1] ? 'is-done' : ( $i === $current ? 'is-current' : '' ); ?>
+			<li class="<?php echo esc_attr( $state ); ?>"<?php echo $i === $current && ! $step[1] ? ' aria-current="step"' : ''; ?>>
+				<span class="gilda-thanks__dot" aria-hidden="true"></span>
+				<span class="gilda-thanks__step"><?php echo esc_html( $step[0] ); ?></span>
+			</li>
+		<?php endforeach; ?>
+	</ol>
+	<?php
+	return gilda_confirmation_compact( (string) ob_get_clean() );
+}
+
+/**
  * [gilda_order_hero] — "obrigada;", número/data e as etapas do pedido.
  *
  * @return string
@@ -62,36 +101,7 @@ function gilda_shortcode_order_hero() {
 			}
 			?>
 		</p>
-		<?php
-		if ( $order && ! $order->has_status( array( 'failed', 'cancelled', 'refunded' ) ) ) :
-			$paid  = $order->is_paid();
-			$done  = $order->has_status( 'completed' );
-			$steps = array(
-				array( __( 'Pedido recebido', 'gilda' ), true ),
-				array( $paid ? __( 'Pagamento aprovado', 'gilda' ) : __( 'Aguardando pagamento', 'gilda' ), $paid ),
-				array( __( 'Em preparação', 'gilda' ), $done ),
-				array( __( 'Enviado', 'gilda' ), $done ),
-			);
-			// A etapa atual é a primeira que ainda não terminou.
-			$current = 0;
-			foreach ( $steps as $i => $step ) {
-				if ( ! $step[1] ) {
-					$current = $i;
-					break;
-				}
-				$current = $i;
-			}
-			?>
-			<ol class="gilda-thanks__steps" aria-label="<?php esc_attr_e( 'Andamento do pedido', 'gilda' ); ?>">
-				<?php foreach ( $steps as $i => $step ) : ?>
-					<?php $state = $step[1] ? 'is-done' : ( $i === $current ? 'is-current' : '' ); ?>
-					<li class="<?php echo esc_attr( $state ); ?>"<?php echo $i === $current && ! $step[1] ? ' aria-current="step"' : ''; ?>>
-						<span class="gilda-thanks__dot" aria-hidden="true"></span>
-						<span class="gilda-thanks__step"><?php echo esc_html( $step[0] ); ?></span>
-					</li>
-				<?php endforeach; ?>
-			</ol>
-		<?php endif; ?>
+		<?php echo $order ? gilda_order_steps_html( $order ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- montado e escapado em gilda_order_steps_html(). ?>
 	</section>
 	<?php
 	return gilda_confirmation_compact( (string) ob_get_clean() );
@@ -148,3 +158,112 @@ function gilda_shortcode_order_aside() {
 	return gilda_confirmation_compact( (string) ob_get_clean() );
 }
 add_shortcode( 'gilda_order_aside', 'gilda_shortcode_order_aside' );
+
+/*
+ * ---------- "Ver pedido" da conta (/minha-conta/ver-pedido/{id}/) ----------
+ * O template do WooCommerce continua o mesmo (sem cópia no tema); por ganchos entram o topo (nº, situação
+ * e etapas), o cartão do rastreio dos Correios e uma marca no total. A frase "O pedido #… foi realizado
+ * em…" fica escondida no CSS (o topo diz o mesmo), e o visual dos cartões está no theme.css (.gilda-view-order).
+ */
+
+/** Classe no body só nessa tela, para o CSS. */
+add_filter(
+	'body_class',
+	static function ( $classes ) {
+		if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'view-order' ) ) {
+			$classes[] = 'gilda-view-order';
+		}
+		return $classes;
+	}
+);
+
+/** Título e frase de cada situação do pedido (em minúsculas, como o "obrigada;"). */
+function gilda_view_order_status_copy( WC_Order $order ): array {
+	switch ( $order->get_status() ) {
+		case 'pending':
+			return array( __( 'aguardando pagamento', 'gilda' ), __( 'Assim que o pagamento for confirmado, a gente começa a preparar suas peças.', 'gilda' ) );
+		case 'on-hold':
+			return array( __( 'aguardando confirmação', 'gilda' ), __( 'Estamos esperando a confirmação do pagamento. Você recebe um e-mail quando ela chegar.', 'gilda' ) );
+		case 'processing':
+			return array( __( 'em preparação', 'gilda' ), __( 'Pagamento aprovado. Suas peças estão sendo separadas e embaladas com carinho.', 'gilda' ) );
+		case 'completed':
+			return array( __( 'a caminho', 'gilda' ), __( 'Seu pedido foi enviado. Acompanhe a entrega pelo rastreio abaixo.', 'gilda' ) );
+		case 'cancelled':
+			return array( __( 'cancelado', 'gilda' ), __( 'Este pedido foi cancelado. Se tiver alguma dúvida, fale com a gente.', 'gilda' ) );
+		case 'refunded':
+			return array( __( 'reembolsado', 'gilda' ), __( 'O valor deste pedido foi devolvido pela mesma forma de pagamento.', 'gilda' ) );
+		case 'failed':
+			return array( __( 'pagamento recusado', 'gilda' ), __( 'O pagamento não foi aprovado. Você pode tentar de novo ou falar com a gente.', 'gilda' ) );
+		default:
+			return array( mb_strtolower( wc_get_order_status_name( $order->get_status() ) ), '' );
+	}
+}
+
+/** Topo: "Pedido nº · data", a situação em destaque, uma frase e as etapas. */
+add_action(
+	'woocommerce_view_order',
+	static function ( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return;
+		}
+		list( $title, $lead ) = gilda_view_order_status_copy( $order );
+		$count                = $order->get_item_count();
+		?>
+		<header class="gilda-view-order__hero">
+			<p class="gilda-thanks__eyebrow">
+				<?php
+				/* translators: 1: número do pedido, 2: data */
+				echo esc_html( sprintf( __( 'Pedido nº %1$s · %2$s', 'gilda' ), $order->get_order_number(), wc_format_datetime( $order->get_date_created(), 'd/m/Y' ) ) );
+				?>
+			</p>
+			<h2 class="gilda-view-order__title"><?php echo esc_html( $title ); ?><span>;</span></h2>
+			<?php if ( $lead ) : ?>
+				<p class="gilda-view-order__lead"><?php echo esc_html( $lead ); ?></p>
+			<?php endif; ?>
+			<?php echo gilda_order_steps_html( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escapado na função. ?>
+			<dl class="gilda-view-order__facts">
+				<div><dt><?php esc_html_e( 'Total', 'gilda' ); ?></dt><dd><?php echo wp_kses_post( $order->get_formatted_order_total() ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Peças', 'gilda' ); ?></dt><dd><?php echo esc_html( (string) $count ); ?></dd></div>
+				<?php if ( $order->get_shipping_method() ) : ?>
+					<div><dt><?php esc_html_e( 'Entrega', 'gilda' ); ?></dt><dd><?php echo esc_html( $order->get_shipping_method() ); ?></dd></div>
+				<?php endif; ?>
+			</dl>
+		</header>
+		<?php
+	},
+	1
+);
+
+/*
+ * Rastreio dos Correios (plugin Infixs, no mesmo gancho com prioridade 5): vai para dentro de um cartão.
+ * Sem plugin (ou sem saída), nada é impresso.
+ */
+add_action(
+	'woocommerce_view_order',
+	static function () {
+		ob_start();
+	},
+	4
+);
+add_action(
+	'woocommerce_view_order',
+	static function () {
+		$html = trim( (string) ob_get_clean() );
+		if ( '' !== $html ) {
+			echo '<section class="gilda-view-order__card gilda-view-order__track">' . $html . '</section>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- saída do próprio plugin.
+		}
+	},
+	6
+);
+
+/** Marca o total na tabela do pedido, para o CSS destacá-lo (a linha não tem classe própria). */
+add_filter(
+	'woocommerce_get_order_item_totals',
+	static function ( $totals ) {
+		if ( isset( $totals['order_total']['value'] ) && function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'view-order' ) ) {
+			$totals['order_total']['value'] = '<span class="gilda-order-total">' . $totals['order_total']['value'] . '</span>';
+		}
+		return $totals;
+	}
+);
