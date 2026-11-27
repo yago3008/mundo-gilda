@@ -550,6 +550,9 @@
 			const span = max - min || 1;
 			range.style.setProperty( '--from', `${ ( ( lo.value - min ) / span ) * 100 }%` );
 			range.style.setProperty( '--to', `${ ( ( hi.value - min ) / span ) * 100 }%` );
+			// Bolinha fora da ponta (filtro em uso) fica preenchida de marrom; na ponta, continua vazada.
+			lo.classList.toggle( 'is-moved', Number( lo.value ) > min );
+			hi.classList.toggle( 'is-moved', Number( hi.value ) < max );
 			lo.setAttribute( 'aria-valuetext', `R$ ${ lo.value }` );
 			hi.setAttribute( 'aria-valuetext', `R$ ${ hi.value }` );
 			if ( outputs[ 0 ] ) {

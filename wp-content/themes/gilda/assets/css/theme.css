@@ -760,6 +760,9 @@ body.gilda-has-hero .gilda-hero {
 	pointer-events: auto;
 	width: 18px;
 }
+/* Bolinha que saiu da ponta (filtro de preço em uso): preenchida de marrom. gilda.js → initRange */
+.gilda-range input[type="range"].is-moved::-webkit-slider-thumb { background: var(--gilda-terracotta); }
+.gilda-range input[type="range"].is-moved::-moz-range-thumb { background: var(--gilda-terracotta); }
 .gilda-range__values { display: flex; font-size: 13px; justify-content: space-between; margin: 8px 0 0; color: var(--gilda-ink-soft); }
 
 .gilda-filters__actions { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; padding-top: 18px; }
