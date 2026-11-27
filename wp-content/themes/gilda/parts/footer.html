@@ -4,6 +4,7 @@
    Contatos, empresa e redes vêm da tela "Dados da loja" do painel (shortcodes em inc/shortcodes.php). */
 .gilda-footer a { color: var(--wp--preset--color--cream); }
 .gilda-footer__top { align-items: start; display: grid; gap: clamp(32px, 4vw, 72px); grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+.gilda-footer__top > * { margin-block: 0 !important; } /* o espaço entre blocos do WordPress descia as colunas 2-4 */
 .gilda-footer__heading { color: color-mix(in srgb, var(--wp--preset--color--cream) 75%, transparent); font: 500 11px/1 var(--wp--preset--font-family--sans); letter-spacing: 2px; margin: 0 0 22px; text-transform: uppercase; }
 .gilda-footer__links { display: flex; flex-direction: column; gap: 13px; list-style: none; margin: 0; padding: 0; }
 .gilda-footer__links a { font: 400 17px/1.2 var(--wp--preset--font-family--serif); text-decoration: none; }
@@ -26,7 +27,7 @@
 @media (max-width: 480px) {
 	.gilda-footer__top { grid-template-columns: 1fr; }
 	.gilda-footer__brand { justify-content: center; text-align: center; }
-	.gilda-footer__social-list a { justify-content: center; }
+	.gilda-footer__social-list a { justify-content: flex-start; } /* à esquerda, como o resto da coluna */
 	.gilda-footer__mark { display: none; }
 	.gilda-footer__bar { flex-direction: column; align-items: flex-start; }
 }

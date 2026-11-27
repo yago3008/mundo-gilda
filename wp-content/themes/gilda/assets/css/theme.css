@@ -1260,6 +1260,53 @@ select.gilda-select,
 .wc-block-components-notice-banner.is-success::before { color: var(--gilda-success); }
 .wc-block-components-notice-banner.is-info { background: var(--gilda-cream); border-left-color: var(--gilda-taupe); color: var(--gilda-ink); }
 .wc-block-components-notice-banner.is-info::before { color: var(--gilda-taupe); }
+/* Aviso com botão (ex.: "Nenhum pedido… Ver produtos", "Confirme seu e-mail… Confirmar"): texto à esquerda e
+   o botão à direita, centralizado, no estilo dos botões secundários. No celular o botão desce. */
+.wc-block-components-notice-banner__content:has(> .wc-forward) {
+	align-items: center;
+	display: grid;
+	flex: 1;
+	gap: 12px 28px;
+	grid-template-columns: minmax(0, 1fr) auto; /* o texto (antes ou depois do botão no HTML) fica na 1ª coluna */
+}
+.wc-block-components-notice-banner > .wc-block-components-notice-banner__content .wc-forward,
+.wc-block-components-notice-banner__content a.button.wc-forward {
+	align-items: center;
+	appearance: none;
+	background: transparent !important;
+	border: 1px solid var(--gilda-terracotta) !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	color: var(--gilda-terracotta) !important;
+	display: inline-flex;
+	flex: 0 0 auto;
+	float: none !important;
+	font: 500 11.5px/1 var(--gilda-sans) !important;
+	justify-content: center;
+	letter-spacing: .14em;
+	margin: 0 !important;
+	min-height: 40px;
+	opacity: 1 !important;
+	grid-column: 2;
+	grid-row: 1;
+	justify-self: end;
+	max-width: none !important;
+	padding: 0 18px !important;
+	width: auto !important;
+	text-decoration: none !important;
+	text-transform: uppercase;
+	transition: background-color .2s, color .2s;
+	white-space: nowrap;
+}
+.wc-block-components-notice-banner__content a.wc-forward::after,
+.wc-block-components-notice-banner__content a.wc-forward::before { display: none !important; }
+.wc-block-components-notice-banner__content a.wc-forward:hover,
+.wc-block-components-notice-banner__content a.wc-forward:focus-visible { background: var(--gilda-terracotta) !important; color: var(--gilda-cream) !important; }
+.wc-block-components-notice-banner__content a.wc-forward:focus-visible { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
+@media (max-width: 600px) {
+	.wc-block-components-notice-banner__content:has(> .wc-forward) { grid-template-columns: minmax(0, 1fr); }
+	.wc-block-components-notice-banner > .wc-block-components-notice-banner__content a.wc-forward { grid-column: 1; grid-row: 2; justify-self: start; white-space: normal; }
+}
 
 .gilda-empty-cart__text {
 	font-family: var(--gilda-display) !important;
