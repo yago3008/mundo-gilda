@@ -1,8 +1,7 @@
 <?php
 /**
  * "Senha" na conta da GILDA; (item próprio do menu, separado dos detalhes da conta).
- * Os ids password_current / password_1 / password_2 e a classe "edit-account" fazem o medidor de força
- * de senha do WooCommerce funcionar aqui também (wc-password-strength-meter).
+ * Senha nova: no mínimo 6 caracteres (sem exigir "senha forte"; regra em gilda-account-details.php).
  *
  * @package gilda
  */
@@ -18,11 +17,12 @@ defined( 'ABSPATH' ) || exit;
 	</p>
 	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 		<label for="password_1"><?php esc_html_e( 'Nova senha', 'gilda' ); ?>&nbsp;<span class="required" aria-hidden="true">*</span></label>
-		<input type="password" class="woocommerce-Input woocommerce-Input--password input-text" name="password_1" id="password_1" autocomplete="new-password" required aria-required="true" />
+		<input type="password" class="woocommerce-Input woocommerce-Input--password input-text" name="password_1" id="password_1" autocomplete="new-password" minlength="6" required aria-required="true" aria-describedby="password_1_description" />
+		<span id="password_1_description"><em><?php esc_html_e( 'Pelo menos 6 caracteres.', 'gilda' ); ?></em></span>
 	</p>
 	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 		<label for="password_2"><?php esc_html_e( 'Confirmar nova senha', 'gilda' ); ?>&nbsp;<span class="required" aria-hidden="true">*</span></label>
-		<input type="password" class="woocommerce-Input woocommerce-Input--password input-text" name="password_2" id="password_2" autocomplete="new-password" required aria-required="true" />
+		<input type="password" class="woocommerce-Input woocommerce-Input--password input-text" name="password_2" id="password_2" autocomplete="new-password" minlength="6" required aria-required="true" />
 	</p>
 
 	<p>

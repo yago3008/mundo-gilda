@@ -7,8 +7,10 @@
  *   mudança do primeiro nome (e uma vez para quem já tinha conta).
  * - Telefone: salvo como billing_phone (o checkout já vem preenchido). Opcional; se preenchido, precisa
  *   ter DDD + número (10 ou 11 dígitos).
- * - Senha: endpoint /minha-conta/senha/ com senha atual + nova + confirmação e o medidor de força do
- *   WooCommerce. A troca usa wp_update_user (a sessão continua; o WordPress manda o e-mail de aviso).
+ * - Senha: endpoint /minha-conta/senha/ com senha atual + nova + confirmação. A troca usa wp_update_user
+ *   (a sessão continua; o WordPress manda o e-mail de aviso).
+ * - Regra de senha do site inteiro: no mínimo 6 caracteres, sem exigir "senha forte" (o medidor de força do
+ *   WooCommerce sai do cadastro, do checkout, da redefinição e da troca de senha).
  * - Os formulários ficam em gilda-account-details/ (o original do WooCommerce não tem gancho para tirar
  *   o nome de exibição nem a senha). O visual da área logada continua em gilda-account-dashboard.php.
  */
@@ -17,6 +19,76 @@ defined( 'ABSPATH' ) || exit;
 
 const GILDA_ACCOUNT_PASSWORD_ENDPOINT = 'senha';
 const GILDA_ACCOUNT_DETAILS_VERSION   = '1';
+const GILDA_PASSWORD_MIN_LENGTH       = 6;
+
+/* -------------------------------------------------------------------------
+ * Senha: mínimo de 6 caracteres, sem "senha forte"
+ * ---------------------------------------------------------------------- */
+
+/** Mensagem de erro se a senha for curta demais; '' se está ok. */
+function gilda_password_too_short( $password ) {
+	return mb_strlen( (string) $password ) < GILDA_PASSWORD_MIN_LENGTH
+		/* translators: %d: mínimo de caracteres */
+		? sprintf( __( 'A senha precisa ter pelo menos %d caracteres.', 'gilda' ), GILDA_PASSWORD_MIN_LENGTH )
+		: '';
+}
+
+// Sem o medidor de força (ele bloqueava o botão até a senha ser "forte").
+add_action(
+	'wp_print_scripts',
+	static function () {
+		if ( ! is_admin() ) {
+			wp_dequeue_script( 'wc-password-strength-meter' );
+		}
+	},
+	100
+);
+add_filter( 'woocommerce_min_password_strength', static fn() => 0 );
+
+// Cadastro em "Minha conta" e criação de conta no checkout.
+add_action(
+	'woocommerce_register_post',
+	static function ( $username, $email, $errors ) {
+		if ( 'yes' === get_option( 'woocommerce_registration_generate_password' ) ) {
+			return;
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput -- o WooCommerce já verificou o nonce; senha não é limpa
+		$pass = isset( $_POST['password'] ) ? (string) wp_unslash( $_POST['password'] ) : ( isset( $_POST['account_password'] ) ? (string) wp_unslash( $_POST['account_password'] ) : '' );
+		$msg  = '' !== $pass ? gilda_password_too_short( $pass ) : '';
+		if ( $msg ) {
+			$errors->add( 'gilda_password_length', $msg );
+		}
+	},
+	10,
+	3
+);
+add_action(
+	'woocommerce_after_checkout_validation',
+	static function ( $data, $errors ) {
+		if ( empty( $data['createaccount'] ) || 'yes' === get_option( 'woocommerce_registration_generate_password' ) ) {
+			return;
+		}
+		$msg = gilda_password_too_short( $data['account_password'] ?? '' );
+		if ( $msg ) {
+			$errors->add( 'gilda_password_length', $msg );
+		}
+	},
+	10,
+	2
+);
+
+// "Esqueci a senha" → nova senha.
+add_action(
+	'validate_password_reset',
+	static function ( $errors ) {
+		// phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput -- o WooCommerce já verificou; senha não é limpa
+		$pass = isset( $_POST['password_1'] ) ? (string) wp_unslash( $_POST['password_1'] ) : '';
+		$msg  = '' !== $pass ? gilda_password_too_short( $pass ) : '';
+		if ( $msg ) {
+			$errors->add( 'gilda_password_length', $msg );
+		}
+	}
+);
 
 /* -------------------------------------------------------------------------
  * Telefone
@@ -189,15 +261,12 @@ add_action(
 	}
 );
 
-// Medidor de força de senha do WooCommerce também na tela "Senha"; máscara do telefone em "Detalhes".
+// Máscara do telefone em "Detalhes".
 add_action(
 	'wp_enqueue_scripts',
 	static function () {
 		if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_user_logged_in() ) {
 			return;
-		}
-		if ( is_wc_endpoint_url( GILDA_ACCOUNT_PASSWORD_ENDPOINT ) ) {
-			wp_enqueue_script( 'wc-password-strength-meter' );
 		}
 		if ( is_wc_endpoint_url( 'edit-account' ) ) {
 			wp_register_script( 'gilda-account-phone', '', array(), GILDA_ACCOUNT_DETAILS_VERSION, true );
@@ -237,6 +306,9 @@ add_action(
 			$ok = false;
 		} elseif ( ! wp_check_password( $current, $user->user_pass, $user->ID ) ) {
 			wc_add_notice( __( 'A senha atual não confere.', 'gilda' ), 'error', array( 'id' => 'password_current' ) );
+			$ok = false;
+		} elseif ( gilda_password_too_short( $pass1 ) ) {
+			wc_add_notice( gilda_password_too_short( $pass1 ), 'error', array( 'id' => 'password_1' ) );
 			$ok = false;
 		} elseif ( $pass1 !== $pass2 ) {
 			wc_add_notice( __( 'A nova senha e a confirmação não são iguais.', 'gilda' ), 'error', array( 'id' => 'password_2' ) );
