@@ -71,6 +71,10 @@ else
   echo "  (sem data/products.json — rode: node scripts/export-wix-products.mjs)"
 fi
 
+# Fotos de cada cor (data/product-color-images.json). Só peças ainda sem fotos por cor.
+echo "==> Fotos por cor"
+wp eval-file /scripts/import-color-images.php
+
 # Páginas legais de docs/legal/ (política de privacidade publicada; o resto em rascunho).
 echo "==> Páginas legais"
 wp eval-file /scripts/import-legal-pages.php --user="$WP_ADMIN_USER"

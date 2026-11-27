@@ -291,6 +291,10 @@ Cada fase é um PR; a 2 e a 3 mexem bastante no tema (K1venn).
 
 Todas as decisões do levantamento estão tomadas.
 
+## Integração com o ERP
+
+As donas planejam um ERP (hoje protótipo) para custo e produção. O que fica no site e o que fica no ERP, e como os dois se ligam pelo SKU, está em [integracao-erp.md](integracao-erp.md).
+
 ## 17. Achados no caminho (fora do painel)
 
 - `© 2006` no rodapé.

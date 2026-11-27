@@ -1,0 +1,98 @@
+{
+  "_sobre": "Fotos de cada cor (mu-plugin gilda-color-gallery). Ids = nome do arquivo no Wix. Classificadas olhando as fotos; o guia de tamanhos e fotos com as duas cores entram nas duas. Carga única: o painel (caixa \"Fotos por cor\") manda depois.",
+  "calca-asas": {
+    "preto": [
+      "ff503a_745e5e0818024657891114f56c5917b8~mv2",
+      "ff503a_d4abd41c0fc6405bb2d184226d2d8187~mv2",
+      "ff503a_9c2fec132ea34eb39cbc62b581f1a65f~mv2",
+      "ff503a_9a1fe46e4bd040fcb61e55a30fbf5e5f~mv2",
+      "ff503a_da7f48f9c80d4081bc752b3fbf0fd9cc~mv2",
+      "ff503a_6fd34874b93b4941a2c22ca416c664ca~mv2",
+      "ff503a_0e8f5ba732034cf0b31921d5d25f1faa~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ],
+    "verde-musgo": [
+      "ff503a_3a59aadf27c549d490c6d093d29b77ca~mv2",
+      "ff503a_a5b5483dd68a4aecb8402ec06f58937c~mv2",
+      "ff503a_6abd1d997c984258bfdc1026169f2a12~mv2",
+      "ff503a_970aa9c042624836aa0acb9d41d15330~mv2",
+      "ff503a_0e8f5ba732034cf0b31921d5d25f1faa~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ]
+  },
+  "calca": {
+    "marrom": [
+      "ff503a_e30ade462b634f1aa4e0491df54984b2~mv2",
+      "ff503a_51d53f24c6434a89b5d4774c83db18f4~mv2",
+      "ff503a_4ccb69c094d044c8926a582e1da14864~mv2",
+      "ff503a_a7ccb27abf654aff936b31068baf9069~mv2",
+      "ff503a_f6b217089144413d9bdc39cac7f50e99~mv2"
+    ],
+    "off-white": [
+      "ff503a_575ffd954e314a669e9e36803ae867e8~mv2",
+      "ff503a_9668038cb57240008cc6917fdae3088f~mv2",
+      "ff503a_7c6830b42e2540f7896fcdaa89b55a84~mv2",
+      "ff503a_110fbf5459704b6890c07c88e16db8f9~mv2",
+      "ff503a_fb58d665d74345b58a96bcbffa23c332~mv2",
+      "ff503a_71b16c8fff654cd492a3243d8187ee05~mv2"
+    ]
+  },
+  "camisa-grao": {
+    "marrom": [
+      "ff503a_a73d329fb0c6420ebb1d001e36b48718~mv2",
+      "ff503a_e7efb381cd8545f59a0534b555155ce5~mv2",
+      "ff503a_c1d4c6c3b1fe45d5af369f218c1086fd~mv2",
+      "ff503a_9bf249d6b2f94de38dc0742103191468~mv2",
+      "ff503a_f4eeab28fa364be0ab9c2d41ce8750e6~mv2",
+      "ff503a_af3895d6ab384b449e53ed0f68617786~mv2",
+      "ff503a_1b6c2f95e20d442eab0c4b1da3f913e0~mv2"
+    ],
+    "off-white": [
+      "ff503a_fd4c0f29d7124736b8587dcd5565ade4~mv2",
+      "ff503a_4ee212cdb2514676a42e6000f4c21ca6~mv2",
+      "ff503a_8688a9bf34354b6f8b9ab493df8577e6~mv2",
+      "ff503a_d6f71623b19a485b867a3a79afe37f6e~mv2",
+      "ff503a_c48485bb3a2240cf863fe146281c6221~mv2"
+    ]
+  },
+  "bermuda-envolto": {
+    "laranja": [
+      "ff503a_6f01a48764264c3b92627768c4ff6af8~mv2",
+      "ff503a_393fc69bca1e492b89ed1504e25db576~mv2",
+      "ff503a_b06c4fc9492142d8a01c3c7c230837ff~mv2",
+      "ff503a_498e67eeea40465e9c658d5c83159de3~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ],
+    "off-white": [
+      "ff503a_10c57d2d75f4485fb6ab3d84ba3f075f~mv2",
+      "ff503a_aea0c24b7e2a404b9085af741ff1de08~mv2",
+      "ff503a_ef49aab7acfb450f992ce88b0ffb0701~mv2",
+      "ff503a_6c5f31b304a0428a8bf9b56ed3990a4d~mv2",
+      "ff503a_eaaf85e2e5e54b96838a897f2b6b4f07~mv2",
+      "ff503a_a9783e761c334d5d802c2db9b09925a7~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ]
+  },
+  "camisa-casulo": {
+    "branco": [
+      "ff503a_a84beb06e92d42a59ee8c297b21f88c8~mv2",
+      "ff503a_eb4521fd5f0d4ca29cc949df4aa40ba5~mv2",
+      "ff503a_c056bc9d1a774b7dbbd1f80aa91d3971~mv2",
+      "ff503a_0eb38a20037a4cd5b7b0e8c3ac82422c~mv2",
+      "ff503a_873c87b194064cb5a3fbd5008cfaebe6~mv2",
+      "ff503a_dc81b7c6659d49dc97be103b6bc44b72~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ],
+    "azul-claro": [
+      "ff503a_958019d191b144e594cd5981edf25c07~mv2",
+      "ff503a_5b7cbe5cf25b4722a7f5f440113e2ed9~mv2",
+      "ff503a_e3e30dc828424479bf6fc986651e1695~mv2",
+      "ff503a_6eda48045b03433cbfbfe57f7bdceac0~mv2",
+      "ff503a_a4040ab66e634880acb6656bc70e9544~mv2",
+      "ff503a_c74d94d3703243d0a72ec6d6200a8881~mv2",
+      "ff503a_03b5c580a21548159683950d3ae8a150~mv2",
+      "ff503a_740f0134648f410a896a2d7c747b7b25~mv2",
+      "ff503a_d8382faf95004b6db8debecbe04600d6~mv2"
+    ]
+  }
+}
