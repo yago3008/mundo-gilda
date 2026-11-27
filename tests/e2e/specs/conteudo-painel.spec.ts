@@ -63,12 +63,6 @@ async function visitor(browser: Browser) {
   return { page, close: () => context.close() };
 }
 
-/** ID de um capítulo pela lista do painel. */
-async function chapterIdByName(page: Page, name: string): Promise<number> {
-  await page.goto('/wp-admin/edit.php?post_type=gilda_capitulo');
-  const row = page.locator('#the-list tr', { has: page.locator('a.row-title', { hasText: name }) });
-  return Number(((await row.getAttribute('id')) || '').replace('post-', ''));
-}
 
 /** Números dos capítulos nos cards da home, na ordem em que aparecem. */
 async function homeCards(page: Page): Promise<number[]> {
@@ -86,7 +80,9 @@ test('capítulos: números permanentes, home com os 5 mais recentes, peças sem 
   };
   let count = await live();
   const mine: { id: number; number: number }[] = [];
-  while (count < 6) {
+  // Pelo menos 3 nossos: o do meio é tirado do site e publicado de novo. Os da carga inicial podem estar
+  // sem fotos (CI, sem importar imagens) e aí nem estão no ar nem podem ser publicados.
+  while (count < 6 || mine.length < 3) {
     const ch = await createChapter(page, { name: `Capítulo teste ${stamp} ${mine.length + 1}`, photos: created.media });
     created.chapters.push(ch.id);
     mine.push(ch);
@@ -96,22 +92,25 @@ test('capítulos: números permanentes, home com os 5 mais recentes, peças sem 
   const cards = await homeCards(v.page);
   expect(cards, 'home: os 5 mais recentes, do mais antigo ao mais novo').toEqual([newest - 4, newest - 3, newest - 2, newest - 1, newest]);
 
-  // Tira o capítulo 2 do site: ninguém é renumerado.
-  const ch2 = await chapterIdByName(page, 'Os filetes da borboleta');
-  await setChapterLive(page, ch2, false);
+  // Tira um capítulo do meio do site: ninguém é renumerado.
+  const [before, middle, after] = mine.slice(-3);
+  const afterName = `Capítulo teste ${stamp} ${mine.indexOf(after) + 1}`;
+  await setChapterLive(page, middle.id, false);
   try {
     await v.page.goto('/capitulos/');
-    await expect(v.page.locator('#capitulo-2')).toHaveCount(0);
-    await expect(v.page.locator('#capitulo-1')).toHaveCount(1);
-    await expect(v.page.locator('#capitulo-3 .gilda-vertical-heading')).toHaveText('CAPÍTULO 3');
-    await expect(v.page.locator('section.gilda-story[aria-label="CAPÍTULO 3"] .gilda-story__eyebrow')).toContainText('Capítulo 3');
+    await expect(v.page.locator(`#capitulo-${middle.number}`)).toHaveCount(0);
+    await expect(v.page.locator(`#capitulo-${before.number}`)).toHaveCount(1);
+    await expect(v.page.locator(`#capitulo-${after.number} .gilda-vertical-heading`)).toHaveText(`CAPÍTULO ${after.number}`);
+    await expect(v.page.locator(`section.gilda-story[aria-label="CAPÍTULO ${after.number}"] .gilda-story__eyebrow`)).toContainText(`Capítulo ${after.number}`);
     await v.page.goto('/loja/');
     const options = await v.page.locator('#gilda-filter-chapter option').allTextContents();
-    expect(options.some((o) => /^Capítulo 2\b/.test(o))).toBe(false);
-    expect(options).toContain('Capítulo 3 — Ritual Brasileiro');
-    expect(await homeCards(v.page)).not.toContain(2);
+    expect(options.some((o) => new RegExp(`^Capítulo ${middle.number}\\b`).test(o))).toBe(false);
+    expect(options).toContain(`Capítulo ${after.number} — ${afterName}`);
+    const cardsWithout = await homeCards(v.page);
+    expect(cardsWithout).not.toContain(middle.number);
+    expect(cardsWithout).toContain(after.number);
   } finally {
-    await setChapterLive(page, ch2, true);
+    await setChapterLive(page, middle.id, true);
   }
 
   // Capítulo com uma peça: tirado do site e depois apagado, a peça fica sem capítulo e tudo funciona.
