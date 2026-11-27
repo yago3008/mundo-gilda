@@ -210,6 +210,26 @@ body.woocommerce-account .woocommerce-MyAccount-content fieldset legend {
 body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-form-row,
 body.woocommerce-account .woocommerce-MyAccount-content .form-row { margin: 0 0 18px; }
 
+/* Botão "Salvar alterações": animação no hover */
+body.woocommerce-account .woocommerce-MyAccount-content button[type="submit"],
+body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button,
+body.woocommerce-account .woocommerce-MyAccount-content button.button {
+	transition: background-color .28s ease, transform .22s ease, box-shadow .28s ease, letter-spacing .28s ease;
+	will-change: transform;
+}
+body.woocommerce-account .woocommerce-MyAccount-content button[type="submit"]:hover,
+body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:hover,
+body.woocommerce-account .woocommerce-MyAccount-content button.button:hover {
+	box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--gilda-acc-terracotta) 75%, transparent);
+	letter-spacing: 1.8px;
+	transform: translateY(-2px);
+}
+body.woocommerce-account .woocommerce-MyAccount-content button[type="submit"]:active,
+body.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:active,
+body.woocommerce-account .woocommerce-MyAccount-content button.button:active {
+	transform: translateY(0);
+}
+
 /* ----- Mobile: empilha menu acima do conteúdo ----- */
 @media (max-width: 782px) {
 	body.woocommerce-account .woocommerce { grid-template-columns: minmax(0, 1fr); gap: 24px; }
