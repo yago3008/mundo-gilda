@@ -129,17 +129,21 @@ export class AdminApi {
   }
 
   async product(id: number) {
-    return this.call<{ id: number; name: string; status: string; type: string; permalink: string; featured: boolean; weight: string; images: { id: number }[]; categories: { slug: string }[] }>(
+    return this.call<{ id: number; name: string; sku: string; status: string; type: string; permalink: string; featured: boolean; weight: string; images: { id: number }[]; categories: { slug: string }[] }>(
       'GET',
       `/wc/v3/products/${id}`,
     );
   }
 
   async variations(productId: number) {
-    return this.call<{ id: number; status: string; stock_quantity: number | null; regular_price: string; attributes: { name: string; option: string }[] }[]>(
+    return this.call<{ id: number; sku: string; status: string; stock_quantity: number | null; regular_price: string; attributes: { name: string; option: string }[] }[]>(
       'GET',
       `/wc/v3/products/${productId}/variations?per_page=100&status=any`,
     );
+  }
+
+  async products() {
+    return this.call<{ id: number; name: string; sku: string; type: string }[]>('GET', '/wc/v3/products?per_page=100&status=any');
   }
 
   /** Apaga um termo de atributo global (ex.: uma cor criada pelo teste). */

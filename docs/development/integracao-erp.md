@@ -114,7 +114,7 @@ Dois caminhos:
 |---|---|
 | Uma linha de "Peça" (nome + tamanho + cor) | Uma **variação** do produto variável (ou o produto simples, para lenço "Único") |
 | Peças com o mesmo nome | O **produto** (pai das variações) |
-| Código / SKU | SKU da variação (`_sku`) |
+| Código / SKU | SKU da variação (`_sku`). **Já existe no site:** `CAT-NOME-COR-TAM` (ex.: `CAM-GRAO-OW-PP`), gerado pela tela "Nova peça" e pela semente `scripts/import-skus.php`; o produto pai tem `CAT-NOME`. Regras em `wp-content/mu-plugins/gilda-painel/sku.php`. |
 | Coleção / capítulo | Capítulo do Painel GILDA; (`_gilda_capitulo` na peça) |
 | Categoria | Categoria do WooCommerce (`product_cat`) |
 | Tamanho / Cor | Atributos `pa_tamanho` / `pa_cor` |
@@ -139,12 +139,12 @@ Os dados de exemplo do protótipo precisam ser alinhados antes de qualquer integ
   - Bermuda Envolto: Terracota no protótipo, Laranja no site;
   - Lenço oitenta-e-oito: Mostarda no protótipo.
 - **Listas:** o protótipo tem Creme, Mostarda, Oliva, Azul, Blazers e Vestidos, que não existem na loja. Pela regra do §3, as listas passam a vir do site.
-- **SKU:** as peças do site ainda não têm SKU (o import do Wix não traz). Ao adotar os SKUs do ERP, o **Meta Pixel** passa a enviar o SKU no lugar do ID da peça (`gilda-meta-pixel.php` usa SKU quando existe). Avisar quem cuida dos anúncios, porque os catálogos do Facebook/Instagram mudam de chave.
+- **SKU:** resolvido no site (nov/2026). Todas as peças e variações têm SKU no formato do protótipo (`CAT-NOME-COR-TAM`). As do Wix ganharam pela semente `scripts/import-skus.php`, que nunca troca um SKU existente; as novas, pela tela "Nova peça". Depois de criado, o SKU não muda (nem com troca de nome ou de categoria); só uma edição manual muda. O **Meta Pixel** já manda o SKU do produto pai (`CAT-NOME`) como `content_id`: o catálogo do Facebook/Instagram deve ser montado com esses SKUs. Para o ERP: os mesmos SKUs; o protótipo precisa adotar os códigos de cor do site (OW, MR, BR, AZC, LJ, PT, VM).
 
 ## 8. Decisões para quando o ERP for construído
 
 1. Caminho A (separado, via API) ou B (dentro do Painel GILDA;).
-2. Formato do SKU (o protótipo usa `CAT-NOME-COR-TAM`, ex.: `CAM-GRAO-OW-PP`) e o que acontece quando uma peça muda de nome (o SKU não muda).
+2. ~~Formato do SKU~~ **Decidido e feito:** `CAT-NOME-COR-TAM` (ex.: `CAM-GRAO-OW-PP`); o SKU não muda quando a peça muda de nome ou de categoria.
 3. Vendas fora do site: registradas como pedido manual no site ou como saída no ERP.
 4. Estoque mínimo por variação (o ERP tem; o site hoje usa um limite único para o "Restam só N").
 5. Quem vê custo e margem: só as donas, ou também alguém da produção.

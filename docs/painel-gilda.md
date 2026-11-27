@@ -106,6 +106,11 @@ Na tela do capítulo, clique em **Tirar do site** (na caixa Publicar). Ele vira 
   - Escreva quantas peças há de cada combinação. **0** quer dizer esgotado: a combinação aparece como "Esgotado" e a cliente pode pedir "Avise-me".
   - **+ Nova cor:** escreva o nome, escolha a cor no quadradinho e clique em **Criar cor**. A bolinha dessa cor aparece igual na loja.
   - Peça sem cor nem tamanho (um lenço, por exemplo) tem um estoque só.
+- **SKU (código):** cada peça e cada combinação de cor e tamanho ganham um código sozinhas, por exemplo `CAM-GRAO-OW-PP`: categoria (CAM), nome (GRAO), cor (OW = Off White) e tamanho (PP).
+  - O código da peça fica no campo **Código da peça (SKU)**. O de cada combinação fica embaixo da quantidade, na tabela de estoque.
+  - **Depois de salvo, o código não muda**, nem se a peça mudar de nome ou de categoria. Só muda se você apagar e escrever outro no campo.
+  - Os códigos não se repetem. Se um já existe em outra peça, o painel avisa e mantém o anterior.
+  - Eles são a chave da peça no catálogo do Instagram/Facebook e, no futuro, no sistema de gestão (ERP). Evite trocar à toa.
 - **Envio:** peso e medidas da embalagem já vêm preenchidos pela categoria. Ajuste se a embalagem for diferente: o frete é calculado com isso.
 - **Publicar:**
   - Marque **Destaque na página inicial** para a peça entrar nos destaques da home.

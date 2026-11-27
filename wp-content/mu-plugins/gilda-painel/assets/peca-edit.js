@@ -11,6 +11,33 @@
 	}
 	var config = $form.data( 'gilda-peca' ) || {};
 	var stock = $.extend( {}, config.stock || {} ); // "corId-tamId" → quantidade (o que já foi digitado)
+	// SKU por combinação: { v: valor, stored: já gravado (não muda sozinho), manual: a dona digitou }.
+	var skus = {};
+	$.each( config.skus || {}, function ( key, value ) {
+		skus[ key ] = { v: value, stored: true, manual: false };
+	} );
+
+	/* SKU sugerido: CAT-NOME[-COR][-TAM], igual ao sku.php (o servidor confere e garante que é único). */
+	function clean( text ) {
+		return String( text || '' ).normalize( 'NFD' ).replace( /[\u0300-\u036f]/g, '' ).toUpperCase().replace( /[^A-Z0-9]+/g, '-' ).replace( /^-+|-+$/g, '' );
+	}
+	function nameToken() {
+		var $cat = $form.find( '#gilda-peca-category :selected' );
+		var slug = String( $cat.data( 'slug' ) || '' );
+		var stem = slug.replace( /s$/, '' );
+		var words = clean( $form.find( '#gilda-peca-name' ).val() ).toLowerCase().split( '-' ).filter( Boolean );
+		if ( words.length > 1 && stem && ( words[ 0 ] === stem || words[ 0 ] === slug ) ) {
+			words.shift();
+		}
+		return clean( words.join( '-' ) ) || 'PECA';
+	}
+	function baseSku() {
+		var code = String( $form.find( '#gilda-peca-category :selected' ).data( 'code' ) || '' );
+		return [ code || 'GIL', nameToken() ].join( '-' );
+	}
+	function suggest( color, size ) {
+		return [ baseSku(), color && color.id !== '0' ? color.code : '', size && size.id !== '0' ? size.code : '' ].filter( Boolean ).join( '-' );
+	}
 
 	function esc( value ) {
 		return String( value == null ? '' : value ).replace( /[&<>"']/g, function ( c ) {
@@ -20,7 +47,7 @@
 
 	function checked( selector ) {
 		return $form.find( selector + ' input[type="checkbox"]:checked' ).map( function () {
-			return { id: this.value, name: $( this ).data( 'name' ), hex: $( this ).data( 'hex' ) };
+			return { id: this.value, name: $( this ).data( 'name' ), hex: $( this ).data( 'hex' ), code: String( $( this ).data( 'code' ) || '' ) };
 		} ).get();
 	}
 
@@ -28,8 +55,9 @@
 	function renderStock() {
 		var colors = checked( '[data-gilda-colors]' );
 		var sizes = checked( '[data-gilda-sizes]' );
-		var rows = colors.length ? colors : [ { id: '0', name: '', hex: '' } ];
-		var cols = sizes.length ? sizes : [ { id: '0', name: 'Estoque' } ];
+		var rows = colors.length ? colors : [ { id: '0', name: '', hex: '', code: '' } ];
+		var cols = sizes.length ? sizes : [ { id: '0', name: 'Estoque', code: '' } ];
+		var variable = colors.length > 0 || sizes.length > 0;
 		var html = '<table><thead><tr><th scope="col">' + ( colors.length ? 'Cor' : '' ) + '</th>';
 		cols.forEach( function ( s ) {
 			html += '<th scope="col">' + esc( s.name ) + '</th>';
@@ -41,7 +69,16 @@
 				var key = c.id + '-' + s.id;
 				var value = stock[ key ] != null ? stock[ key ] : 0;
 				var label = [ c.name, s.id !== '0' ? s.name : '' ].filter( Boolean ).join( ' ' ) || 'Estoque';
-				html += '<td><input type="number" min="0" step="1" inputmode="numeric" name="estoque[' + esc( c.id ) + '][' + esc( s.id ) + ']" value="' + esc( value ) + '" data-key="' + esc( key ) + '" aria-label="' + esc( label ) + '"' + ( +value === 0 ? ' class="is-zero"' : '' ) + ' /></td>';
+				html += '<td><input type="number" min="0" step="1" inputmode="numeric" name="estoque[' + esc( c.id ) + '][' + esc( s.id ) + ']" value="' + esc( value ) + '" data-key="' + esc( key ) + '" aria-label="' + esc( label ) + '"' + ( +value === 0 ? ' class="is-zero"' : '' ) + ' />';
+				if ( variable ) {
+					var sku = skus[ key ] || ( skus[ key ] = { v: '', stored: false, manual: false } );
+					if ( ! sku.stored && ! sku.manual ) {
+						sku.v = suggest( c, s );
+					}
+					html += '<input type="text" class="gilda-sku" name="sku[' + esc( c.id ) + '][' + esc( s.id ) + ']" value="' + esc( sku.v ) + '" data-key="' + esc( key ) + '" aria-label="SKU ' + esc( label ) + '" autocomplete="off" spellcheck="false" />' +
+						'<input type="hidden" name="sku_manual[' + esc( c.id ) + '][' + esc( s.id ) + ']" value="' + ( sku.manual ? '1' : '0' ) + '" />';
+				}
+				html += '</td>';
 			} );
 			html += '</tr>';
 		} );
@@ -53,6 +90,27 @@
 		$( this ).toggleClass( 'is-zero', +this.value === 0 );
 	} );
 	$form.on( 'change', '[data-gilda-colors] input, [data-gilda-sizes] input', renderStock );
+	$form.on( 'input', '[data-gilda-stock] .gilda-sku', function () {
+		var sku = skus[ $( this ).data( 'key' ) ];
+		sku.v = this.value;
+		sku.manual = true;
+		$( this ).next( 'input[type="hidden"]' ).val( '1' );
+	} );
+
+	/* SKU da peça: sugerido enquanto não existe; gravado, só muda se a dona editar. */
+	var $parentSku = $form.find( '#gilda-peca-sku' );
+	var parentManual = false;
+	function refreshSkus() {
+		if ( ! $parentSku.data( 'stored' ) && ! parentManual ) {
+			$parentSku.val( baseSku() );
+		}
+		renderStock();
+	}
+	$parentSku.on( 'input', function () {
+		parentManual = true;
+		$form.find( '[data-gilda-sku-manual]' ).val( '1' );
+	} );
+	$form.on( 'input change', '#gilda-peca-name, #gilda-peca-category', refreshSkus );
 
 	/* + Nova cor */
 	var $new = $form.find( '[data-gilda-newcolor]' );
@@ -89,7 +147,7 @@
 					$existing.prop( 'checked', true ).data( 'hex', c.hex ).siblings( '.gilda-swatch' ).css( 'background', c.hex );
 				} else {
 					$(
-						'<label class="gilda-chip"><input type="checkbox" name="cores[]" value="' + esc( c.id ) + '" data-name="' + esc( c.name ) + '" data-hex="' + esc( c.hex ) + '" checked /><span class="gilda-swatch" style="background:' + esc( c.hex ) + '" aria-hidden="true"></span>' + esc( c.name ) + '</label>'
+						'<label class="gilda-chip"><input type="checkbox" name="cores[]" value="' + esc( c.id ) + '" data-name="' + esc( c.name ) + '" data-hex="' + esc( c.hex ) + '" data-code="' + esc( c.code ) + '" checked /><span class="gilda-swatch" style="background:' + esc( c.hex ) + '" aria-hidden="true"></span>' + esc( c.name ) + '</label>'
 					).insertBefore( $form.find( '[data-gilda-newcolor-open]' ) );
 				}
 				$new.prop( 'hidden', true ).find( '[data-gilda-newcolor-name]' ).val( '' );
@@ -141,5 +199,5 @@
 		$form.find( '[data-gilda-preview-empty]' ).prop( 'hidden', !! $first.length );
 	} );
 
-	renderStock();
+	refreshSkus();
 } )( jQuery );

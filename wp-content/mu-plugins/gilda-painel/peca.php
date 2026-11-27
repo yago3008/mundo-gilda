@@ -159,7 +159,7 @@ add_action(
 		$term_id = (int) ( is_array( $term ) ? $term['term_id'] : $term );
 		update_term_meta( $term_id, 'gilda_hex', $hex );
 		$saved = get_term( $term_id, 'pa_cor' );
-		wp_send_json_success( array( 'id' => $term_id, 'slug' => $saved->slug, 'name' => $saved->name, 'hex' => $hex ) );
+		wp_send_json_success( array( 'id' => $term_id, 'slug' => $saved->slug, 'name' => $saved->name, 'hex' => $hex, 'code' => gilda_sku_color_code( $saved->slug ) ) );
 	}
 );
 
@@ -265,7 +265,10 @@ function gilda_peca_save(): void {
 	$colors  = array_values( array_filter( array_map( 'absint', (array) ( $post['cores'] ?? array() ) ) ) );
 	$sizes   = array_values( array_filter( array_map( 'absint', (array) ( $post['tamanhos'] ?? array() ) ) ) );
 	$stock   = (array) ( $post['estoque'] ?? array() );
+	$skus    = (array) ( $post['sku'] ?? array() );
+	$manual  = (array) ( $post['sku_manual'] ?? array() );
 	$errors  = array();
+	$notes   = array();
 
 	if ( '' === $name ) {
 		set_transient( 'gilda_peca_error_' . get_current_user_id(), array( 'Escreva o nome da peça.' ), 120 );
@@ -347,6 +350,10 @@ function gilda_peca_save(): void {
 
 	$product_id = $product->save();
 
+	// SKU da peça (CAT-NOME): criado uma vez; só muda se a dona editar o campo.
+	gilda_peca_apply_sku( $product, (string) ( $post['parent_sku'] ?? '' ), ! empty( $post['parent_sku_manual'] ), $notes );
+	$product->save();
+
 	if ( $variable ) {
 		// Variações existentes pela combinação (inclui as "privadas", que voltam com o mesmo ID).
 		$by_combo = array();
@@ -377,6 +384,13 @@ function gilda_peca_save(): void {
 				$variation->set_regular_price( $price > 0 ? (string) $price : '' );
 				$variation->set_manage_stock( true );
 				$variation->set_stock_quantity( max( 0, (int) ( $stock[ $color ? $color->term_id : 0 ][ $size ? $size->term_id : 0 ] ?? 0 ) ) );
+				$cell = array( $color ? $color->term_id : 0, $size ? $size->term_id : 0 );
+				gilda_peca_apply_sku(
+					$variation,
+					(string) ( $skus[ $cell[0] ][ $cell[1] ] ?? '' ),
+					! empty( $manual[ $cell[0] ][ $cell[1] ] ),
+					$notes
+				);
 				$kept[] = $variation->save();
 			}
 		}
@@ -412,8 +426,45 @@ function gilda_peca_save(): void {
 	if ( $errors ) {
 		set_transient( 'gilda_peca_error_' . get_current_user_id(), array( 'A peça foi salva como rascunho. Para publicar, falta: ' . implode( ', ', $errors ) . '.' ), 120 );
 	}
+	if ( $notes ) {
+		set_transient( 'gilda_peca_info_' . get_current_user_id(), $notes, 120 );
+	}
 	wp_safe_redirect( add_query_arg( 'saved', $errors ? 'incomplete' : $action, gilda_peca_edit_url( $product_id ) ) );
 	exit;
+}
+
+/**
+ * SKU de uma peça/variação ao salvar (sku.php):
+ * - editado à mão (e diferente do atual): usa o digitado, se ninguém mais usa;
+ * - sem SKU ainda: gera o automático (CAT-NOME[-COR][-TAM], único);
+ * - já tem SKU: fica como está (mudar o nome ou a categoria não troca o SKU).
+ *
+ * @param WC_Product $item   Produto ou variação (o pai já salvo).
+ * @param string     $posted Valor do campo.
+ * @param bool       $manual A dona mexeu no campo.
+ * @param string[]   $notes  Avisos para a tela.
+ */
+function gilda_peca_apply_sku( WC_Product $item, string $posted, bool $manual, array &$notes ): void {
+	$current = (string) $item->get_sku( 'edit' );
+	$posted  = gilda_sku_clean( $posted );
+	if ( $manual && '' !== $posted && $posted !== $current ) {
+		if ( wc_product_has_unique_sku( $item->get_id(), $posted ) ) {
+			try {
+				$item->set_sku( $posted );
+				return;
+			} catch ( WC_Data_Exception $e ) {
+				unset( $e ); // cai no aviso abaixo
+			}
+		}
+		$notes[] = sprintf( 'O SKU %1$s já é de outra peça, então ficou %2$s.', $posted, '' !== $current ? $current : 'o automático' );
+	}
+	if ( '' === (string) $item->get_sku( 'edit' ) ) {
+		try {
+			$item->set_sku( gilda_sku_unique( gilda_sku_for( $item ), $item->get_id() ) );
+		} catch ( WC_Data_Exception $e ) {
+			unset( $e ); // sem SKU desta vez; a próxima gravação (ou a semente) tenta de novo
+		}
+	}
 }
 
 /* ---------- Tela ---------- */
@@ -448,6 +499,7 @@ function gilda_peca_screen(): void {
 	$sel_cores = array();
 	$sel_tams  = array();
 	$stock     = array();
+	$skus      = array();
 	$price     = '';
 
 	if ( $product && $product->is_type( 'variable' ) ) {
@@ -467,6 +519,7 @@ function gilda_peca_screen(): void {
 			$c     = ! empty( $attrs['pa_cor'] ) ? get_term_by( 'slug', $attrs['pa_cor'], 'pa_cor' ) : null;
 			$s     = ! empty( $attrs['pa_tamanho'] ) ? get_term_by( 'slug', $attrs['pa_tamanho'], 'pa_tamanho' ) : null;
 			$stock[ ( $c ? $c->term_id : 0 ) . '-' . ( $s ? $s->term_id : 0 ) ] = (int) $variation->get_stock_quantity();
+			$skus[ ( $c ? $c->term_id : 0 ) . '-' . ( $s ? $s->term_id : 0 ) ]  = (string) $variation->get_sku( 'edit' );
 			if ( '' === $price ) {
 				$price = (string) $variation->get_regular_price( 'edit' );
 			}
@@ -489,6 +542,8 @@ function gilda_peca_screen(): void {
 		? array( $product->get_weight(), $product->get_length(), $product->get_width(), $product->get_height() )
 		: ( $defaults[ $cat_slug ] ?? $defaults[''] );
 
+	$info   = get_transient( 'gilda_peca_info_' . get_current_user_id() );
+	delete_transient( 'gilda_peca_info_' . get_current_user_id() );
 	$error  = get_transient( 'gilda_peca_error_' . get_current_user_id() );
 	delete_transient( 'gilda_peca_error_' . get_current_user_id() );
 	$saved  = isset( $_GET['saved'] ) ? sanitize_key( wp_unslash( $_GET['saved'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
@@ -500,6 +555,7 @@ function gilda_peca_screen(): void {
 		'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 		'nonce'    => wp_create_nonce( 'gilda_peca_save' ),
 		'stock'    => (object) $stock,
+		'skus'     => (object) array_filter( $skus, 'strlen' ),
 		'defaults' => $defaults,
 		'colors'   => $colors,
 	);
@@ -513,6 +569,11 @@ function gilda_peca_screen(): void {
 
 		<?php if ( $error ) : ?>
 			<div class="gilda-notice gilda-notice--err" role="alert"><p><?php echo esc_html( implode( ' ', (array) $error ) ); ?></p></div>
+		<?php endif; ?>
+		<?php if ( $info ) : ?>
+			<div class="gilda-notice" role="status"><p><?php echo esc_html( implode( ' ', (array) $info ) ); ?></p></div>
+		<?php endif; ?>
+		<?php if ( $error ) : ?>
 		<?php elseif ( 'publish' === $saved && $product ) : ?>
 			<div class="gilda-notice gilda-notice--ok" role="status"><p>Peça publicada: já está na loja. <a href="<?php echo esc_url( get_permalink( $id ) ); ?>" target="_blank" rel="noopener">Ver na loja ↗</a></p></div>
 		<?php elseif ( 'draft' === $saved ) : ?>
@@ -536,7 +597,7 @@ function gilda_peca_screen(): void {
 						<select name="category" id="gilda-peca-category" class="gilda-input">
 							<option value="0" data-slug="">Escolha…</option>
 							<?php foreach ( $cats as $cat ) : ?>
-								<option value="<?php echo (int) $cat->term_id; ?>" data-slug="<?php echo esc_attr( $cat->slug ); ?>" <?php selected( $cat_id, $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
+								<option value="<?php echo (int) $cat->term_id; ?>" data-slug="<?php echo esc_attr( $cat->slug ); ?>" data-code="<?php echo esc_attr( gilda_sku_category_code( $cat->slug ) ); ?>" <?php selected( $cat_id, $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</label>
@@ -547,6 +608,11 @@ function gilda_peca_screen(): void {
 							<?php endforeach; ?>
 							<option value="0" <?php selected( $chapter, 0 ); ?>>Sem capítulo</option>
 						</select>
+					</label>
+					<label class="gilda-label gilda-span">Código da peça (SKU)
+						<input type="text" name="parent_sku" id="gilda-peca-sku" class="gilda-input gilda-input--sku" value="<?php echo esc_attr( $product ? (string) $product->get_sku( 'edit' ) : '' ); ?>" data-stored="<?php echo esc_attr( $product ? (string) $product->get_sku( 'edit' ) : '' ); ?>" autocomplete="off" spellcheck="false" />
+						<input type="hidden" name="parent_sku_manual" value="0" data-gilda-sku-manual />
+						<span class="gilda-help gilda-help--plain">Gerado sozinho (categoria + nome) e não muda depois, nem se a peça mudar de nome. Cada combinação de cor e tamanho tem o seu, na tabela de estoque. É a chave da peça no catálogo do Instagram/Facebook e, no futuro, no sistema de gestão.</span>
 					</label>
 					<label class="gilda-label gilda-span">Descrição
 						<textarea name="description" rows="6" class="gilda-input" placeholder="Composição, caimento, cuidados e a tabela de medidas."><?php echo esc_textarea( $description ); ?></textarea>
@@ -571,7 +637,7 @@ function gilda_peca_screen(): void {
 						<legend>Cores</legend>
 						<div class="gilda-chips" data-gilda-colors>
 							<?php foreach ( $all_cores as $term ) : ?>
-								<label class="gilda-chip"><input type="checkbox" name="cores[]" value="<?php echo (int) $term->term_id; ?>" data-name="<?php echo esc_attr( $term->name ); ?>" data-hex="<?php echo esc_attr( $hex_of[ $term->slug ] ?? '#D9D3C2' ); ?>" <?php checked( in_array( $term->term_id, $sel_cores, true ) ); ?> /><span class="gilda-swatch" style="background:<?php echo esc_attr( $hex_of[ $term->slug ] ?? '#D9D3C2' ); ?>" aria-hidden="true"></span><?php echo esc_html( $term->name ); ?></label>
+								<label class="gilda-chip"><input type="checkbox" name="cores[]" value="<?php echo (int) $term->term_id; ?>" data-name="<?php echo esc_attr( $term->name ); ?>" data-hex="<?php echo esc_attr( $hex_of[ $term->slug ] ?? '#D9D3C2' ); ?>" data-code="<?php echo esc_attr( gilda_sku_color_code( $term->slug ) ); ?>" <?php checked( in_array( $term->term_id, $sel_cores, true ) ); ?> /><span class="gilda-swatch" style="background:<?php echo esc_attr( $hex_of[ $term->slug ] ?? '#D9D3C2' ); ?>" aria-hidden="true"></span><?php echo esc_html( $term->name ); ?></label>
 							<?php endforeach; ?>
 							<?php if ( current_user_can( 'manage_product_terms' ) ) : ?>
 								<button type="button" class="gilda-chip gilda-chip--add" data-gilda-newcolor-open>+ Nova cor</button>
@@ -589,14 +655,14 @@ function gilda_peca_screen(): void {
 						<legend>Tamanhos</legend>
 						<div class="gilda-sizes" data-gilda-sizes>
 							<?php foreach ( $all_tams as $term ) : ?>
-								<label class="gilda-size"><input type="checkbox" name="tamanhos[]" value="<?php echo (int) $term->term_id; ?>" data-name="<?php echo esc_attr( $term->name ); ?>" <?php checked( in_array( $term->term_id, $sel_tams, true ) ); ?> /><?php echo esc_html( $term->name ); ?></label>
+								<label class="gilda-size"><input type="checkbox" name="tamanhos[]" value="<?php echo (int) $term->term_id; ?>" data-name="<?php echo esc_attr( $term->name ); ?>" data-code="<?php echo esc_attr( gilda_sku_size_code( $term->name ) ); ?>" <?php checked( in_array( $term->term_id, $sel_tams, true ) ); ?> /><?php echo esc_html( $term->name ); ?></label>
 							<?php endforeach; ?>
 						</div>
 					</fieldset>
 					<div class="gilda-fieldset">
 						<span class="gilda-label">Estoque de cada combinação</span>
 						<div class="gilda-stock" data-gilda-stock></div>
-						<span class="gilda-help">Com 0, a combinação aparece como "Esgotado" e as clientes podem pedir "Avise-me". Sem cores e tamanhos, a peça tem um estoque só.</span>
+						<span class="gilda-help">Com 0, a combinação aparece como "Esgotado" e as clientes podem pedir "Avise-me". Sem cores e tamanhos, a peça tem um estoque só. Embaixo de cada quantidade fica o SKU da combinação.</span>
 					</div>
 				</section>
 

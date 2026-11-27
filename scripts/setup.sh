@@ -90,6 +90,10 @@ fi
 echo "==> Capítulos"
 wp eval-file /scripts/import-chapters.php
 
+# SKU (CAT-NOME-COR-TAM) para peças e variações que ainda não têm; nunca troca um SKU existente. Semente.
+echo "==> SKUs"
+wp eval-file /scripts/import-skus.php
+
 echo
 echo "Pronto!"
 echo "  Site:        http://localhost:${WP_PORT:-8080}"

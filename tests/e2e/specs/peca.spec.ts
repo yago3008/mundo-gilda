@@ -15,6 +15,10 @@ import { loginAsOwner, pickPhotos } from '../helpers/painel';
 const IMAGES = path.resolve(__dirname, '..', '..', '..', 'data', 'images');
 const stamp = Date.now().toString(36);
 const pieceName = `Camisa Teste ${stamp}`;
+const STAMP = stamp.toUpperCase();
+const baseSku = `CAM-TESTE-${STAMP}`; // categoria Camisas + nome sem "Camisa"
+const newColorCode = `T${STAMP[0]}`; // "Teste <stamp>": iniciais das duas palavras
+const manualSku = `CAM-MANUAL-${STAMP}`;
 const newColor = { name: `Teste ${stamp}`, hex: '#2a6f97' };
 const created = { userId: 0, productId: 0, media: [] as number[] };
 const owner = { username: `dona-peca-${stamp}`, password: strongPassword() };
@@ -112,6 +116,11 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
   for (const [label, qty] of Object.entries(stock)) {
     await page.getByLabel(label, { exact: true }).fill(String(qty));
   }
+  // SKU: sugerido na hora (peça e cada combinação); um deles a dona troca à mão.
+  await expect(page.locator('#gilda-peca-sku')).toHaveValue(baseSku);
+  await expect(page.getByLabel('SKU Marrom P', { exact: true })).toHaveValue(`${baseSku}-MR-P`);
+  await expect(page.getByLabel(`SKU ${newColor.name} G`, { exact: true })).toHaveValue(`${baseSku}-${newColorCode}-G`);
+  await page.getByLabel('SKU Marrom G', { exact: true }).fill(manualSku);
   await expect(page.locator('[data-gilda-preview-name]')).toHaveText(pieceName);
   await expect(page.locator('[data-gilda-preview-price]')).toHaveText('R$ 199,90');
 
@@ -131,6 +140,7 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
     expect(product.images.map((i) => i.id)).toEqual(created.media);
     expect(product.categories.map((c) => c.slug)).toEqual(['camisas']);
     expect(product.weight).toBe('0.35');
+    expect(product.sku).toBe(baseSku);
     permalink = product.permalink;
     before = (await api.variations(created.productId)).filter((v) => v.status === 'publish');
     expect(before).toHaveLength(6);
@@ -138,6 +148,9 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
       const label = `${v.attributes.find((a) => a.name === 'Cor')!.option} ${v.attributes.find((a) => a.name === 'Tamanho')!.option}`;
       expect(v.stock_quantity, label).toBe(stock[label]);
       expect(v.regular_price).toBe('199.9');
+      const color = label.startsWith('Marrom') ? 'MR' : newColorCode;
+      const size = label.split(' ').pop();
+      expect(v.sku, label).toBe(label === 'Marrom G' ? manualSku : `${baseSku}-${color}-${size}`);
     }
   } finally {
     await api.dispose();
@@ -162,6 +175,10 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
   await expect(page).toHaveURL(new RegExp(`page=gilda-peca&product=${created.productId}`));
   await expect(page.getByLabel('Marrom M', { exact: true })).toHaveValue('2');
   await page.getByLabel('Marrom M', { exact: true }).fill('7');
+  // Mudar o nome não muda nenhum SKU (nem o sugerido na tela).
+  await page.locator('#gilda-peca-name').fill(`Camisa Renomeada ${stamp}`);
+  await expect(page.locator('#gilda-peca-sku')).toHaveValue(baseSku);
+  await expect(page.getByLabel('SKU Marrom M', { exact: true })).toHaveValue(`${baseSku}-MR-M`);
   await page.locator('#gilda-peca-publish').click();
   await expect(page.locator('.gilda-notice--ok')).toBeVisible();
 
@@ -172,7 +189,37 @@ test('a dona cadastra uma peça variável e ela aparece na loja, no capítulo e 
     const marromM = after.find((x) => x.attributes.some((a) => a.option === 'Marrom') && x.attributes.some((a) => a.option === 'M'))!;
     expect(marromM.id).toBe(before.find((x) => x.attributes.some((a) => a.option === 'Marrom') && x.attributes.some((a) => a.option === 'M'))!.id);
     expect(marromM.stock_quantity).toBe(7);
+    // SKUs iguais aos de antes, mesmo com o nome novo.
+    const skuOf = (list: typeof before) => Object.fromEntries(list.map((x) => [x.id, x.sku]));
+    expect(skuOf(after)).toEqual(skuOf(before));
+    const renamed = await api2.product(created.productId);
+    expect(renamed.name).toBe(`Camisa Renomeada ${stamp}`);
+    expect(renamed.sku).toBe(baseSku);
   } finally {
     await api2.dispose();
+  }
+});
+
+test('as peças da carga inicial ganharam SKU (semente do setup.sh)', async () => {
+  const api = await AdminApi.login();
+  try {
+    const seeded = ['Camisa Casulo', 'Calça Asas', 'Lenço oitenta-e-oito', 'Bermuda Envolto', 'Lenço Manacá', 'Camisa Grão', 'Calça Torra'];
+    const products = (await api.products()).filter((p) => seeded.includes(p.name));
+    expect(products.map((p) => p.name).sort()).toEqual([...seeded].sort());
+    for (const product of products) {
+      expect(product.sku, product.name).toMatch(/^(CAM|CAL|BER|LEN)-[A-Z0-9-]+$/);
+      if (product.type !== 'variable') continue;
+      const variations = await api.variations(product.id);
+      expect(variations.length, product.name).toBeGreaterThan(0);
+      for (const v of variations) {
+        expect(v.sku, `${product.name} ${v.attributes.map((a) => a.option).join(' ')}`).toMatch(new RegExp(`^${product.sku}-[A-Z0-9]+-[A-Z0-9]+$`));
+      }
+    }
+    const grao = products.find((p) => p.name === 'Camisa Grão')!;
+    expect(grao.sku).toBe('CAM-GRAO');
+    const owPP = (await api.variations(grao.id)).find((v) => v.attributes.some((a) => a.option === 'Off White') && v.attributes.some((a) => a.option === 'PP'));
+    expect(owPP?.sku).toBe('CAM-GRAO-OW-PP'); // o exemplo de docs/development/integracao-erp.md
+  } finally {
+    await api.dispose();
   }
 });
