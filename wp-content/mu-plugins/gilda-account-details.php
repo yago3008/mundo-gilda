@@ -6,7 +6,7 @@
  * - Nome de exibição = primeiro nome, sempre: ao salvar a conta, no cadastro, no checkout e em qualquer
  *   mudança do primeiro nome (e uma vez para quem já tinha conta).
  * - Telefone: salvo como billing_phone (o checkout já vem preenchido). Opcional; se preenchido, precisa
- *   ter DDD + número (10 ou 11 dígitos).
+ *   ter DDD + número (10 ou 11 dígitos). Sai dos formulários de endereço da conta (fica só aqui).
  * - Senha: endpoint /minha-conta/senha/ com senha atual + nova + confirmação. A troca usa wp_update_user
  *   (a sessão continua; o WordPress manda o e-mail de aviso).
  * - Regra de senha do site inteiro: no mínimo 6 caracteres, sem exigir "senha forte" (o medidor de força do
@@ -167,6 +167,23 @@ add_action(
 		update_user_meta( $user_id, 'billing_phone', $phone ? gilda_account_format_phone( $phone ) : '' );
 	}
 );
+
+// Endereços em "Minha conta" sem o telefone: ele fica em "Detalhes da conta" (o checkout continua pedindo).
+// Fora da lista de campos, o WooCommerce nem valida nem apaga o telefone ao salvar o endereço.
+// Prioridade 200: o plugin de frete (woo-better-shipping-calculator-for-brazil) refaz esses campos na 99/100.
+function gilda_account_address_without_phone( $fields ) {
+	if ( is_admin() || ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'edit-address' ) ) {
+		return $fields;
+	}
+	foreach ( array_keys( $fields ) as $key ) {
+		if ( preg_match( '/^(billing|shipping)_(cell)?phone(_country)?$/', (string) $key ) ) {
+			unset( $fields[ $key ] );
+		}
+	}
+	return $fields;
+}
+add_filter( 'woocommerce_billing_fields', 'gilda_account_address_without_phone', 200 );
+add_filter( 'woocommerce_shipping_fields', 'gilda_account_address_without_phone', 200 );
 
 /* -------------------------------------------------------------------------
  * Nome de exibição = primeiro nome, em qualquer lugar
