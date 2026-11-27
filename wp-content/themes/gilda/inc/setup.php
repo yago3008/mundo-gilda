@@ -134,7 +134,7 @@ add_action( 'wp_enqueue_scripts', 'gilda_enqueue_assets' );
 
 /**
  * Segunda metade da transição dos cards de categoria: inline no começo do <body>, para a tela
- * creme com o nome já sair na primeira pintura da página de destino (assets/js/category-zoom-arrive.js).
+ * marrom com o nome já sair na primeira pintura da página de destino (assets/js/category-zoom-arrive.js).
  * Não faz nada se a página não foi aberta por um card.
  */
 function gilda_category_zoom_arrive() {
