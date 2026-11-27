@@ -152,6 +152,7 @@ docs/
   development/tasks.md            # backlog (K1venn)
   development/backend-para-frontend.md  # o que o backend oferece pro tema
   development/deploy.md           # roteiro de produção (servidor, wp-config, cron, backup, virada)
+  development/integracao-erp.md   # o que é do site e o que é do ERP (futuro), sem cadastro duplo
   design/                         # design system (K1venn)
 ```
 
