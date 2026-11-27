@@ -65,7 +65,7 @@ body.woocommerce-account .woocommerce-MyAccount-navigation ul {
 	margin: 0;
 	padding: 0;
 }
-body.woocommerce-account .woocommerce-MyAccount-navigation li { margin: 0; }
+body.woocommerce-account .woocommerce-MyAccount-navigation li { margin: 0; padding: 0; }
 body.woocommerce-account .woocommerce-MyAccount-navigation li a {
 	border-left: 2px solid transparent;
 	color: var(--gilda-acc-ink);
@@ -229,7 +229,22 @@ add_action( 'wp_head', 'gilda_account_dashboard_styles', 99 );
  */
 function gilda_account_menu_items( $items ) {
 	unset( $items['dashboard'], $items['downloads'] );
-	return $items;
+
+	// "Detalhes da conta" em primeiro; depois pedidos, endereços e sair.
+	$order   = array( 'edit-account', 'orders', 'edit-address', 'customer-logout' );
+	$ordered = array();
+	foreach ( $order as $key ) {
+		if ( isset( $items[ $key ] ) ) {
+			$ordered[ $key ] = $items[ $key ];
+		}
+	}
+	// Preserva quaisquer outros itens (de plugins) no fim.
+	foreach ( $items as $key => $label ) {
+		if ( ! isset( $ordered[ $key ] ) ) {
+			$ordered[ $key ] = $label;
+		}
+	}
+	return $ordered;
 }
 add_filter( 'woocommerce_account_menu_items', 'gilda_account_menu_items' );
 
