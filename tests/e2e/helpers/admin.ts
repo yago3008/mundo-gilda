@@ -120,6 +120,39 @@ export class AdminApi {
     await this.call('DELETE', `/wc/v3/products/${id}?force=true`);
   }
 
+  /** Quantos pedidos com estes status (cabeçalho X-WP-Total). */
+  async ordersCount(status: string, after?: Date): Promise<number> {
+    const query = `status=${encodeURIComponent(status)}&per_page=1${after ? `&after=${encodeURIComponent(after.toISOString())}` : ''}`;
+    const res = await this.ctx.fetch(`/wp-json/wc/v3/orders?${query}`, { headers: { 'X-WP-Nonce': this.nonce } });
+    if (!res.ok()) throw new Error(`REST orders: HTTP ${res.status()}`);
+    return Number(res.headers()['x-wp-total'] ?? 0);
+  }
+
+  async product(id: number) {
+    return this.call<{ id: number; name: string; status: string; type: string; permalink: string; featured: boolean; weight: string; images: { id: number }[]; categories: { slug: string }[] }>(
+      'GET',
+      `/wc/v3/products/${id}`,
+    );
+  }
+
+  async variations(productId: number) {
+    return this.call<{ id: number; status: string; stock_quantity: number | null; regular_price: string; attributes: { name: string; option: string }[] }[]>(
+      'GET',
+      `/wc/v3/products/${productId}/variations?per_page=100&status=any`,
+    );
+  }
+
+  /** Apaga um termo de atributo global (ex.: uma cor criada pelo teste). */
+  async deleteAttributeTerm(taxonomy: string, name: string) {
+    const attributes = await this.call<{ id: number; slug: string }[]>('GET', '/wc/v3/products/attributes');
+    const attribute = attributes.find((a) => a.slug === taxonomy);
+    if (!attribute) return;
+    const terms = await this.call<{ id: number; name: string }[]>('GET', `/wc/v3/products/attributes/${attribute.id}/terms?per_page=100&search=${encodeURIComponent(name)}`);
+    for (const term of terms.filter((t) => t.name === name)) {
+      await this.call('DELETE', `/wc/v3/products/attributes/${attribute.id}/terms/${term.id}?force=true`);
+    }
+  }
+
   /** Apaga pedidos e contas criados com estes e-mails. */
   async cleanup(emails: string[]) {
     for (const email of emails) {

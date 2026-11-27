@@ -1,0 +1,145 @@
+/**
+ * Tela "Nova peça" (peca.php): grade de estoque cor × tamanho, "+ Nova cor", peso/medidas pela
+ * categoria e a prévia do card da loja.
+ */
+( function ( $ ) {
+	'use strict';
+
+	var $form = $( '#gilda-peca-form' );
+	if ( ! $form.length ) {
+		return;
+	}
+	var config = $form.data( 'gilda-peca' ) || {};
+	var stock = $.extend( {}, config.stock || {} ); // "corId-tamId" → quantidade (o que já foi digitado)
+
+	function esc( value ) {
+		return String( value == null ? '' : value ).replace( /[&<>"']/g, function ( c ) {
+			return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ c ];
+		} );
+	}
+
+	function checked( selector ) {
+		return $form.find( selector + ' input[type="checkbox"]:checked' ).map( function () {
+			return { id: this.value, name: $( this ).data( 'name' ), hex: $( this ).data( 'hex' ) };
+		} ).get();
+	}
+
+	/* Grade de estoque */
+	function renderStock() {
+		var colors = checked( '[data-gilda-colors]' );
+		var sizes = checked( '[data-gilda-sizes]' );
+		var rows = colors.length ? colors : [ { id: '0', name: '', hex: '' } ];
+		var cols = sizes.length ? sizes : [ { id: '0', name: 'Estoque' } ];
+		var html = '<table><thead><tr><th scope="col">' + ( colors.length ? 'Cor' : '' ) + '</th>';
+		cols.forEach( function ( s ) {
+			html += '<th scope="col">' + esc( s.name ) + '</th>';
+		} );
+		html += '</tr></thead><tbody>';
+		rows.forEach( function ( c ) {
+			html += '<tr><th scope="row">' + ( c.name ? '<span><span class="gilda-swatch" style="background:' + esc( c.hex ) + '" aria-hidden="true"></span>' + esc( c.name ) + '</span>' : ( sizes.length ? 'Quantidade' : 'Peça' ) ) + '</th>';
+			cols.forEach( function ( s ) {
+				var key = c.id + '-' + s.id;
+				var value = stock[ key ] != null ? stock[ key ] : 0;
+				var label = [ c.name, s.id !== '0' ? s.name : '' ].filter( Boolean ).join( ' ' ) || 'Estoque';
+				html += '<td><input type="number" min="0" step="1" inputmode="numeric" name="estoque[' + esc( c.id ) + '][' + esc( s.id ) + ']" value="' + esc( value ) + '" data-key="' + esc( key ) + '" aria-label="' + esc( label ) + '"' + ( +value === 0 ? ' class="is-zero"' : '' ) + ' /></td>';
+			} );
+			html += '</tr>';
+		} );
+		html += '</tbody></table>';
+		$form.find( '[data-gilda-stock]' ).html( html );
+	}
+	$form.on( 'input', '[data-gilda-stock] input', function () {
+		stock[ $( this ).data( 'key' ) ] = this.value;
+		$( this ).toggleClass( 'is-zero', +this.value === 0 );
+	} );
+	$form.on( 'change', '[data-gilda-colors] input, [data-gilda-sizes] input', renderStock );
+
+	/* + Nova cor */
+	var $new = $form.find( '[data-gilda-newcolor]' );
+	$form.on( 'click', '[data-gilda-newcolor-open]', function () {
+		$new.prop( 'hidden', false ).find( '[data-gilda-newcolor-name]' ).trigger( 'focus' );
+	} );
+	$form.on( 'click', '[data-gilda-newcolor-cancel]', function () {
+		$new.prop( 'hidden', true );
+	} );
+	$form.on( 'keydown', '[data-gilda-newcolor-name]', function ( event ) {
+		if ( event.key === 'Enter' ) {
+			event.preventDefault();
+			$form.find( '[data-gilda-newcolor-save]' ).trigger( 'click' );
+		}
+	} );
+	$form.on( 'click', '[data-gilda-newcolor-save]', function () {
+		var name = $.trim( $new.find( '[data-gilda-newcolor-name]' ).val() );
+		var hex = $new.find( '[data-gilda-newcolor-hex]' ).val();
+		var $msg = $new.find( '[data-gilda-newcolor-msg]' );
+		if ( ! name ) {
+			$msg.text( 'Escreva o nome da cor.' );
+			return;
+		}
+		$msg.text( 'Criando…' );
+		$.post( config.ajaxUrl, { action: 'gilda_new_color', nonce: config.nonce, name: name, hex: hex } )
+			.done( function ( res ) {
+				if ( ! res || ! res.success ) {
+					$msg.text( ( res && res.data && res.data.message ) || 'Não deu para criar a cor.' );
+					return;
+				}
+				var c = res.data;
+				var $existing = $form.find( '[data-gilda-colors] input[value="' + c.id + '"]' );
+				if ( $existing.length ) {
+					$existing.prop( 'checked', true ).data( 'hex', c.hex ).siblings( '.gilda-swatch' ).css( 'background', c.hex );
+				} else {
+					$(
+						'<label class="gilda-chip"><input type="checkbox" name="cores[]" value="' + esc( c.id ) + '" data-name="' + esc( c.name ) + '" data-hex="' + esc( c.hex ) + '" checked /><span class="gilda-swatch" style="background:' + esc( c.hex ) + '" aria-hidden="true"></span>' + esc( c.name ) + '</label>'
+					).insertBefore( $form.find( '[data-gilda-newcolor-open]' ) );
+				}
+				$new.prop( 'hidden', true ).find( '[data-gilda-newcolor-name]' ).val( '' );
+				$msg.text( '' );
+				renderStock();
+			} )
+			.fail( function ( xhr ) {
+				$msg.text( ( xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ) || 'Não deu para criar a cor.' );
+			} );
+	} );
+
+	/* Peso e medidas pela categoria (só enquanto a dona não mexeu nelas) */
+	var touched = $form.find( 'input[name="product_id"]' ).val() !== '0';
+	$form.on( 'input', '[data-gilda-ship]', function () {
+		touched = true;
+	} );
+	$form.on( 'change', '#gilda-peca-category', function () {
+		var $opt = $( this ).find( ':selected' );
+		var values = ( config.defaults || {} )[ $opt.data( 'slug' ) ] || ( config.defaults || {} )[ '' ];
+		if ( touched || ! values ) {
+			return;
+		}
+		$form.find( '[data-gilda-ship]' ).each( function () {
+			$( this ).val( String( values[ $( this ).data( 'gilda-ship' ) ] ).replace( '.', ',' ) );
+		} );
+		if ( $opt.val() !== '0' ) {
+			$form.find( '[data-gilda-ship-help]' ).text( 'Já vem preenchido pela categoria (' + $opt.text() + '). Ajuste se a embalagem for diferente: o frete é calculado com isso.' );
+		}
+	} );
+
+	/* Prévia do card */
+	function money( raw ) {
+		var text = String( raw || '' ).replace( /[^\d,.]/g, '' );
+		if ( text.indexOf( ',' ) > -1 ) {
+			text = text.replace( /\./g, '' ).replace( ',', '.' );
+		}
+		var value = parseFloat( text );
+		return isNaN( value ) ? 'R$ —' : 'R$ ' + value.toFixed( 2 ).replace( '.', ',' ).replace( /\B(?=(\d{3})+(?!\d))/g, '.' );
+	}
+	$form.on( 'input', '#gilda-peca-name', function () {
+		$form.find( '[data-gilda-preview-name]' ).text( this.value || 'Nome da peça' );
+	} );
+	$form.on( 'input', '#gilda-peca-price', function () {
+		$form.find( '[data-gilda-preview-price]' ).text( money( this.value ) );
+	} );
+	$( document ).on( 'gilda:photos', function () {
+		var $first = $form.find( '.gilda-photos--cover .gilda-photo img' ).first();
+		$form.find( '[data-gilda-preview-img]' ).attr( 'src', $first.attr( 'src' ) || '' ).prop( 'hidden', ! $first.length );
+		$form.find( '[data-gilda-preview-empty]' ).prop( 'hidden', !! $first.length );
+	} );
+
+	renderStock();
+} )( jQuery );

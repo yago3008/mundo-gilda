@@ -88,6 +88,8 @@ Nome · preço (promoção funciona, mas não há selo "Oferta" nos cards) · fo
 
 **Proposta:** tela "Nova peça" simplificada por cima do WooCommerce (os dados continuam no WooCommerce, então pedidos, estoque e relatórios seguem iguais), com a grade cor × tamanho de estoque, campo de capítulo e o peso/medidas já preenchidos pela categoria (editáveis). Mudanças no código: capítulo por relação, e o cache do frete (`T/inc/shipping.php:69,131`) passa a considerar alterações de peso/medidas.
 
+**Feito (fase 3, parte):** tela "Nova peça" (`MU/gilda-painel/peca.php`, `admin.php?page=gilda-peca`): nome, preço, categoria, capítulo, descrição, fotos (1ª = principal, 2ª = a do "passar o mouse"), cores com bolinha e "+ Nova cor" (grava `gilda_hex`), tamanhos na ordem do painel, grade cor × tamanho de estoque, peso/medidas pela categoria, destaque. Variações atualizadas pela combinação (mesmo ID; combinação desmarcada vira privada). Para a dona, "Nova peça" e "Editar" abrem essa tela quando a peça é simples ou variável só com Cor/Tamanho, preço único e sem promoção; senão, a do WooCommerce. **Ainda não:** cache do frete por peso/medidas (`T/inc/shipping.php`), promoção.
+
 ---
 
 ## 3. Categorias — hoje **parcial**
@@ -245,6 +247,8 @@ Painel GILDA;
 ```
 
 Plugins, temas, configurações técnicas e o editor de blocos ficam escondidos para esse perfil.
+
+**Visual (nov/2026):** login da marca para todos (`MU/gilda-painel/login.php`), wp-admin com a cara da GILDA; só para a Dona da loja (`admin-skin.php`, `assets/owner.css`), Início com números reais (`home.php`) e as telas de capítulo e peça no padrão do protótipo aprovado (`painel-proto/`).
 
 **Feito (fase 1):** perfil `gilda_dona` ("Dona da loja", `MU/gilda-painel/role.php`), com o menu Painel GILDA; · Pedidos (e Clientes) · Peças · Capítulos · Categorias, Cores e Tamanhos · Cupons · Dados da loja · Páginas. Os itens de Página inicial, Quem Cria, Menus e Textos do site entram com as fases 4 e 5. Por que dentro do WordPress e não um site administrativo à parte: login, permissões, envio de fotos, estoque e pedidos já existem e são seguros; um painel separado teria que refazer tudo isso.
 

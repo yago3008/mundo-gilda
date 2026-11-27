@@ -139,7 +139,7 @@ wp-content/mu-plugins/      # nosso código que roda sempre
   gilda-hardening.php             # segurança: limite de login, sem XML-RPC/enumeração de usuários, headers
   gilda-stock-alerts.php (+ pasta) # "avise-me quando chegar": formulário, lista de espera, e-mail de volta ao estoque
   gilda-low-stock.php             # "Restam só N" (últimas unidades)
-  gilda-painel.php (+ pasta)      # painel das donas: perfil "Dona da loja", Dados da loja, Capítulos (guia: docs/painel-gilda.md)
+  gilda-painel.php (+ pasta)      # painel das donas: login da marca, perfil "Dona da loja" com visual GILDA;, Início, Dados da loja, Capítulos, Nova peça (guia: docs/painel-gilda.md)
 wp-content/themes/gilda/    # tema da loja (K1venn), ativado pelo setup.sh quando existir style.css
 scripts/backup.sh           # backup do banco + uploads em backups/ (retenção de 14)
 scripts/restore.sh          # restaura um backup
