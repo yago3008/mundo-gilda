@@ -14,7 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$file = '/data/site-images.json';
+$data_dir = rtrim( getenv( 'GILDA_DATA_DIR' ) ?: '/data', '/' ); // produção: GILDA_DATA_DIR=<pasta-de-deploy>/data
+$file     = $data_dir . '/site-images.json';
 if ( ! file_exists( $file ) ) {
 	WP_CLI::error( "Arquivo $file não encontrado." );
 }
@@ -62,8 +63,8 @@ $sideload = static function ( string $url, string $alt ) use ( $find, $set_alt )
 
 // Arquivo do próprio repositório (data/<file>), ex.: fotos enviadas pelas donas que não estão no Wix.
 // A chave inclui o hash do arquivo: se a foto for trocada no repo, ela é importada de novo.
-$sideload_file = static function ( string $file, string $alt ) use ( $find, $set_alt ): int {
-	$path = '/data/' . ltrim( $file, '/' );
+$sideload_file = static function ( string $file, string $alt ) use ( $find, $set_alt, $data_dir ): int {
+	$path = $data_dir . '/' . ltrim( $file, '/' );
 	if ( ! file_exists( $path ) ) {
 		WP_CLI::warning( "Arquivo $path não encontrado." );
 		return 0;

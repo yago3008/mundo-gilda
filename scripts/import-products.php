@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$file = '/data/products.json';
+$file = rtrim( getenv( 'GILDA_DATA_DIR' ) ?: '/data', '/' ) . '/products.json'; // produção: GILDA_DATA_DIR=<pasta-de-deploy>/data
 if ( ! file_exists( $file ) ) {
 	WP_CLI::error( "Arquivo $file não encontrado. Rode antes: node scripts/export-wix-products.mjs" );
 }
