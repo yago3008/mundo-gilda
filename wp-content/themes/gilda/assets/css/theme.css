@@ -655,19 +655,17 @@ body.gilda-has-hero .gilda-hero {
 
 .gilda-filters { background: var(--gilda-white); padding: 24px; }
 .gilda-filters__head { display: none; }
-.gilda-filters__by { font: 400 20px/1.2 var(--gilda-display); margin: 0 0 8px; }
-.gilda-filter-cats { list-style: none; margin: 0 0 16px; padding: 0 0 16px; border-bottom: 1px solid var(--gilda-sand); }
-.gilda-filter-cats a {
-	color: var(--gilda-ink);
-	display: flex;
-	align-items: center;
-	font-size: 15px;
-	font-weight: 300;
-	min-height: 36px;
-	text-decoration: none;
-}
-.gilda-filter-cats a:hover { text-decoration: underline; }
-.gilda-filter-cats a[aria-current="page"] { color: var(--gilda-terracotta); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+/* Tipo de produto (une o antigo "Buscar por"): itens de texto sem caixinha, mais de um pode ficar
+   marcado. Marcado = terracota sublinhado. A caixinha continua no HTML (acessível), só escondida. */
+.gilda-types { display: flex; flex-direction: column; }
+.gilda-type { align-items: center; color: var(--gilda-ink); cursor: pointer; display: flex; font-size: 15px; font-weight: 300; min-height: 36px; position: relative; }
+.gilda-type input { clip: rect(0 0 0 0); height: 1px; margin: 0; overflow: hidden; position: absolute; width: 1px; }
+.gilda-type:hover span { text-decoration: underline; text-underline-offset: 4px; }
+.gilda-type:has(input:checked) { color: var(--gilda-terracotta); font-weight: 600; }
+.gilda-type:has(input:checked) span { text-decoration: underline; text-underline-offset: 4px; }
+.gilda-type:has(input:focus-visible) span { outline: 2px solid var(--gilda-terracotta); outline-offset: 2px; }
+.gilda-type:has(input:disabled) { color: var(--gilda-graphite); cursor: not-allowed; }
+.gilda-type:has(input:disabled):hover span { text-decoration: none; }
 
 .gilda-filter { border-bottom: 1px solid var(--gilda-sand); }
 .gilda-filter__title {

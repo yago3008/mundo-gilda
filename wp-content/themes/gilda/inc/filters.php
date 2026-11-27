@@ -87,9 +87,8 @@ function gilda_price_bounds() {
  * @return string
  */
 function gilda_filters_base_url() {
-	if ( is_product_category() ) {
-		return get_term_link( get_queried_object() );
-	}
+	// Sempre a loja: na página de uma categoria ela já vem marcada em "Tipo de produto"; enviar para a
+	// própria categoria cruzaria as categorias (AND) e esvaziaria a lista ao marcar outra.
 	return wc_get_page_permalink( 'shop' );
 }
 
@@ -156,24 +155,6 @@ function gilda_shortcode_product_filters() {
 	$categories = is_wp_error( $categories ) ? array() : $categories;
 	$current    = is_product_category() ? get_queried_object_id() : 0;
 
-	// 4.1 Buscar por.
-	$nav  = '<ul class="gilda-filter-cats">';
-	$nav .= sprintf(
-		'<li><a href="%1$s"%2$s>%3$s</a></li>',
-		esc_url( wc_get_page_permalink( 'shop' ) ),
-		$current ? '' : ' aria-current="page"',
-		esc_html__( 'Todos os produtos', 'gilda' )
-	);
-	foreach ( $categories as $cat ) {
-		$nav .= sprintf(
-			'<li><a href="%1$s"%2$s>%3$s</a></li>',
-			esc_url( get_term_link( $cat ) ),
-			$current === $cat->term_id ? ' aria-current="page"' : '',
-			esc_html( $cat->name )
-		);
-	}
-	$nav .= '</ul>';
-
 	// Chapter selector.
 	$chapter_html = sprintf(
 		'<label class="screen-reader-text" for="gilda-filter-chapter">%1$s</label><select class="gilda-filter-chapter" id="gilda-filter-chapter" name="capitulo"><option value="">%2$s</option>',
@@ -192,13 +173,14 @@ function gilda_shortcode_product_filters() {
 	}
 	$chapter_html .= '</select>';
 
-	// 4.2 Tipo de produto.
+	// 4.1 + 4.2 Tipo de produto (o antigo "Buscar por" foi unido aqui): itens de texto, sem caixinha,
+	// mais de um pode ficar marcado. Na página de uma categoria, ela já vem marcada.
 	$tipo_html = '';
 	foreach ( $categories as $cat ) {
 		$tipo_html .= sprintf(
-			'<label class="gilda-check"><input type="checkbox" name="tipo[]" value="%1$s"%2$s%3$s /><span>%4$s</span></label>',
+			'<label class="gilda-type"><input type="checkbox" name="tipo[]" value="%1$s"%2$s%3$s /><span>%4$s</span></label>',
 			esc_attr( $cat->slug ),
-			checked( in_array( $cat->slug, $tipos, true ), true, false ),
+			checked( in_array( $cat->slug, $tipos, true ) || $current === $cat->term_id, true, false ),
 			disabled( 0 === (int) $cat->count, true, false ),
 			esc_html( $cat->name )
 		);
@@ -256,8 +238,8 @@ function gilda_shortcode_product_filters() {
 		);
 	}
 
-	$sections  = gilda_filter_section( __( 'Capítulo', 'gilda' ), $chapter_html, 'gilda-f-capitulo' );
-	$sections .= gilda_filter_section( __( 'Tipo de produto', 'gilda' ), $tipo_html, 'gilda-f-tipo' );
+	$sections  = gilda_filter_section( __( 'Tipo de produto', 'gilda' ), '<div class="gilda-types">' . $tipo_html . '</div>', 'gilda-f-tipo' );
+	$sections .= gilda_filter_section( __( 'Capítulo', 'gilda' ), $chapter_html, 'gilda-f-capitulo' );
 	$sections .= gilda_filter_section( __( 'Preço', 'gilda' ), $price_html, 'gilda-f-preco' );
 	if ( $cor_html ) {
 		$sections .= gilda_filter_section( __( 'Cor', 'gilda' ), $cor_html, 'gilda-f-cor' );
@@ -269,13 +251,11 @@ function gilda_shortcode_product_filters() {
 	return sprintf(
 		'<aside class="gilda-filters" id="gilda-filters" aria-label="%1$s">
 			<div class="gilda-filters__head"><h2 class="gilda-filters__heading">%2$s</h2><button type="button" class="gilda-filters__close" aria-label="%3$s">%4$s</button></div>
-			<h2 class="gilda-filters__by">%5$s</h2>
-			%6$s
-			<form class="gilda-filters__form" method="get" action="%7$s">
-				%8$s
+			<form class="gilda-filters__form" method="get" action="%5$s">
+				%6$s
 				<div class="gilda-filters__actions">
-					<button type="submit" class="gilda-btn gilda-btn--primary">%9$s</button>
-					<a class="gilda-filters__clear" href="%7$s">%10$s</a>
+					<button type="submit" class="gilda-btn gilda-btn--primary">%7$s</button>
+					<a class="gilda-filters__clear" href="%5$s">%8$s</a>
 				</div>
 			</form>
 		</aside>',
@@ -283,8 +263,6 @@ function gilda_shortcode_product_filters() {
 		esc_html__( 'Filtrar', 'gilda' ),
 		esc_attr__( 'Fechar filtros', 'gilda' ),
 		gilda_icon( 'close' ),
-		esc_html__( 'Buscar por', 'gilda' ),
-		$nav,
 		esc_url( $base ),
 		$sections,
 		esc_html__( 'Aplicar filtros', 'gilda' ),
