@@ -2558,3 +2558,93 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 	text-underline-offset: 3px;
 }
 .gilda-shipping__row .gilda-shipping__help:hover { color: var(--gilda-terracotta); }
+
+/* ---------- Filtro de cor: paleta (inc/filters.php) ----------
+ * Bolinhas de cor com o nome embaixo, sem checkbox à vista. Escolhida: anel terracota em volta e um
+ * "visto" dentro (claro ou escuro conforme a cor). Cor sem peças: apagada, com um risco. */
+.gilda-palette {
+	display: grid;
+	gap: 18px 6px;
+	grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+	padding: 6px 0 4px;
+}
+.gilda-palette__item {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+	position: relative;
+	text-align: center;
+}
+.gilda-palette__item input {
+	height: 1px;
+	margin: 0;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+}
+.gilda-palette__swatch {
+	background: var(--swatch, var(--gilda-sand));
+	border-radius: 50%;
+	box-shadow: inset 0 0 0 1px rgba(36, 26, 22, .14), 0 0 0 0 var(--gilda-cream), 0 0 0 0 var(--gilda-terracotta);
+	display: grid;
+	height: 38px;
+	place-items: center;
+	position: relative;
+	transition: transform .25s var(--gilda-ease), box-shadow .25s var(--gilda-ease);
+	width: 38px;
+}
+/* "visto" desenhado em CSS, aparece quando escolhida */
+.gilda-palette__swatch::after {
+	border: solid var(--gilda-cream);
+	border-width: 0 2px 2px 0;
+	content: "";
+	height: 11px;
+	margin-top: -3px;
+	opacity: 0;
+	transform: rotate(45deg) scale(.4);
+	transition: opacity .2s, transform .25s var(--gilda-ease);
+	width: 6px;
+}
+.gilda-palette__item.is-light .gilda-palette__swatch::after { border-color: var(--gilda-ink); }
+.gilda-palette__name {
+	color: var(--gilda-ink-soft);
+	font: 400 12px/1.25 var(--gilda-sans);
+	letter-spacing: .02em;
+	transition: color .2s;
+}
+
+.gilda-palette__item:hover .gilda-palette__swatch { transform: scale(1.08); }
+.gilda-palette__item:hover .gilda-palette__name { color: var(--gilda-ink); }
+
+.gilda-palette__item:has(input:checked) .gilda-palette__swatch {
+	box-shadow: inset 0 0 0 1px rgba(36, 26, 22, .14), 0 0 0 3px var(--gilda-cream), 0 0 0 4.5px var(--gilda-terracotta);
+	transform: scale(1);
+}
+.gilda-palette__item:has(input:checked) .gilda-palette__swatch::after { opacity: 1; transform: rotate(45deg) scale(1); }
+.gilda-palette__item:has(input:checked) .gilda-palette__name { color: var(--gilda-terracotta); font-weight: 500; }
+
+.gilda-palette__item:has(input:focus-visible) .gilda-palette__swatch { outline: 2px solid var(--gilda-terracotta); outline-offset: 6px; }
+
+.gilda-palette__item:has(input:disabled) { cursor: not-allowed; }
+.gilda-palette__item:has(input:disabled) .gilda-palette__swatch { opacity: .35; transform: none; }
+.gilda-palette__item:has(input:disabled) .gilda-palette__swatch::before {
+	background: var(--gilda-ink-soft);
+	content: "";
+	height: 1.5px;
+	position: absolute;
+	transform: rotate(-45deg);
+	width: 120%;
+}
+.gilda-palette__item:has(input:disabled) .gilda-palette__name { color: var(--gilda-taupe); }
+
+@media (max-width: 960px) {
+	.gilda-palette { gap: 20px 8px; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+	.gilda-palette__swatch { height: 44px; width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.gilda-palette__swatch,
+	.gilda-palette__swatch::after { transition: none; }
+}

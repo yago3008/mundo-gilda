@@ -94,6 +94,24 @@ function gilda_filters_base_url() {
 }
 
 /**
+ * Cor clara (o "visto" da paleta fica escuro em cima dela)?
+ *
+ * @param string $hex Cor #RRGGBB.
+ * @return bool
+ */
+function gilda_color_is_light( $hex ) {
+	$hex = ltrim( (string) $hex, '#' );
+	if ( 3 === strlen( $hex ) ) {
+		$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+	}
+	if ( 6 !== strlen( $hex ) || ! ctype_xdigit( $hex ) ) {
+		return true;
+	}
+	list( $r, $g, $b ) = array_map( 'hexdec', str_split( $hex, 2 ) );
+	return ( 0.299 * $r + 0.587 * $g + 0.114 * $b ) > 170;
+}
+
+/**
  * Render a collapsible filter section.
  *
  * @param string $title Section title.
@@ -208,15 +226,21 @@ function gilda_shortcode_product_filters() {
 	$colors    = gilda_product_colors();
 	$cor_html  = '';
 	$cor_terms = taxonomy_exists( 'pa_cor' ) ? get_terms( array( 'taxonomy' => 'pa_cor', 'hide_empty' => false ) ) : array();
+	// Paleta: bolinhas de cor com o nome embaixo; o checkbox continua lá (escondido, mas acessível pelo teclado).
 	foreach ( is_wp_error( $cor_terms ) ? array() : $cor_terms as $term ) {
+		$hex       = (string) ( $colors[ $term->slug ] ?? '#D9D3C2' );
 		$cor_html .= sprintf(
-			'<label class="gilda-check gilda-check--color"><input type="checkbox" name="cor[]" value="%1$s"%2$s%3$s /><span class="gilda-swatch" style="--swatch:%4$s" aria-hidden="true"></span><span>%5$s</span></label>',
+			'<label class="gilda-palette__item%6$s" title="%5$s"><input type="checkbox" name="cor[]" value="%1$s"%2$s%3$s /><span class="gilda-palette__swatch" style="--swatch:%4$s" aria-hidden="true"></span><span class="gilda-palette__name">%5$s</span></label>',
 			esc_attr( $term->slug ),
 			checked( in_array( $term->slug, $cores, true ), true, false ),
 			disabled( 0 === (int) $term->count, true, false ),
-			esc_attr( $colors[ $term->slug ] ?? '#D9D3C2' ),
-			esc_html( $term->name )
+			esc_attr( $hex ),
+			esc_html( $term->name ),
+			gilda_color_is_light( $hex ) ? ' is-light' : ''
 		);
+	}
+	if ( $cor_html ) {
+		$cor_html = '<div class="gilda-palette">' . $cor_html . '</div>';
 	}
 
 	// 4.5 Tamanho.
