@@ -61,6 +61,9 @@ body.woocommerce-account .woocommerce-MyAccount-navigation {
 	width: auto !important;
 }
 body.woocommerce-account .woocommerce-MyAccount-navigation ul {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -76,9 +79,6 @@ body.woocommerce-account .woocommerce-MyAccount-navigation li a {
 	text-decoration: none;
 	text-transform: uppercase;
 	transition: color .18s ease, background .18s ease, border-color .18s ease, padding .18s ease;
-}
-body.woocommerce-account .woocommerce-MyAccount-navigation li + li a {
-	border-top: 1px solid color-mix(in srgb, var(--gilda-acc-linen) 70%, transparent);
 }
 body.woocommerce-account .woocommerce-MyAccount-navigation li a:hover {
 	background: var(--gilda-acc-cream);
