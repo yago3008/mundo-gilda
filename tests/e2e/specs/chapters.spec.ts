@@ -234,14 +234,15 @@ test('a dona edita os Dados da loja e o rodapé, a faixa e os textos das página
 
     // Textos das páginas ([gilda_loja …] em vez do número e do e-mail escritos à mão).
     await v.page.goto('/duvidas-frequentes/');
-    const text = v.page.getByRole('main');
-    await expect(text.getByRole('link', { name: '(41) 98888-7777' })).toHaveAttribute('href', 'https://wa.me/5541988887777');
-    await expect(text.getByRole('link', { name: testEmail })).toHaveAttribute('href', `mailto:${testEmail}`);
-    await expect(text.getByRole('link', { name: `@gilda_teste_${stamp}` })).toHaveCount(1);
-    await expect(text).not.toContainText('99100-8303');
+    // (as respostas ficam em <details> fechados: procura pelo endereço do link, não pelo que está visível)
+    const text = v.page.locator('main');
+    await expect(text.locator('details a[href="https://wa.me/5541988887777"]')).toHaveText('(41) 98888-7777');
+    await expect(text.locator(`details a[href="mailto:${testEmail}"]`)).toHaveText(testEmail);
+    await expect(text.locator(`details a[href="https://www.instagram.com/gilda_teste_${stamp}/"]`)).toHaveText(`@gilda_teste_${stamp}`);
+    expect(await text.innerHTML()).not.toContain('99100-8303');
     await v.page.goto('/politica-de-privacidade/');
-    await expect(v.page.getByRole('main')).toContainText(testEmail);
-    await expect(v.page.getByRole('main')).not.toContainText('mundogilda@gmail.com');
+    expect(await v.page.locator('main').innerHTML()).toContain(testEmail);
+    expect(await v.page.locator('main').innerHTML()).not.toContain('mundogilda@gmail.com');
     await v.close();
   } finally {
     await page.goto('/wp-admin/admin.php?page=gilda-dados-da-loja');

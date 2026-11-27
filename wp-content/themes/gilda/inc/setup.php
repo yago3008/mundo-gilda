@@ -57,6 +57,20 @@ function gilda_enqueue_assets() {
 		)
 	);
 
+	// Páginas de atendimento: perguntas das dúvidas frequentes abrem e fecham (inc/pages.php).
+	if ( function_exists( 'gilda_current_info_page' ) && gilda_current_info_page() ) {
+		wp_enqueue_script(
+			'gilda-info-pages',
+			GILDA_URI . '/assets/js/info-pages.js',
+			array(),
+			GILDA_VERSION . '.' . filemtime( GILDA_DIR . '/assets/js/info-pages.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
+
 	$wc = function_exists( 'WC' );
 	$account_images = array();
 	// Fotos do carrossel do login/cadastro: as versões em alta de data/site-images.json (account_carousel).
@@ -145,6 +159,22 @@ function gilda_category_zoom_arrive() {
 	echo '<script id="gilda-category-zoom-arrive">' . file_get_contents( $file ) . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput, WordPress.WP.AlternativeFunctions
 }
 add_action( 'wp_body_open', 'gilda_category_zoom_arrive', 1 );
+
+/**
+ * Chegada pela transição dos cards: no <head>, pede ao navegador para segurar o último quadro da página
+ * anterior (marrom com o catálogo nas letras) até esta página terminar de chegar (link rel=expect,
+ * blocking=render), e já começa a carregar a fonte do nome. Sem isso, a primeira pintura saía com as
+ * letras creme ou sumidas por um instante. Não faz nada se a página não foi aberta por um card.
+ */
+function gilda_category_zoom_hold() {
+	if ( is_admin() ) {
+		return;
+	}
+	?>
+<script id="gilda-category-zoom-hold">(()=>{try{const s=JSON.parse(sessionStorage.getItem('gilda-czoom')||'null');if(!s||!s.text||Date.now()-s.t>10000)return;const l=document.createElement('link');l.rel='expect';l.href='#gilda-czoom-parsed';l.setAttribute('blocking','render');document.head.appendChild(l);if(document.fonts&&s.font){document.fonts.load(`${s.font.style} ${s.font.weight} ${Math.round(s.size)}px ${s.font.family}`).catch(()=>{});}}catch(e){}})();</script>
+	<?php
+}
+add_action( 'wp_head', 'gilda_category_zoom_hold', 1 );
 
 /**
  * Product colour swatches (docs/design/01-colors.md → Product colors).

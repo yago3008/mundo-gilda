@@ -2,6 +2,7 @@
  * Segunda metade da transição dos cards de categoria (a primeira é assets/js/category-zoom.js).
  * Impresso inline logo no começo do <body> (inc/setup.php), para a tela marrom com o nome vazado
  * já sair na primeira pintura do catálogo. Depois o zoom entra numa letra e revela a página.
+ * No <head>, gilda_category_zoom_hold() segura a pintura até a página chegar inteira e adianta a fonte.
  */
 (() => {
 	let s = null;
@@ -64,10 +65,37 @@
 			fontReady = document.fonts.load(fontSpec).catch(() => {});
 		}
 	} catch (e) { /* segue com a fonte que tiver */ }
+	// O nome volta assim que a fonte chega (não espera o resto da página).
+	Promise.race([fontReady, new Promise((r) => setTimeout(r, 1500))]).then(() => { word.style.visibility = ''; });
 
 	const domReady = document.readyState === 'loading'
 		? new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }))
 		: Promise.resolve();
+
+	// As fotos do catálogo são "lazy" (só carregam depois da primeira pintura); aqui elas aparecem pelas
+	// letras desde o começo, então carregam já (a abertura na home deixou elas no cache).
+	const eager = (img) => {
+		// decoding=sync: a primeira pintura já sai com a foto (senão as letras ficam creme por uns quadros)
+		img.setAttribute('decoding', 'sync');
+		if (img.getAttribute('loading') !== 'lazy') return;
+		img.setAttribute('loading', 'eager');
+		const sizes = img.getAttribute('sizes');
+		if (sizes) img.setAttribute('sizes', sizes.replace(/^\s*auto\s*,\s*/, ''));
+	};
+	try {
+		document.querySelectorAll('img').forEach(eager);
+		const mo = new MutationObserver((list) => {
+			for (const m of list) {
+				for (const n of m.addedNodes) {
+					if (n.nodeType !== 1) continue;
+					if (n.tagName === 'IMG') eager(n);
+					else n.querySelectorAll('img').forEach(eager);
+				}
+			}
+		});
+		mo.observe(document.documentElement, { childList: true, subtree: true });
+		domReady.then(() => mo.disconnect());
+	} catch (e) { /* segue com o lazy */ }
 	const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
 
 	const dive = (p) => {
@@ -78,24 +106,40 @@
 		zoom.setAttribute('transform', `translate(${px} ${py}) scale(${sc}) translate(${-origin.x} ${-origin.y})`);
 	};
 	dive(0);
+	// A letra já cobre a tela toda quando o círculo inscrito (raio r, o ponto mais grosso) passa da metade
+	// da diagonal: termina ali. Mais perto de maxScale a letra fica enorme e o navegador pode deixar de
+	// desenhar (a tela marrom voltava por um quadro no fim).
+	const r = (Math.hypot(vw, vh) * 0.7) / s.maxScale;
+	const pEnd = clamp(Math.sqrt(Math.log(Math.max(1.0001, (Math.hypot(vw, vh) * 0.56) / r)) / Math.log(s.maxScale)), 0.5, 1);
 
-	Promise.race([Promise.all([fontReady, domReady]), timeout(1500)]).then(() => {
+	// O gilda.js marca <html class="js"> no fim do carregamento; como o mergulho começa antes, marca já
+	// (senão o layout que depende dela, como os filtros no celular, mudaria no meio do mergulho).
+	document.documentElement.classList.add('js');
+
+	// Começa logo depois do primeiro quadro da página (não espera os scripts do fim: era mais uma pausa
+	// parada). O <head> segura a pintura até o HTML chegar inteiro (readyState "interactive"); dois
+	// requestAnimationFrame garantem que esse primeiro quadro, igual ao último da home, já foi mostrado.
+	const parsed = document.readyState === 'loading'
+		? new Promise((r) => document.addEventListener('readystatechange', r, { once: true }))
+		: Promise.resolve();
+	const painted = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+	Promise.race([Promise.all([fontReady, parsed]).then(painted), timeout(1500)]).then(() => {
 		word.style.visibility = '';
 		let started = 0;
 		const frame = (now) => {
 			if (!started) started = now;
 			const p = clamp((now - started) / DIVE_MS);
-			dive(p);
-			if (p < 1) {
+			dive(Math.min(p, pEnd));
+			if (p < pEnd) {
 				requestAnimationFrame(frame);
 			} else {
 				overlay.remove();
 			}
 		};
-		// um respiro curto: a página por baixo termina de montar antes do mergulho
-		setTimeout(() => requestAnimationFrame(frame), 150);
+		// começa no próximo quadro: a página já chegou inteira (o <head> segurou a pintura até ela chegar)
+		requestAnimationFrame(frame);
 		// aba em segundo plano (sem requestAnimationFrame): não deixa a tela marrom presa
-		setTimeout(() => overlay.remove(), 150 + DIVE_MS + 1500);
+		setTimeout(() => overlay.remove(), DIVE_MS + 1500);
 	});
 
 	// Voltar/avançar pelo navegador não pode reaparecer com a tela marrom.

@@ -1117,8 +1117,12 @@ select.gilda-select,
 
 /* Transição ao clicar num card de categoria (assets/js/category-zoom.js) */
 .gilda-czoom { inset: 0; overflow: hidden; pointer-events: auto; position: fixed; z-index: 100000; }
-.gilda-czoom__photo { background: var(--gilda-cream); overflow: hidden; position: absolute; }
-.gilda-czoom__photo img { display: block; height: 100%; max-width: none; object-fit: cover; transform-origin: center; width: 100%; }
+.gilda-czoom__photo { background: var(--gilda-cream); overflow: hidden; position: absolute; transition: background-color .25s ease; }
+.gilda-czoom__photo.is-see-through { background-color: transparent; }
+/* Catálogo do card, carregado por baixo (sem scripts) para aparecer pelas letras já na abertura. */
+.gilda-czoom__page { border: 0; height: 100vh; left: 0; opacity: 0; pointer-events: none; position: fixed; top: 0; width: 100vw; z-index: 99999; }
+.gilda-czoom__page.is-playing { opacity: 1; }
+.gilda-czoom__photo img { display: block; max-width: none; object-fit: cover; position: absolute; transform-origin: center; will-change: transform, opacity; }
 .gilda-czoom__shade { inset: 0; position: absolute; }
 .gilda-czoom__svg { display: block; height: 100%; inset: 0; position: absolute; width: 100%; }
 /* Marrom da marca: as letras vazadas (página creme por baixo) aparecem sempre, sem sumir no fundo. */
@@ -2192,6 +2196,457 @@ body.gilda-account-auth-page .gilda-account-tab-panel .woocommerce-Button { min-
 .single-product .gilda-shipping__row > button[type="submit"] {
 	grid-column: 2;
 	grid-row: 1;
+}
+
+/* ---------- Páginas de atendimento: cuidados, trocas, dúvidas (templates/page-info.html) ----------
+ * O texto vem da página (painel); aqui só estilizamos os blocos comuns. Cada título (H2) vira uma linha:
+ * título à esquerda, conteúdo à direita. Nas dúvidas, cada pergunta (H3) abre e fecha (info-pages.js). */
+.gilda-info { --gi-gap: clamp(24px, 4vw, 64px); --gi-rule: color-mix(in srgb, var(--gilda-sand) 80%, var(--gilda-taupe)); }
+
+.gilda-info__hero {
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+	padding: clamp(56px, 8vw, 104px) 24px clamp(20px, 3vw, 28px);
+}
+.gilda-info__hero-inner { margin: 0 auto; max-width: 1170px; }
+.gilda-info .gilda-info__kicker {
+	font: 500 12px/1 var(--gilda-sans);
+	letter-spacing: .24em;
+	margin: 0 0 20px;
+	opacity: .78;
+	text-transform: uppercase;
+}
+.gilda-info .gilda-info__title {
+	color: inherit;
+	font-size: clamp(46px, 7.4vw, 92px) !important;
+	letter-spacing: -.01em;
+	line-height: .95;
+	margin: 0 0 clamp(36px, 5vw, 64px);
+}
+.gilda-info__nav ul {
+	border-top: 1px solid color-mix(in srgb, var(--gilda-cream) 28%, transparent);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px clamp(20px, 3vw, 40px);
+	list-style: none;
+	margin: 0;
+	padding: 14px 0 0;
+}
+.gilda-info__nav a {
+	border-bottom: 1px solid transparent;
+	color: inherit;
+	display: inline-block;
+	font: 500 12.5px/1 var(--gilda-sans);
+	letter-spacing: .14em;
+	opacity: .7;
+	padding: 12px 0 10px;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: opacity .2s, border-color .2s;
+}
+.gilda-info__nav a:hover,
+.gilda-info__nav a:focus-visible { opacity: 1; }
+.gilda-info__nav a[aria-current="page"] { border-bottom-color: currentColor; opacity: 1; }
+.gilda-info__nav a:focus-visible { outline: 2px solid var(--gilda-cream); outline-offset: 4px; }
+
+.gilda-info__body {
+	align-items: start;
+	display: grid;
+	gap: clamp(48px, 6vw, 96px);
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+	margin: 0 auto;
+	max-width: 1170px;
+	padding: clamp(44px, 6vw, 88px) 24px 0;
+}
+.gilda-info__body > * { margin-block: 0; }
+
+/* conteúdo: linhas título | texto */
+.gilda-info .gilda-info__content {
+	color: var(--gilda-ink);
+	column-gap: var(--gi-gap);
+	display: grid;
+	font: 400 16px/1.7 var(--gilda-sans);
+	grid-template-columns: minmax(150px, 230px) minmax(0, 1fr);
+}
+.gilda-info .gilda-info__content > * { grid-column: 2; margin-block: 0 14px; margin-inline: 0; max-width: 66ch; }
+.gilda-info .gilda-info__content > :not(h2):not(h2 ~ *) { grid-column: 1 / -1; } /* abertura, antes do 1º título */
+.gilda-info .gilda-info__content > p:first-child {
+	color: var(--gilda-ink-soft);
+	font: 300 clamp(21px, 2.2vw, 26px)/1.45 var(--gilda-display);
+	margin-bottom: clamp(12px, 2vw, 20px);
+	max-width: 40ch;
+}
+.gilda-info .gilda-info__content > h2 {
+	border-top: 1px solid var(--gi-rule);
+	color: var(--gilda-terracotta);
+	font: 400 clamp(22px, 2.2vw, 27px)/1.2 var(--gilda-display);
+	grid-column: 1;
+	letter-spacing: 0;
+	margin: clamp(20px, 3vw, 32px) calc(-1 * var(--gi-gap)) 0 0;
+	padding: 26px var(--gi-gap) 0 0;
+	text-transform: none;
+}
+.gilda-info .gilda-info__content > h2 + * {
+	border-top: 1px solid var(--gi-rule);
+	margin-top: clamp(20px, 3vw, 32px);
+	padding-top: 28px; /* 1ª linha alinhada com o título ao lado */
+}
+.gilda-info .gilda-info__content h3,
+.gilda-info .gilda-info__content h4 { font: 500 18px/1.35 var(--gilda-display); margin-block: 22px 8px; }
+.gilda-info .gilda-info__content strong { font-weight: 600; }
+.gilda-info .gilda-info__content a {
+	color: var(--gilda-terracotta);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 4px;
+}
+.gilda-info .gilda-info__content a:hover { color: var(--gilda-terracotta-900); }
+
+.gilda-info .gilda-info__content ul,
+.gilda-info .gilda-info__content ol { list-style: none; padding-left: 0; padding-right: 0; }
+.gilda-info .gilda-info__content li { margin: 0 0 10px; padding-left: 26px; position: relative; }
+.gilda-info .gilda-info__content ul > li::before {
+	background: var(--gilda-terracotta);
+	content: "";
+	height: 1px;
+	left: 0;
+	position: absolute;
+	top: .85em;
+	width: 12px;
+}
+.gilda-info .gilda-info__content ol { counter-reset: gilda-info-ol; }
+.gilda-info .gilda-info__content ol > li { counter-increment: gilda-info-ol; padding-left: 34px; }
+.gilda-info .gilda-info__content ol > li::before {
+	color: var(--gilda-terracotta);
+	content: counter(gilda-info-ol, decimal-leading-zero);
+	font: italic 400 15px/1.7 var(--gilda-display);
+	left: 0;
+	position: absolute;
+	top: 0;
+}
+.gilda-info .gilda-info__content blockquote {
+	background: var(--gilda-linen);
+	border-left: 3px solid var(--gilda-terracotta);
+	font-size: 15px;
+	padding: 18px 22px;
+}
+.gilda-info .gilda-info__content blockquote p { margin: 0; }
+
+/* Cuidados: os títulos ganham número (01 Lavar, 02 Secar…) */
+.gilda-info-page--cuidados-com-as-pecas .gilda-info__content { counter-reset: gilda-care; }
+.gilda-info-page--cuidados-com-as-pecas .gilda-info__content > h2 + * { padding-top: 53px; } /* o número fica acima do título */
+.gilda-info-page--cuidados-com-as-pecas .gilda-info__content > h2::before {
+	color: var(--gilda-taupe);
+	content: counter(gilda-care, decimal-leading-zero);
+	counter-increment: gilda-care;
+	display: block;
+	font: italic 300 15px/1 var(--gilda-display);
+	margin-bottom: 10px;
+}
+
+/* Dúvidas: pergunta que abre e fecha */
+.gilda-info .gilda-info__content > .gilda-faq {
+	border-top: 1px solid var(--gi-rule);
+	grid-column: 1 / -1;
+	margin: 0;
+	max-width: none;
+}
+.gilda-info .gilda-info__content > .gilda-faq:last-of-type { border-bottom: 1px solid var(--gi-rule); margin-bottom: 24px; }
+.gilda-faq > summary {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	gap: 24px;
+	justify-content: space-between;
+	list-style: none;
+	padding: 24px 0;
+}
+.gilda-faq > summary::-webkit-details-marker { display: none; }
+.gilda-info .gilda-faq > summary h3 {
+	color: var(--gilda-ink);
+	font: 400 clamp(19px, 2vw, 23px)/1.3 var(--gilda-display);
+	margin: 0;
+	transition: color .2s;
+}
+.gilda-faq > summary:hover h3,
+.gilda-faq[open] > summary h3 { color: var(--gilda-terracotta); }
+.gilda-faq > summary::after {
+	background:
+		linear-gradient(currentColor, currentColor) center / 14px 1px no-repeat,
+		linear-gradient(currentColor, currentColor) center / 1px 14px no-repeat;
+	border: 1px solid var(--gi-rule);
+	border-radius: 50%;
+	color: var(--gilda-terracotta);
+	content: "";
+	flex: 0 0 36px;
+	height: 36px;
+	transition: transform .3s var(--gilda-ease), background-color .2s;
+}
+.gilda-faq[open] > summary::after { transform: rotate(45deg); }
+.gilda-faq > summary:focus-visible { outline: 2px solid var(--gilda-terracotta); outline-offset: 4px; }
+.gilda-faq__answer { max-width: 66ch; padding: 0 60px 26px 0; }
+.gilda-faq__answer > * { margin: 0 0 12px; }
+.gilda-faq[open] .gilda-faq__answer { animation: gilda-faq-in .3s var(--gilda-ease); }
+@keyframes gilda-faq-in { from { opacity: 0; transform: translateY(-4px); } }
+
+/* cartão "Fale com a gente" */
+.gilda-info__contact {
+	background: var(--gilda-linen);
+	padding: clamp(28px, 3vw, 36px);
+	position: sticky;
+	top: calc(var(--gilda-header-h) + 24px);
+}
+.gilda-info__contact > * { margin: 0; }
+.gilda-info__contact-kicker {
+	color: var(--gilda-terracotta);
+	font: 500 11.5px/1 var(--gilda-sans);
+	letter-spacing: .2em;
+	text-transform: uppercase;
+}
+.gilda-info .gilda-info__contact-title {
+	color: var(--gilda-ink);
+	font: italic 300 34px/1.05 var(--gilda-display);
+	margin: 12px 0 12px;
+	text-transform: lowercase;
+}
+.gilda-info__contact-text { color: var(--gilda-ink-soft); font: 400 15px/1.55 var(--gilda-sans); }
+.gilda-info__whatsapp {
+	align-items: center;
+	background: var(--gilda-terracotta);
+	color: var(--gilda-cream);
+	display: flex;
+	font: 500 12.5px/1 var(--gilda-sans);
+	gap: 10px;
+	justify-content: center;
+	letter-spacing: .14em;
+	margin-top: 24px;
+	min-height: 50px;
+	padding: 0 20px;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: background-color .2s;
+}
+.gilda-info__whatsapp svg { flex: 0 0 18px; height: 18px; width: 18px; }
+.gilda-info__whatsapp:hover { background: var(--gilda-terracotta-900); color: var(--gilda-cream); }
+.gilda-info__whatsapp:focus-visible { outline: 2px solid var(--gilda-terracotta); outline-offset: 3px; }
+.gilda-info__phone { color: var(--gilda-ink-soft); font: 400 13px/1 var(--gilda-sans); margin-top: 10px !important; text-align: center; }
+.gilda-info__contact-list { list-style: none; margin-top: 24px !important; padding: 0; }
+.gilda-info__contact-list li {
+	border-top: 1px solid var(--gi-rule);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 14px 0;
+}
+.gilda-info__contact-list li:last-child { padding-bottom: 0; }
+.gilda-info__contact-list span {
+	color: var(--gilda-graphite);
+	font: 500 11px/1 var(--gilda-sans);
+	letter-spacing: .16em;
+	text-transform: uppercase;
+}
+.gilda-info__contact-list a { color: var(--gilda-ink); font: 400 15px/1.4 var(--gilda-sans); overflow-wrap: anywhere; text-decoration: none; }
+.gilda-info__contact-list a:hover { color: var(--gilda-terracotta); text-decoration: underline; text-underline-offset: 4px; }
+
+@media (max-width: 960px) {
+	.gilda-info__body { grid-template-columns: minmax(0, 1fr); }
+	.gilda-info__contact { position: static; }
+}
+@media (max-width: 640px) {
+	.gilda-info .gilda-info__content { display: block; }
+	.gilda-info .gilda-info__content > h2 { margin-right: 0; padding-right: 0; }
+	.gilda-info .gilda-info__content > h2 + *,
+	.gilda-info-page--cuidados-com-as-pecas .gilda-info__content > h2 + * { border-top: 0; margin-top: 0; padding-top: 12px; }
+	.gilda-faq__answer { padding-right: 0; }
+	.gilda-info__nav ul { gap: 0 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.gilda-faq > summary::after,
+	.gilda-faq[open] .gilda-faq__answer { animation: none; transition: none; }
+}
+
+/* ---------- Página do produto: área de compra organizada ----------
+ * 1. linha de estoque (bolinha verde "Em estoque" / terracota "Resta só 1");
+ * 2. quantidade + "Adicionar ao carrinho" na mesma altura, o botão ocupando o resto da linha;
+ * 3. "Compre já" na largura toda, alinhado às mesmas bordas;
+ * 4. frete logo abaixo, com o "Não sei meu CEP" colado no campo. */
+.gilda-pdp-summary .single_variation_wrap { display: flex; flex-direction: column; gap: 14px; }
+.gilda-pdp-summary .woocommerce-variation:empty,
+.gilda-pdp-summary .woocommerce-variation-description:empty,
+.gilda-pdp-summary .woocommerce-variation-price:empty { display: none; }
+.gilda-pdp-summary .woocommerce-variation { display: flex; flex-direction: column; gap: 6px; }
+
+.gilda-pdp-summary .woocommerce-variation-availability .stock,
+.gilda-pdp-summary form.cart:not(.variations_form) .stock {
+	align-items: center;
+	color: var(--gilda-success);
+	display: inline-flex;
+	font: 500 12px/1 var(--gilda-sans);
+	gap: 8px;
+	letter-spacing: .14em;
+	margin: 0 !important;
+	text-transform: uppercase;
+}
+.gilda-pdp-summary .woocommerce-variation-availability .stock::before,
+.gilda-pdp-summary form.cart:not(.variations_form) .stock::before {
+	background: currentColor;
+	border-radius: 50%;
+	content: "";
+	flex: 0 0 7px;
+	height: 7px;
+	width: 7px;
+}
+.gilda-pdp-summary .stock.gilda-low-stock { color: var(--gilda-terracotta); }
+.gilda-pdp-summary .stock.out-of-stock { color: var(--gilda-error); }
+
+.gilda-pdp-summary form.cart:not(.variations_form),
+.gilda-pdp-summary .woocommerce-variation-add-to-cart {
+	align-items: stretch;
+	display: grid !important;
+	gap: 10px !important;
+	grid-template-columns: auto minmax(0, 1fr);
+	width: 100%;
+}
+.gilda-pdp-summary .quantity.gilda-stepper {
+	background: var(--gilda-white);
+	box-sizing: border-box;
+	height: 54px;
+	margin: 0 !important;
+}
+.gilda-pdp-summary .gilda-stepper .qty { background: transparent !important; }
+.gilda-pdp-summary .single_add_to_cart_button,
+.gilda-pdp-summary .gilda-buy-now {
+	align-items: center;
+	box-sizing: border-box;
+	display: flex !important;
+	justify-content: center;
+	justify-self: stretch;
+	letter-spacing: .14em;
+	margin: 0 !important;
+	max-width: none !important;
+	min-height: 54px;
+	width: 100% !important;
+}
+/* o estilo do bloco do WooCommerce põe todo .single_add_to_cart_button na 2ª coluna; o "Compre já" ocupa a linha toda */
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form .variations_button > .gilda-buy-now,
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form form.cart > .gilda-buy-now { grid-column: 1 / -1; justify-self: stretch; }
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form .variations_button > .single_add_to_cart_button,
+.gilda-pdp-summary .wp-block-woocommerce-add-to-cart-form form.cart > .single_add_to_cart_button { justify-self: stretch; white-space: nowrap; }
+@media (max-width: 420px) {
+	.gilda-pdp-summary .gilda-stepper button { width: 38px; }
+	.gilda-pdp-summary .gilda-stepper .qty { width: 34px !important; }
+	.gilda-pdp-summary .single_add_to_cart_button,
+	.gilda-pdp-summary .gilda-buy-now { font-size: 12.5px !important; letter-spacing: .1em; padding-inline: 12px !important; }
+}
+
+/* Tamanho/cor esgotado: o "Avise-me" já é a ação; some a quantidade, os botões apagados e a linha vazia de estoque. */
+.gilda-pdp-summary .single_variation_wrap:has(.gilda-notify:not([hidden])) .woocommerce-variation-add-to-cart,
+.gilda-pdp-summary .single_variation_wrap:has(.gilda-notify:not([hidden])) .woocommerce-variation { display: none !important; }
+.gilda-pdp-summary .single_variation_wrap .gilda-notify { margin: 0; }
+/* sem a margem de baixo padrão do formulário do WooCommerce: o frete vem logo depois, no mesmo ritmo */
+.gilda-pdp-summary form.cart { margin-bottom: 0 !important; }
+
+/* frete: o link fica logo abaixo do campo, na coluna dele */
+.single-product .gilda-shipping { gap: 12px; margin-top: 6px; padding-top: 22px; }
+.single-product .gilda-shipping__row { row-gap: 8px; }
+.gilda-shipping__row .gilda-shipping__help {
+	align-self: start;
+	color: var(--gilda-ink-soft);
+	font-size: 12.5px;
+	grid-column: 1;
+	justify-self: start;
+	text-underline-offset: 3px;
+}
+.gilda-shipping__row .gilda-shipping__help:hover { color: var(--gilda-terracotta); }
+
+/* ---------- Filtro de cor: paleta (inc/filters.php) ----------
+ * Bolinhas de cor com o nome embaixo, sem checkbox à vista. Escolhida: anel terracota em volta e um
+ * "visto" dentro (claro ou escuro conforme a cor). Cor sem peças: apagada, com um risco. */
+.gilda-palette {
+	display: grid;
+	gap: 18px 6px;
+	grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+	padding: 6px 0 4px;
+}
+.gilda-palette__item {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+	position: relative;
+	text-align: center;
+}
+.gilda-palette__item input {
+	height: 1px;
+	margin: 0;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+}
+.gilda-palette__swatch {
+	background: var(--swatch, var(--gilda-sand));
+	border-radius: 50%;
+	box-shadow: inset 0 0 0 1px rgba(36, 26, 22, .14), 0 0 0 0 var(--gilda-cream), 0 0 0 0 var(--gilda-terracotta);
+	display: grid;
+	height: 38px;
+	place-items: center;
+	position: relative;
+	transition: transform .25s var(--gilda-ease), box-shadow .25s var(--gilda-ease);
+	width: 38px;
+}
+/* "visto" desenhado em CSS, aparece quando escolhida */
+.gilda-palette__swatch::after {
+	border: solid var(--gilda-cream);
+	border-width: 0 2px 2px 0;
+	content: "";
+	height: 11px;
+	margin-top: -3px;
+	opacity: 0;
+	transform: rotate(45deg) scale(.4);
+	transition: opacity .2s, transform .25s var(--gilda-ease);
+	width: 6px;
+}
+.gilda-palette__item.is-light .gilda-palette__swatch::after { border-color: var(--gilda-ink); }
+.gilda-palette__name {
+	color: var(--gilda-ink-soft);
+	font: 400 12px/1.25 var(--gilda-sans);
+	letter-spacing: .02em;
+	transition: color .2s;
+}
+
+.gilda-palette__item:hover .gilda-palette__swatch { transform: scale(1.08); }
+.gilda-palette__item:hover .gilda-palette__name { color: var(--gilda-ink); }
+
+.gilda-palette__item:has(input:checked) .gilda-palette__swatch {
+	box-shadow: inset 0 0 0 1px rgba(36, 26, 22, .14), 0 0 0 3px var(--gilda-cream), 0 0 0 4.5px var(--gilda-terracotta);
+	transform: scale(1);
+}
+.gilda-palette__item:has(input:checked) .gilda-palette__swatch::after { opacity: 1; transform: rotate(45deg) scale(1); }
+.gilda-palette__item:has(input:checked) .gilda-palette__name { color: var(--gilda-terracotta); font-weight: 500; }
+
+.gilda-palette__item:has(input:focus-visible) .gilda-palette__swatch { outline: 2px solid var(--gilda-terracotta); outline-offset: 6px; }
+
+.gilda-palette__item:has(input:disabled) { cursor: not-allowed; }
+.gilda-palette__item:has(input:disabled) .gilda-palette__swatch { opacity: .35; transform: none; }
+.gilda-palette__item:has(input:disabled) .gilda-palette__swatch::before {
+	background: var(--gilda-ink-soft);
+	content: "";
+	height: 1.5px;
+	position: absolute;
+	transform: rotate(-45deg);
+	width: 120%;
+}
+.gilda-palette__item:has(input:disabled) .gilda-palette__name { color: var(--gilda-taupe); }
+
+@media (max-width: 960px) {
+	.gilda-palette { gap: 20px 8px; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+	.gilda-palette__swatch { height: 44px; width: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.gilda-palette__swatch,
+	.gilda-palette__swatch::after { transition: none; }
 }
 
 /* Tamanho esgotado na cor escolhida: riscado e apagado, mas clicável (abre o "Avise-me"). gilda.js → initSizeButtons */

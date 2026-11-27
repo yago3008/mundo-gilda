@@ -187,12 +187,14 @@ function gilda_shortcode_shipping_calculator() {
 			<label class="screen-reader-text" for="gilda-cep"><?php esc_html_e( 'CEP', 'gilda' ); ?></label>
 			<input id="gilda-cep" class="gilda-input" type="text" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="<?php esc_attr_e( 'CEP', 'gilda' ); ?>" maxlength="9" pattern="\d{5}-?\d{3}" aria-describedby="gilda-cep-feedback" />
 			<button type="submit" class="gilda-btn gilda-btn--secondary"><?php esc_html_e( 'Calcular', 'gilda' ); ?></button>
+			<a class="gilda-shipping__help" href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Não sei meu CEP', 'gilda' ); ?></a>
 		</div>
-		<a class="gilda-shipping__help" href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Não sei meu CEP', 'gilda' ); ?></a>
 		<div id="gilda-cep-feedback" class="gilda-shipping__feedback" aria-live="polite"></div>
 	</form>
 	<?php
-	return (string) ob_get_clean();
+	// Sem quebras de linha entre as tags: o template passa o HTML pelo wpautop, que enfiava <br> e <p>
+	// (vazios) no meio do formulário e afastava o "Não sei meu CEP" do campo.
+	return (string) preg_replace( '/>\s+</', '><', trim( (string) ob_get_clean() ) );
 }
 add_shortcode( 'gilda_shipping_calculator', 'gilda_shortcode_shipping_calculator' );
 

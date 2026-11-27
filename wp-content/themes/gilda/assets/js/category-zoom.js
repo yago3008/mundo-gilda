@@ -3,7 +3,8 @@
  * (CAMISAS, CALÇAS…) como no mergulho do "GILDA;" (assets/js/transitions.js) e cai no catálogo.
  *
  * 1. abertura (aqui): o card vira marrom com o nome vazado (a foto do card some das letras logo no
- *    começo e elas ficam creme, a cor da página), cresce até ocupar a tela e o nome vai para o centro;
+ *    começo e elas mostram o próprio catálogo, carregado num iframe por baixo desde que o mouse/dedo
+ *    chegou no card), cresce até ocupar a tela e o nome vai para o centro;
  * 2. navega para o link do card. Enquanto o catálogo carrega, o navegador segura esse último quadro;
  * 3. mergulho (no catálogo, assets/js/category-zoom-arrive.js): a mesma tela marrom com o nome aparece
  *    já na primeira pintura e o zoom entra numa letra revelando o próprio catálogo.
@@ -31,18 +32,106 @@
 	const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 	let overlay = null;
+	let preview = null; // catálogo carregado por baixo: { href, frame, ready, loaded }
+	const dropPreview = () => {
+		if (preview) preview.frame.remove();
+		preview = null;
+	};
 	const cleanup = () => {
 		if (overlay) overlay.remove();
 		overlay = null;
+		dropPreview();
 	};
 	// Voltar pelo navegador (bfcache) não pode mostrar a tela da transição.
 	window.addEventListener('pageshow', (e) => { if (e.persisted) cleanup(); });
 
-	// Adianta o carregamento do catálogo quando a pessoa chega perto do card.
+	/**
+	 * Carrega o catálogo do card num iframe invisível, para as letras já mostrarem a página de destino
+	 * durante a abertura, igual ao mergulho que continua lá (sem a tela creme piscando no meio).
+	 * O HTML vem por fetch (catálogo em cache) e entra sem scripts nem <noscript>: nada de pixel, banner
+	 * ou visita contada em dobro. As fotos carregam já (não "lazy"), e o navegador guarda para a página real.
+	 */
+	// HTML dos catálogos já buscado (href => Promise<texto>): no celular não há "mouse em cima" antes do toque.
+	const pages = new Map();
+	const fetchPage = (href) => {
+		if (!pages.has(href)) {
+			const req = fetch(href, { credentials: 'same-origin', priority: 'low' })
+				.then((res) => (res.ok ? res.text() : Promise.reject(new Error(String(res.status)))));
+			req.catch(() => pages.delete(href));
+			pages.set(href, req);
+		}
+		return pages.get(href);
+	};
+	// Quando os cards aparecem na tela, já busca o HTML de cada catálogo (leve, vem do cache do catálogo).
+	if ('IntersectionObserver' in window && window.fetch) {
+		const io = new IntersectionObserver((entries) => {
+			if (!entries.some((en) => en.isIntersecting)) return;
+			io.disconnect();
+			document.querySelectorAll('.gilda-category a[href]').forEach((a) => {
+				if (a.origin === window.location.origin) {
+					fetchPage(a.href);
+					prefetch(a.href);
+				}
+			});
+		}, { rootMargin: '200px 0px' });
+		document.querySelectorAll('.gilda-category').forEach((card) => io.observe(card));
+	}
+
+	const loadPreview = (href) => {
+		if (preview && preview.href === href) return preview;
+		if (overlay || !window.fetch || !window.DOMParser) return preview; // já animando: não troca
+		dropPreview();
+		const frame = document.createElement('iframe');
+		frame.className = 'gilda-czoom__page';
+		frame.setAttribute('sandbox', 'allow-same-origin');
+		frame.setAttribute('aria-hidden', 'true');
+		frame.setAttribute('tabindex', '-1');
+		frame.setAttribute('title', '');
+		document.body.appendChild(frame);
+		const p = { href, frame, ready: false, loaded: null };
+		p.loaded = fetchPage(href)
+			.then((html) => {
+				if (preview !== p) return Promise.reject(new Error('trocou'));
+				const doc = new DOMParser().parseFromString(html, 'text/html');
+				doc.querySelectorAll('script, noscript, iframe, link[rel="modulepreload"], link[as="script"]').forEach((n) => n.remove());
+				doc.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+					img.setAttribute('loading', 'eager');
+					const sizes = img.getAttribute('sizes');
+					if (sizes) img.setAttribute('sizes', sizes.replace(/^\s*auto\s*,\s*/, ''));
+				});
+				// a página real marca <html class="js"> (gilda.js); sem isso o layout muda (filtros no celular)
+				doc.documentElement.classList.add('js');
+				const base = doc.createElement('base');
+				base.href = href;
+				doc.head.prepend(base);
+				return new Promise((resolve) => {
+					frame.addEventListener('load', resolve, { once: true });
+					frame.srcdoc = `<!DOCTYPE html>${doc.documentElement.outerHTML}`;
+				});
+			})
+			.then(() => {
+				p.ready = true;
+				return true;
+			}, () => false); // falhou: as letras ficam creme, como antes
+		preview = p;
+		return p;
+	};
+
+	// Adianta o carregamento do catálogo quando a pessoa chega perto do card. Com Speculation Rules
+	// (Chrome/Edge), a navegação usa a resposta já buscada: o clique não espera o servidor (antes eram
+	// ~0,5 s parados no fim da abertura). Sem suporte, fica o <link rel=prefetch> comum.
 	const prefetched = new Set();
+	const canSpeculate = !!(window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules'));
 	const prefetch = (href) => {
 		if (prefetched.has(href)) return;
 		prefetched.add(href);
+		if (canSpeculate) {
+			const rules = document.createElement('script');
+			rules.type = 'speculationrules';
+			rules.textContent = JSON.stringify({ prefetch: [{ source: 'list', urls: [href] }] });
+			document.head.appendChild(rules);
+			return;
+		}
 		const link = document.createElement('link');
 		link.rel = 'prefetch';
 		link.href = href;
@@ -53,7 +142,25 @@
 	 * Ponto mais "grosso" de uma letra (o mais longe da borda), relativo à posição da caneta
 	 * (início da letra, na linha de base). O zoom entra por ali sem cair num vão da letra.
 	 */
+	// Cópia da foto do card já decodificada (no mouse em cima): o clique não espera decodificar.
+	const decodedPics = new Map();
+	const predecode = (img) => {
+		const src = img && (img.currentSrc || img.src);
+		if (!src || decodedPics.has(src)) return;
+		const pic = new Image();
+		pic.decoding = 'sync';
+		pic.src = src;
+		decodedPics.set(src, pic);
+		if (pic.decode) pic.decode().catch(() => {});
+	};
+
+	const thickCache = new Map();
 	function thickestPoint(char, style, size) {
+		const key = `${char}|${style.fontStyle}|${style.fontWeight}|${style.fontFamily}|${size}`;
+		if (!thickCache.has(key)) thickCache.set(key, measureThickest(char, style, size));
+		return thickCache.get(key);
+	}
+	function measureThickest(char, style, size) {
 		const canvas = document.createElement('canvas');
 		const pad = Math.ceil(size * 0.4);
 		canvas.width = Math.ceil(size * 1.6) + pad * 2;
@@ -97,7 +204,7 @@
 	 *                          go: o que fazer no fim (navegar, enviar o formulário).
 	 */
 	function play(label, opts) {
-		const { card = null, img = null, zoomInto = 'middle', requireLogin = false, go } = opts;
+		const { card = null, img = null, page = null, zoomInto = 'middle', requireLogin = false, go } = opts;
 		const text = (label.textContent || '').trim();
 		if (!text || (card && !img)) return false;
 
@@ -120,10 +227,11 @@
 		// Sem card (login), as letras mostram a própria página por baixo.
 		const photo = document.createElement('div');
 		photo.className = 'gilda-czoom__photo';
-		const pic = document.createElement('img');
+		const src = img ? img.currentSrc || img.src : '';
+		const pic = (src && decodedPics.get(src)) || document.createElement('img');
 		const shade = document.createElement('div');
 		if (img) {
-			pic.src = img.currentSrc || img.src;
+			if (pic.src !== src) pic.src = src;
 			pic.alt = '';
 			pic.style.objectPosition = getComputedStyle(img).objectPosition;
 			photo.appendChild(pic);
@@ -153,6 +261,19 @@
 		if (img) overlay.append(photo);
 		overlay.append(svg);
 		document.body.appendChild(overlay);
+
+		// Catálogo por baixo: a área do card mostra o iframe (recortado no tamanho do card) e a foto
+		// some revelando ele. Se ainda não carregou, as letras ficam creme até ele chegar.
+		const fw = window.innerWidth;
+		const seeThrough = () => {
+			if (!page || !overlay) return;
+			page.frame.classList.add('is-playing');
+			photo.classList.add('is-see-through');
+		};
+		if (page) {
+			if (page.ready) seeThrough();
+			else page.loaded.then((ok) => { if (ok) seeThrough(); });
+		}
 
 		// ---- tamanho final do nome: ~86% da largura, sem passar de ~40% da altura
 		const probe = 100;
@@ -191,29 +312,38 @@
 		const labelCenter = { x: labelBox.left + labelBox.width / 2, y: labelBox.top + labelBox.height / 2 };
 		const startScale = labelSize / size;
 
-		const setBox = (b) => {
-			Object.assign(photo.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` });
+		// A foto não muda de tamanho de verdade (cada tamanho novo obrigava o navegador a decodificar a imagem
+		// de novo, 30-50 ms por quadro: era a travada no começo). Ela fica no tamanho do card e só cresce por
+		// transform; a camada da foto ocupa a tela e é recortada (clip-path) no retângulo que cresce.
+		const from = { x: cardBox.left, y: cardBox.top, w: cardBox.width, h: cardBox.height };
+		const to = { x: 0, y: 0, w: vw, h: vh };
+		Object.assign(photo.style, { left: '0px', top: '0px', width: `${vw}px`, height: `${vh}px` });
+		Object.assign(pic.style, { left: `${from.x}px`, top: `${from.y}px`, width: `${from.w}px`, height: `${from.h}px` });
+		const setBox = (b, t) => {
+			photo.style.clipPath = `inset(${b.y}px ${vw - b.x - b.w}px ${vh - b.y - b.h}px ${b.x}px)`;
+			const k = Math.max(b.w / from.w, b.h / from.h) * lerp(1, 1.2, t);
+			const dx = b.x + b.w / 2 - (from.x + from.w / 2);
+			const dy = b.y + b.h / 2 - (from.y + from.h / 2);
+			pic.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
 			cover.setAttribute('x', b.x);
 			cover.setAttribute('y', b.y);
 			cover.setAttribute('width', b.w);
 			cover.setAttribute('height', b.h);
+			if (page) page.frame.style.clipPath = `inset(${b.y}px ${fw - b.x - b.w}px ${vh - b.y - b.h}px ${b.x}px)`;
 		};
-
-		const from = { x: cardBox.left, y: cardBox.top, w: cardBox.width, h: cardBox.height };
-		const to = { x: 0, y: 0, w: vw, h: vh };
 
 		const open = (p) => {
 			const t = easeInOut(p);
-			setBox({ x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t), w: lerp(from.w, to.w, t), h: lerp(from.h, to.h, t) });
+			setBox({ x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t), w: lerp(from.w, to.w, t), h: lerp(from.h, to.h, t) }, t);
 			cover.style.opacity = smooth(clamp(p / 0.35));
 			const cx = lerp(labelCenter.x, center.x, t);
 			const cy = lerp(labelCenter.y, center.y, t);
 			const s = lerp(startScale, 1, t);
 			zoom.setAttribute('transform', `translate(${cx} ${cy}) scale(${s}) translate(${-center.x} ${-center.y})`);
-			pic.style.transform = `scale(${lerp(1, 1.2, t)})`;
-			// A foto do card some logo no começo: as letras ficam na cor da página (creme) sobre o marrom,
-			// iguais às do catálogo quando ele abre por baixo (category-zoom-arrive.js).
-			const fade = 1 - smooth(clamp(p / 0.3));
+			// A foto do card some logo no começo: as letras passam a mostrar o catálogo (iframe por baixo),
+			// iguais às do mergulho que continua lá (category-zoom-arrive.js).
+			// Começa a sumir quando o marrom já cobriu o card (senão o catálogo aparece "fantasma" no card todo).
+			const fade = 1 - smooth(clamp((p - 0.28) / 0.27));
 			pic.style.opacity = fade;
 			shade.style.opacity = shadeFrom * fade;
 		};
@@ -240,8 +370,20 @@
 			if (finished || !overlay) return;
 			finished = true;
 			open(1);
-			handOff();
-			go();
+			const leave = () => {
+				handOff();
+				go();
+			};
+			if (!page || page.ready) {
+				leave();
+				return;
+			}
+			// O catálogo do iframe ainda não chegou: espera um pouco (a navegação ia esperar parte disso).
+			// Se chegar, deixa o creme sair das letras antes de ir; se não, vai assim mesmo.
+			let gone = false;
+			const once = (ms) => { setTimeout(() => { if (!gone) { gone = true; leave(); } }, ms); };
+			page.loaded.then((ok) => once(ok ? 260 : 0));
+			once(600);
 		};
 		const frame = (now) => {
 			if (finished || !overlay) return;
@@ -257,10 +399,26 @@
 		return true;
 	}
 
-	document.addEventListener('pointerover', (e) => {
+	// Mouse chegando no card, toque começando ou foco pelo teclado: já busca o catálogo e monta ele por baixo.
+	const warm = (e) => {
 		const link = e.target.closest && e.target.closest('.gilda-category a[href]');
-		if (link) prefetch(link.href);
-	});
+		if (!link) return;
+		prefetch(link.href);
+		loadPreview(link.href);
+		const card = link.closest('.gilda-category');
+		predecode(card && card.querySelector('img'));
+		// e já mede por onde o zoom vai entrar (o clique começa a animar na hora)
+		const text = (link.textContent || '').trim();
+		if (text && !overlay) {
+			const st = getComputedStyle(link);
+			const n = text.length, mid = Math.floor(n / 2);
+			const run = () => [mid - 1, mid, mid + 1].forEach((i) => { const ch = text.charAt(i); if (ch && ch.trim()) thickestPoint(ch, st, 120); });
+			(window.requestIdleCallback || ((f) => setTimeout(f, 1)))(run);
+		}
+	};
+	document.addEventListener('pointerover', warm);
+	document.addEventListener('pointerdown', warm);
+	document.addEventListener('focusin', warm);
 
 	document.addEventListener('click', (e) => {
 		const link = e.target.closest && e.target.closest('.gilda-category a[href]');
@@ -272,7 +430,7 @@
 		let ok = false;
 		try {
 			const card = link.closest('.gilda-category');
-			ok = play(link, { card, img: card && card.querySelector('img'), go: () => window.location.assign(link.href) });
+			ok = play(link, { card, img: card && card.querySelector('img'), page: loadPreview(link.href), go: () => window.location.assign(link.href) });
 		} catch (err) {
 			cleanup();
 		}
