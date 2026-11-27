@@ -98,19 +98,6 @@ function gilda_product_type_url( $slug ) {
 }
 
 /**
- * Product slugs linked to each chapter in the Livro GILDA page.
- *
- * @return array<string,string[]>
- */
-function gilda_chapter_product_slugs() {
-	return array(
-		'capitulo-1' => array( 'camisa-casulo' ),
-		'capitulo-2' => array( 'bermuda-envolto', 'lenco-manaca' ),
-		'capitulo-3' => array( 'camisa-grao', 'bermuda-envolto', 'camisa-casulo' ),
-	);
-}
-
-/**
  * URL of the catalog filtered by a chapter.
  *
  * @param string $chapter Chapter slug.

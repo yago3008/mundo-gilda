@@ -203,7 +203,8 @@ function gilda_render_logo( $content, $block ) {
 	if ( false === strpos( $class, 'gilda-logo' ) ) {
 		return $content;
 	}
-	$id = gilda_image( 'logo' );
+	// Logo da tela "Dados da loja" (painel); sem ele, o importado do site antigo.
+	$id = function_exists( 'gilda_store_logo_id' ) ? gilda_store_logo_id() : gilda_image( 'logo' );
 	if ( ! $id ) {
 		return $content;
 	}

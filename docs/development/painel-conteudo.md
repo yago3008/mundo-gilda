@@ -69,6 +69,8 @@ Hoje existem **três listas de capítulos separadas**, que não conversam entre 
 
 **Proposta:** tipo de conteúdo **Capítulo** (`gilda_capitulo`, num mu-plugin), tela de edição em português com seletores de fotos e arrastar para ordenar, e as listas A/B/C lendo dele. Um script migra os 3 capítulos de hoje (a página deve ficar igual depois).
 
+**Feito (fase 2):** `MU/gilda-painel/chapters.php` (tipo de conteúdo e leitura `gilda_chapters()`), `chapters-admin.php` (tela de edição, campo "Capítulo" na peça) e `scripts/import-chapters.php` (semente dos 3 capítulos, chamada pelo `setup.sh`). As listas A/B/C leem de `gilda_book_chapters()` (`T/inc/book-chapters.php`); a página da peça mostra o capítulo (`[gilda_product_chapter]`). Guia das donas: `docs/painel-gilda.md`.
+
 ---
 
 ## 2. Peças — hoje **parcial**
@@ -186,6 +188,8 @@ O mesmo dado está escrito em vários lugares, em formatos diferentes:
 
 **Proposta:** uma tela **"Dados da loja"** (razão social, CNPJ, endereço, CEP, cidade/UF, telefone, WhatsApp, e-mail, Instagram) e todos esses lugares passam a ler dela (rodapé, textos legais via marcadores, remetente dos Correios, SEO). Copyright com ano automático.
 
+**Feito (fase 1):** tela "Dados da loja" (`MU/gilda-painel/store-data.php`, opção `gilda_store`, função `gilda_store()`), com o logo. Leem dela: o rodapé (`[gilda_footer_social]`, `[gilda_footer_contact]`, `[gilda_footer_legal]`, `[gilda_copyright]` com ano automático), o @ da faixa de avisos e o logo do cabeçalho/rodapé. **Ainda não leem:** textos legais, remetente dos Correios / endereço de origem do WooCommerce e SEO.
+
 ---
 
 ## 11. Menus — hoje **fixo** e inconsistentes
@@ -240,7 +244,9 @@ Painel GILDA;
 └─ Páginas                      (políticas, trocas, FAQ)
 ```
 
-Plugins, temas, configurações técnicas e o editor de blocos ficam escondidos para esse perfil. Por que dentro do WordPress e não um site administrativo à parte: login, permissões, envio de fotos, estoque e pedidos já existem e são seguros; um painel separado teria que refazer tudo isso.
+Plugins, temas, configurações técnicas e o editor de blocos ficam escondidos para esse perfil.
+
+**Feito (fase 1):** perfil `gilda_dona` ("Dona da loja", `MU/gilda-painel/role.php`), com o menu Painel GILDA; · Pedidos (e Clientes) · Peças · Capítulos · Categorias, Cores e Tamanhos · Cupons · Dados da loja · Páginas. Os itens de Página inicial, Quem Cria, Menus e Textos do site entram com as fases 4 e 5. Por que dentro do WordPress e não um site administrativo à parte: login, permissões, envio de fotos, estoque e pedidos já existem e são seguros; um painel separado teria que refazer tudo isso.
 
 ## 15. Fases sugeridas
 

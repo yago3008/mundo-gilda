@@ -22,13 +22,15 @@ defined( 'ABSPATH' ) || exit;
  * @return string
  */
 function gilda_shortcode_announcement() {
-	$messages = apply_filters(
+	$instagram = gilda_store_value( 'instagram', 'gildapontoevirgula' );
+	$instagram = function_exists( 'gilda_store_instagram_handle' ) ? gilda_store_instagram_handle( $instagram ) : ltrim( $instagram, '@' );
+	$messages  = apply_filters(
 		'gilda_announcement_messages',
 		array(
 			__( '10% OFF na primeira compra com o cupom primeiracompra', 'gilda' ),
 			__( 'Alfaiataria criativa — feito à mão em Curitiba/PR', 'gilda' ),
 			__( 'Novas peças a cada capítulo', 'gilda' ),
-			__( '@gildapontoevirgula', 'gilda' ),
+			$instagram ? '@' . $instagram : '', // Dados da loja
 		)
 	);
 	$messages = array_values( array_filter( array_map( 'trim', (array) $messages ) ) );
@@ -209,3 +211,101 @@ function gilda_shortcode_result_count() {
 	);
 }
 add_shortcode( 'gilda_result_count', 'gilda_shortcode_result_count' );
+
+/**
+ * Um dado da tela "Dados da loja" do painel (mu-plugin gilda-painel), com reserva se o plugin faltar.
+ *
+ * @param string $field    Campo (razao_social, cnpj, endereco, cep, cidade, uf, telefone, whatsapp, email, instagram).
+ * @param string $fallback Valor sem o plugin.
+ * @return string
+ */
+function gilda_store_value( $field, $fallback = '' ) {
+	return function_exists( 'gilda_store' ) ? trim( (string) gilda_store( $field ) ) : $fallback;
+}
+
+/**
+ * [gilda_footer_social] — Instagram e WhatsApp do rodapé (Dados da loja).
+ *
+ * @return string
+ */
+function gilda_shortcode_footer_social() {
+	$items     = '';
+	$instagram = function_exists( 'gilda_store_instagram_url' ) ? gilda_store_instagram_url() : 'https://www.instagram.com/gildapontoevirgula/';
+	$handle    = function_exists( 'gilda_store_instagram_handle' ) ? gilda_store_instagram_handle( gilda_store_value( 'instagram' ) ) : 'gildapontoevirgula';
+	$whatsapp  = function_exists( 'gilda_store_whatsapp_url' ) ? gilda_store_whatsapp_url() : 'https://wa.me/5541991008303';
+	if ( $instagram ) {
+		$items .= sprintf(
+			'<li><a href="%1$s" target="_blank" rel="noreferrer noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg><span>@%2$s</span></a></li>',
+			esc_url( $instagram ),
+			esc_html( $handle )
+		);
+	}
+	if ( $whatsapp ) {
+		$items .= sprintf(
+			'<li><a href="%1$s" target="_blank" rel="noreferrer noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7L4 20z"></path><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1-1.2 1.8.8c-.2 1-1.1 1.6-2.1 1.5-3.2-.4-5.8-3-6.2-6.2-.1-1 .5-1.9 1.5-2.1l.8 1.8L9 9.5z"></path></svg><span>%2$s</span></a></li>',
+			esc_url( $whatsapp ),
+			esc_html__( 'WhatsApp', 'gilda' )
+		);
+	}
+	return $items ? '<ul class="gilda-footer__social-list">' . $items . '</ul>' : '';
+}
+add_shortcode( 'gilda_footer_social', 'gilda_shortcode_footer_social' );
+
+/**
+ * [gilda_footer_contact] — telefone e e-mail do rodapé (Dados da loja).
+ *
+ * @return string
+ */
+function gilda_shortcode_footer_contact() {
+	$phone     = gilda_store_value( 'telefone', '41.991008303' );
+	$phone_url = function_exists( 'gilda_store_phone_url' ) ? gilda_store_phone_url() : 'tel:+5541991008303';
+	$email     = gilda_store_value( 'email', 'mundogilda@gmail.com' );
+	$items     = '';
+	if ( $phone ) {
+		$items .= sprintf( '<li><a href="%1$s">%2$s</a></li>', esc_url( $phone_url, array( 'tel' ) ), esc_html( $phone ) );
+	}
+	if ( $email ) {
+		$items .= sprintf( '<li><a href="%1$s">%2$s</a></li>', esc_url( 'mailto:' . $email, array( 'mailto' ) ), esc_html( $email ) );
+	}
+	return $items ? '<ul class="wp-block-list gilda-footer__links">' . $items . '</ul>' : '';
+}
+add_shortcode( 'gilda_footer_contact', 'gilda_shortcode_footer_contact' );
+
+/**
+ * [gilda_footer_legal] — razão social, CNPJ, endereço, cidade/UF e CEP (Dados da loja).
+ *
+ * @return string
+ */
+function gilda_shortcode_footer_legal() {
+	$sep   = '&nbsp;·&nbsp;';
+	$line1 = array_filter(
+		array(
+			esc_html( gilda_store_value( 'razao_social', 'GILDA ALFAIATARIA LTDA' ) ),
+			( '' !== gilda_store_value( 'cnpj', '45.822.638/0001-09' ) ) ? esc_html__( 'CNPJ', 'gilda' ) . ' ' . esc_html( gilda_store_value( 'cnpj', '45.822.638/0001-09' ) ) : '',
+		)
+	);
+	$city  = implode( '/', array_filter( array( gilda_store_value( 'cidade', 'Curitiba' ), gilda_store_value( 'uf', 'PR' ) ) ) );
+	$line2 = array_filter(
+		array(
+			esc_html( implode( ', ', array_filter( array( gilda_store_value( 'endereco' ), $city ) ) ) ),
+			( '' !== gilda_store_value( 'cep', '82.015-384' ) ) ? esc_html__( 'CEP', 'gilda' ) . ' ' . esc_html( gilda_store_value( 'cep', '82.015-384' ) ) : '',
+		)
+	);
+	$lines = array_filter( array( implode( $sep, $line1 ), implode( $sep, $line2 ) ) );
+	return $lines ? '<p class="gilda-footer__legal wp-block-paragraph">' . implode( '<br>', $lines ) . '</p>' : '';
+}
+add_shortcode( 'gilda_footer_legal', 'gilda_shortcode_footer_legal' );
+
+/**
+ * [gilda_copyright] — "© ano by GILDA;", com o ano atual.
+ *
+ * @return string
+ */
+function gilda_shortcode_copyright() {
+	return sprintf(
+		'<p class="gilda-footer__copyright wp-block-paragraph">© %1$s by GILDA;&nbsp;·&nbsp;%2$s</p>',
+		esc_html( wp_date( 'Y' ) ),
+		esc_html__( 'Todos os direitos reservados.', 'gilda' )
+	);
+}
+add_shortcode( 'gilda_copyright', 'gilda_shortcode_copyright' );
