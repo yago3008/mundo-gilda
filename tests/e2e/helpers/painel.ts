@@ -68,3 +68,55 @@ export async function runCron(page: Page): Promise<void> {
   // Sem parâmetro: o wp-cron.php pega a trava e roda o que estiver vencido (inclui a fila do WooCommerce).
   await page.request.get('/wp-cron.php').catch(() => undefined);
 }
+
+/** Cria e publica um capítulo pela tela do painel (7 fotos: 1 principal + 6). Devolve ID e número. */
+export async function createChapter(page: Page, data: { name: string; photos: number[]; products?: string[] }): Promise<{ id: number; number: number }> {
+  await page.goto('/wp-admin/post-new.php?post_type=gilda_capitulo');
+  const number = Number((await page.locator('.gilda-chapter-number strong').innerText()).match(/\d+/)![0]);
+  await page.locator('#title').fill(data.name);
+  await page.locator('.gilda-paragraph textarea').first().fill(`Texto do ${data.name}.`);
+  await pickPhotos(page, page.locator('.gilda-opening__main [data-gilda-photos]'), [data.photos[0]]);
+  await pickPhotos(page, page.locator('.gilda-opening__others [data-gilda-photos]'), data.photos.slice(1, 7));
+  await pickPhotos(page, page.locator('#gilda-chapter-gallery [data-gilda-photos]'), [data.photos[1]]);
+  for (const product of data.products ?? []) {
+    await page.locator('.gilda-products label', { hasText: product }).locator('input').check();
+  }
+  await expect(page.locator('#publish')).toBeEnabled();
+  await page.locator('#publish').click();
+  await expect(page.locator('#message')).toContainText('publicado');
+  return { id: Number(new URL(page.url()).searchParams.get('post')), number };
+}
+
+/** Tira o capítulo do site (rascunho) ou publica de novo, pela tela do capítulo. */
+export async function setChapterLive(page: Page, id: number, live: boolean): Promise<void> {
+  await page.goto(`/wp-admin/post.php?post=${id}&action=edit`);
+  if (live) {
+    await page.locator('#publish').click();
+    await expect(page.locator('#message')).toContainText('publicado');
+  } else {
+    await page.getByRole('button', { name: 'Tirar do site' }).click();
+    await expect(page.locator('.notice-info')).toContainText('tirado do site');
+  }
+}
+
+/** Apaga o capítulo de vez (lixeira → excluir permanentemente). */
+export async function deleteChapter(page: Page, id: number): Promise<void> {
+  await page.goto(`/wp-admin/post.php?post=${id}&action=edit`);
+  if (await page.locator('#delete-action a').isVisible()) {
+    await page.locator('#delete-action a').click();
+    await page.waitForURL(/edit\.php/);
+  }
+  await page.goto('/wp-admin/edit.php?post_status=trash&post_type=gilda_capitulo');
+  const row = page.locator(`#post-${id}`);
+  if (await row.count()) {
+    await row.hover();
+    await row.locator('.row-actions .delete a').click();
+    await expect(page.locator(`#post-${id}`)).toHaveCount(0);
+  }
+}
+
+/** Recusa o banner de cookies, se estiver aberto. */
+export async function refuseCookies(page: Page): Promise<void> {
+  const refuse = page.getByRole('dialog', { name: /cookies/i }).getByRole('button', { name: 'Recusar' });
+  if (await refuse.isVisible().catch(() => false)) await refuse.click();
+}

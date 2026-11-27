@@ -78,6 +78,12 @@
 			placeholder: 'gilda-photo gilda-photo--placeholder',
 			update: function () { refresh( $box ); },
 		} );
+		// As fotos ficam lado a lado (grade/flex), mas o jQuery UI só reconhece "lado a lado" por float ou
+		// display inline: sem isto ele compara só o movimento vertical e arrastar para o lado não reordena.
+		var sortable = $box.find( '.gilda-photos__list' ).sortable( 'instance' );
+		if ( sortable ) {
+			sortable._isFloating = function () { return true; };
+		}
 
 		$box.on( 'click', '.gilda-photo__remove', function () {
 			$( this ).closest( '.gilda-photo' ).remove();
